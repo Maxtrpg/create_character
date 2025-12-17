@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>馬茲提卡：傳奇起源 - 完美預覽版</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* --- 0. 視覺核心 (Aztec Dark Fantasy) --- */
+        :root {
+            --bg-dark: #0a0a0a;
+            --panel-bg: rgba(15, 15, 15, 0.96);
+            --gold-primary: #d4af37;
+            --gold-orange: #FFEA80; 
+            --gold-dim: #8a6d1c;
+            --gold-glow: rgba(255, 234, 128, 0.8);
+            --jade: #00bfa5;
+            --jade-dark: #00695c;
+            --blood: #b71c1c;
+            --font-title: 'Cinzel', serif;
+            --font-body: 'Noto Sans TC', sans-serif;
+        }
+
+        * { box-sizing: border-box; outline: none; user-select: none; }
+        
+        body {
+            background-color: var(--bg-dark);
+            /* 若沒有圖片，會使用漸層黑底 */
+            background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('images/texture_stone.webp');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #d0d0d0;
+            font-family: var(--font-body);
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        /* --- Header --- */
+        header {
+            text-align: center;
+            padding: 10px 0;
+            background: linear-gradient(to bottom, #000, transparent);
+            border-bottom: 2px solid var(--gold-dim);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        h1 {
+            margin: 0;
+            font-family: var(--font-title);
+            color: var(--gold-primary);
+            letter-spacing: 6px;
+            text-shadow: 0 0 20px var(--gold-glow), 0 2px 0px #000;
+            font-size: 2em;
+            text-transform: uppercase;
+        }
+
+        /* --- Container --- */
+        .creator-container {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 70px);
+            padding: 20px 40px;
+            gap: 30px;
+            overflow: hidden; 
+        }
+
+        /* --- Panels --- */
+        .panel {
+            background: var(--panel-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/black-scales.png');
+            border: 2px solid var(--gold-dim);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.9), inset 0 0 60px rgba(0,0,0,0.8);
+            clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111; }
+        ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 3px; }
+
+        .panel-left { width: 340px; min-width: 340px; }
+        .panel-right { width: 360px; min-width: 360px; }
+        
+        /* --- Middle: Wheel Stage --- */
+        .panel-center {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            padding-top: 20px;
+            padding-bottom: 40px;
+        }
+
+        .name-input {
+            width: 50%; 
+            background: transparent; border: none; border-bottom: 2px solid var(--gold-primary);
+            color: var(--gold-primary); font-family: var(--font-title); font-size: 2.2em; text-align: center;
+            margin-bottom: 10px; transition: 0.3s;
+            text-shadow: 0 0 15px var(--gold-glow); z-index: 10;
+        }
+        .name-input:focus { box-shadow: 0 10px 30px -10px var(--gold-glow); outline: none; }
+
+        /* --- 命運之輪 (1.1倍) --- */
+        .aztec-wheel-container {
+            position: relative;
+            width: 528px; height: 528px; 
+            flex-shrink: 0;
+            background: url('images/wheel_bg.webp') no-repeat center center;
+            background-size: contain;
+            border-radius: 50%;
+            box-shadow: 0 0 70px rgba(0,0,0,0.9); 
+            margin: 50px 0 30px 0;
+        }
+        .aztec-wheel-container:after {
+            content:''; position:absolute; top:0; left:0; width:100%; height:100%;
+            border-radius:50%; background: radial-gradient(circle, rgba(0,0,0,0.8) 40%, transparent 70%);
+            z-index:-1;
+        }
+
+        .wheel-ring {
+            position: absolute; top: 50%; left: 50%;
+            transform-origin: 0 0;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+        .ring-outer { z-index: 10; }
+        .ring-inner { z-index: 20; }
+
+        .wheel-item {
+            position: absolute; 
+            width: 66px; height: 66px; 
+            top: -33px; left: -33px;   
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; pointer-events: auto;
+            background: transparent; border: none; box-shadow: none; border-radius: 0; 
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .wheel-item img {
+            width: 100%; height: 100%; object-fit: contain;
+            filter: grayscale(100%) brightness(0.6) drop-shadow(0 2px 3px rgba(0,0,0,0.8)); 
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+        .wheel-item:hover { z-index: 50; }
+        .wheel-item:hover img { filter: grayscale(0%) brightness(1.2) drop-shadow(0 0 10px var(--jade)); transform: scale(1.2); }
+        .wheel-item.active { z-index: 40; }
+        .wheel-item.active img { filter: grayscale(0%) brightness(1.3) drop-shadow(0 0 15px var(--gold-primary)); transform: scale(1.4); }
+
+        .wheel-core-display {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 220px; height: 220px; 
+            z-index: 5;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .portrait-frame-circle {
+            width: 100%; height: 100%; border-radius: 50%;
+            overflow: hidden; background: #000; position: relative; z-index: 1;
+            mask-image: radial-gradient(circle, white 70%, transparent 100%);
+            -webkit-mask-image: radial-gradient(circle, white 70%, transparent 100%);
+        }
+        .character-img {
+            width: 100%; height: 100%; object-fit: cover;
+            animation: breathe 6s ease-in-out infinite;
+        }
+        .portrait-rim {
+            position: absolute; top: -8px; left: -8px; right: -8px; bottom: -8px;
+            border-radius: 50%; border: 5px solid var(--gold-primary);
+            box-shadow: inset 0 0 35px #000, 0 0 25px var(--gold-glow);
+            z-index: 2; pointer-events: none;
+        }
+        .wheel-marker {
+            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 18px solid transparent; border-right: 18px solid transparent;
+            border-top: 30px solid var(--gold-primary);
+            z-index: 60; filter: drop-shadow(0 3px 5px black);
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* --- 標籤 UI (純文字+光暈) --- */
+        .wheel-label {
+            position: absolute;
+            top: -40px; 
+            font-family: var(--font-title);
+            color: var(--gold-orange); 
+            font-size: 2em; 
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px var(--gold-glow), 0 0 20px rgba(255, 100, 0, 0.6), 2px 2px 0px #000;
+            background: transparent; padding: 0; border: none; border-radius: 0;       
+            pointer-events: none; text-align: center; transition: all 0.2s ease;
+            box-shadow: none; letter-spacing: 2px;
+        }
+        .label-left { left: -60px; } 
+        .label-right { right: -60px; }
+
+        /* --- UI Controls --- */
+        .section-title {
+            color: var(--jade); font-family: var(--font-title);
+            border-bottom: 2px solid var(--jade-dark);
+            padding-bottom: 5px; margin-bottom: 12px;
+            font-size: 1.1em; letter-spacing: 1px;
+            text-shadow: 0 0 8px var(--jade-glow);
+        }
+
+        select, input[type="number"], input[type="text"] {
+            width: 100%; background: rgba(0,0,0,0.6); 
+            border: 1px solid #444; border-left: 3px solid var(--gold-dim);
+            color: #ddd; padding: 8px 10px; font-size: 0.95em; margin-bottom: 8px;
+            font-family: var(--font-body); transition: 0.2s;
+        }
+        select:hover, input:hover { background: rgba(30,30,30,0.8); border-color: var(--gold-primary); }
+        select:focus, input:focus { border-color: var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); background: #000; }
+
+        .info-box {
+            font-size: 0.9em; color: #ccc; background: rgba(0, 50, 50, 0.2); 
+            padding: 12px; border: 1px solid var(--jade-dark);
+            margin-top: 5px; line-height: 1.6; white-space: pre-wrap;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        }
+        .highlight { color: var(--gold-primary); font-weight: bold; }
+        .wp-cost { color: #ffeb3b; font-size: 0.85em; background: rgba(0,0,0,0.5); padding: 1px 6px; border-radius: 3px; border: 1px solid #555; margin-right: 5px; }
+
+        .skill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .skill-check {
+            font-size: 0.85em; padding: 8px; background: #1a1a1a; border: 1px solid #333; 
+            cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 5px; color: #888; transition: 0.2s;
+        }
+        .skill-check.active { 
+            border-color: var(--jade); background: rgba(0, 191, 165, 0.1); color: #fff; 
+            box-shadow: 0 0 8px var(--jade-glow);
+        }
+        .skill-val { font-size: 0.9em; color: var(--gold-dim); font-weight: bold; }
+        .skill-check.active .skill-val { color: var(--gold-primary); }
+
+        .tag { 
+            font-size: 0.8em; padding: 4px 8px; background: #222; border: 1px solid #444; 
+            display: inline-flex; align-items: center; gap:5px; margin: 2px; color: #bbb;
+        }
+        .tag.removable:hover { border-color: var(--blood); color: #fff; cursor: pointer; }
+        .tag.item { width: 100%; border-color: #333; justify-content: space-between; background: rgba(0,0,0,0.3); }
+
+        .attr-row { 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px dashed #333; padding: 4px 0; margin-bottom: 4px;
+        }
+        .stat-input { width: 45px !important; text-align: center; border: 1px solid #444 !important; color: var(--gold-primary) !important; font-weight: bold; background: #000 !important; padding: 2px !important; }
+        
+        .btn-group { display:flex; gap:10px; justify-content:center; margin-top:20px; width: 80%; }
+        .btn-finish {
+            flex:1;
+            background: linear-gradient(45deg, #8a0303, #500);
+            border: 2px solid #ff4444; color: #fff;
+            font-family: var(--font-title); font-size: 1.2em; padding: 12px;
+            cursor: pointer; letter-spacing: 2px; 
+            box-shadow: 0 0 20px rgba(138, 3, 3, 0.6);
+            transition: 0.3s; position: relative; z-index: 100;
+        }
+        .btn-finish:hover { 
+            background: linear-gradient(45deg, #b30404, #700);
+            box-shadow: 0 0 40px rgba(255, 68, 68, 0.8);
+            transform: scale(1.02);
+        }
+        .btn-pdf {
+            flex:1;
+            background: linear-gradient(45deg, #d4af37, #8a6d1c);
+            border: 2px solid #fff; color: #000;
+            font-family: var(--font-title); font-size: 1.2em; padding: 12px;
+            cursor: pointer; letter-spacing: 2px; font-weight: bold;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+            transition: 0.3s; position: relative; z-index: 100;
+        }
+        .btn-pdf:hover {
+            background: linear-gradient(45deg, #ffd700, #b8860b);
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+            transform: scale(1.02);
+        }
+
+        .hud { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: auto; border-top: 2px solid var(--gold-dim); padding-top: 15px;}
+        .hud-box { text-align: center; background: rgba(0,0,0,0.6); padding: 5px; border: 1px solid #444; }
+        .hud-val { display: block; font-size: 1.2em; color: var(--gold-primary); font-family: var(--font-title); }
+        .hud-label { font-size: 0.6em; color: var(--jade); letter-spacing: 1px; }
+
+        /* --- PDF Preview Modal (關鍵修正：預覽視窗) --- */
+        #pdf-preview-modal {
+            display: none; /* 預設隱藏 */
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            flex-direction: column; align-items: center; justify-content: center;
+            overflow: auto;
+        }
+        #pdf-preview-modal.show { display: flex; }
+        
+        .pdf-preview-container {
+            /* A4 比例與樣式 */
+            width: 210mm; 
+            min-height: 297mm;
+            padding: 15mm;
+            background: #111;
+            border: 2px solid var(--gold-dim);
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+            color: #ddd;
+            font-family: 'Noto Sans TC', sans-serif;
+            position: relative;
+            margin: 20px 0;
+            transform-origin: top center;
+        }
+        
+        /* 關閉與下載按鈕列 */
+        .pdf-toolbar {
+            position: fixed; top: 20px; right: 20px;
+            display: flex; gap: 10px; z-index: 10000;
+        }
+        .tool-btn {
+            padding: 10px 20px; font-size: 1.2em; cursor: pointer; font-family: var(--font-title);
+            border: 1px solid #fff; color: #fff; background: #333;
+        }
+        .tool-btn.download { background: var(--gold-primary); border-color: var(--gold-orange); color: #000; }
+
+        /* PDF 內部樣式 (專為列印設計) */
+        .pdf-header { text-align: center; border-bottom: 3px double var(--gold-primary); margin-bottom: 20px; padding-bottom: 10px; }
+        .pdf-title { font-family: var(--font-title); font-size: 3em; color: var(--gold-orange); margin: 0; text-transform: uppercase; }
+        .pdf-subtitle { color: var(--jade); font-size: 1.5em; margin-top: 5px; font-weight: bold; }
+        
+        .pdf-grid { display: grid; grid-template-columns: 1fr 1.8fr; gap: 25px; }
+        
+        .pdf-section { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid #444; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 4px;
+        }
+        .pdf-section h3 { 
+            color: var(--gold-primary); 
+            border-bottom: 1px solid #666; 
+            padding-bottom: 5px; margin-top: 0; 
+            font-family: var(--font-title); 
+            font-size: 1.4em; 
+        }
+        
+        .pdf-attr-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding: 6px 0; font-size: 1.1em; }
+        .pdf-attr-name { font-weight: bold; color: #bbb; }
+        .pdf-attr-val { color: var(--gold-orange); font-weight: bold; font-family: var(--font-title); font-size: 1.2em; }
+        
+        .pdf-stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 10px; }
+        .pdf-stat-box { border: 1px solid var(--jade-dark); padding: 8px; background: rgba(0,50,50,0.2); }
+        .pdf-stat-val { font-size: 1.8em; color: #fff; display: block; font-weight: bold; font-family: var(--font-title); }
+        .pdf-stat-label { font-size: 0.8em; color: var(--jade); letter-spacing: 1px; }
+
+        .pdf-skill-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.95em; }
+        .pdf-skill-item { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #333; }
+        .pdf-skill-item.trained { color: var(--gold-orange); font-weight: bold; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-dim); }
+
+        .pdf-ability-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dotted #444; }
+        .pdf-ability-name { color: var(--jade); font-weight: bold; margin-bottom: 5px; font-size: 1.1em; }
+        .pdf-ability-desc { font-size: 0.9em; line-height: 1.6; color: #ccc; text-align: justify; }
+        
+        .pdf-inventory { font-size: 0.9em; display: flex; flex-wrap: wrap; gap: 8px; }
+        .pdf-item { border: 1px solid #555; padding: 4px 10px; background: #222; border-radius: 4px; color: #ddd; }
+    </style>
+</head>
+<body onload="updateStatsAndSkills()">
+
+<header>
+    <h1>馬茲提卡：傳奇起源</h1>
+</header>
+
+<div class="creator-container">
+    
+    <div class="panel panel-left">
+        <div class="control-group">
+            <div class="section-title">I. 族裔</div>
+            <div id="subrace-container" style="display:none; margin-top:15px;">
+                <label style="font-size:0.8em; color:var(--jade);">亞種</label>
+                <select id="subrace-select" onchange="updateRaceAbility()"></select>
+            </div>
+            <div class="info-box" id="race-ability-box" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="control-group">
+            <div class="section-title">II. 職業範型</div>
+            <div id="hero-ability-container">
+                <label style="font-size:0.8em; color:var(--jade);">英雄能力</label>
+                <select id="hero-ability-select" onchange="updateHeroDesc()"></select>
+                <div class="info-box" id="hero-desc"></div>
+            </div>
+
+            <div id="extra-trait-container" style="display:none; margin-top:12px;">
+                <label style="font-size:0.8em; color:var(--jade);" id="extra-trait-label">額外特性</label>
+                <select id="extra-trait-select" onchange="updateExtraTrait()"></select>
+                <div class="info-box" id="extra-desc"></div>
+            </div>
+
+            <div id="spell-selector" style="display:none; margin-top:18px;">
+                <div class="section-title" style="font-size:1em; border-bottom:none;">法術書</div>
+                <div style="font-size:0.85em; margin-bottom:5px;">0階戲法 <span id="cnt-t0" style="color:var(--gold-primary)">0/3</span></div>
+                <div class="tag-container" id="grid-t0"></div>
+                <div style="font-size:0.85em; margin:12px 0 5px;">1階法術 <span id="cnt-t1" style="color:var(--gold-primary)">0/3</span></div>
+                <div class="tag-container" id="grid-t1"></div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="section-title">III. 屬性與年齡</div>
+            <div id="attr-inputs"></div>
+            <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
+                <span style="font-size:0.9em; color:var(--gold-dim);">年齡:</span>
+                <select id="age-select" onchange="updateStatsAndSkills()" style="flex:1;">
+                   <option value="young">少年 (敏捷和體質+1/自選受訓技能2)</option>
+                    <option value="adult" selected>成年 (自選受訓技能4)</option>
+                    <option value="old">老年 (力量.敏捷.體質-2/智力.意志+1/自選受訓技能6)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-center">
+        <input type="text" class="name-input" id="char-name" placeholder="冒險者姓名">
+        
+        <div class="aztec-wheel-container">
+            <div class="wheel-label label-left" id="race-label-display">人類</div>
+            <div class="wheel-label label-right" id="class-label-display">戰士</div>
+
+            <div class="wheel-ring ring-outer" id="class-ring"></div>
+            <div class="wheel-ring ring-inner" id="race-ring"></div>
+            
+            <div class="wheel-core-display">
+                <div class="portrait-frame-circle">
+                    <img id="char-img" class="character-img" src="" alt="Character Portrait">
+                </div>
+                <div class="portrait-rim"></div>
+            </div>
+            
+            <div class="wheel-marker"></div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-finish" onclick="downloadFVTTJson()">匯出 JSON (FVTT)</button>
+            <button class="btn-pdf" onclick="openPDFPreview()">匯出 PDF 角色卡</button>
+        </div>
+    </div>
+
+    <div class="panel panel-right">
+        
+        <div class="control-group">
+            <div class="section-title">IV. 技能 <span id="skill-pts" style="float:right; font-size:0.8em; color:#888;"></span></div>
+            <div style="font-size:0.8em; color:var(--jade); margin-bottom:8px;">核心技能 (選 6 項)</div>
+            <div id="core-skill-list" class="skill-grid"></div>
+            
+            <div style="font-size:0.8em; color:var(--gold-primary); margin-top:18px; margin-bottom:8px; border-top:1px solid #333; padding-top:8px;">自由受訓 (消耗點數)</div>
+            <div style="display:flex; gap:8px;">
+                <select id="free-skill-select"></select>
+                <button onclick="addFreeSkill()" style="background:#333; border:1px solid #555; color:#fff; cursor:pointer; padding:0 15px;">+</button>
+            </div>
+            <div id="free-skill-list" class="tag-container"></div>
+        </div>
+
+        <div class="control-group">
+            <div class="section-title">V. 裝備</div>
+            <select id="equip-select" onchange="updateInventory()"></select>
+            
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <div style="flex:1">
+                    <label style="font-size:0.8em; color:#888;">銀幣</label>
+                    <input type="number" id="money-input" value="0">
+                </div>
+                <div style="flex:1">
+                    <label style="font-size:0.8em; color:#888;">口糧</label>
+                    <input type="number" id="food-input" value="0">
+                </div>
+            </div>
+
+            <div style="margin-top:15px;">
+                <div style="font-size:0.85em; color:var(--jade); margin-bottom:6px;">紀念物</div>
+                <select id="memento-select" onchange="handleCustomInput('memento')"></select>
+                <input type="text" id="memento-custom" style="display:none; margin-top:6px; border-color:var(--jade);" placeholder="輸入自訂紀念物..." oninput="updateInventory()">
+            </div>
+
+            <div style="margin-top:15px;">
+                <div style="font-size:0.85em; color:#888; margin-bottom:6px;">物品清單</div>
+                <div id="inventory-list" style="max-height:100px; overflow-y:auto; padding-right:5px;"></div>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <div class="section-title">VI. 特徵</div>
+            <label style="font-size:0.8em; color:#888;">弱點</label>
+            <select id="weakness-select" onchange="handleCustomInput('weakness')"></select>
+            <input type="text" id="weakness-custom" style="display:none;" placeholder="輸入自訂弱點...">
+            
+            <label style="font-size:0.8em; color:#888; margin-top:8px; display:block;">外觀</label>
+            <select id="appearance-select" onchange="handleCustomInput('appearance')"></select>
+            <input type="text" id="appearance-custom" style="display:none;" placeholder="輸入自訂外觀...">
+        </div>
+
+        <div class="hud">
+            <div class="hud-box"><span class="hud-val" id="val-hp">--</span><span class="hud-label">HP</span></div>
+            <div class="hud-box"><span class="hud-val" id="val-wp">--</span><span class="hud-label">WP</span></div>
+            <div class="hud-box"><span class="hud-val" id="val-move">--</span><span class="hud-label">MOV</span></div>
+            <div class="hud-box"><span class="hud-val" id="val-enc">--</span><span class="hud-label">ENC</span></div>
+            <div class="hud-box"><span class="hud-val" id="val-dmg" style="font-size:0.9em; padding-top:3px;">-</span><span class="hud-label">DMG</span></div>
+        </div>
+
+        <div id="spell-summary" style="margin-top:15px; display:none; background:rgba(0,0,0,0.4); padding:10px; border:1px solid var(--gold-dim);">
+            <div style="font-size:0.85em; color:var(--gold-primary);">已記憶法術</div>
+            <div id="spell-tags" class="tag-container"></div>
+        </div>
+
+    </div>
+</div>
+
+<div id="pdf-preview-modal">
+    <div class="pdf-toolbar">
+        <button class="tool-btn" onclick="closePreview()">關閉預覽</button>
+        <button class="tool-btn download" onclick="confirmDownloadPDF()">下載 PDF</button>
+    </div>
+    
+    <div id="pdf-content" class="pdf-preview-container">
+        <div class="pdf-header">
+            <h1 class="pdf-title" id="pdf-char-name">NAME</h1>
+            <div class="pdf-subtitle" id="pdf-char-desc">Race / Profession</div>
+        </div>
+        
+        <div class="pdf-grid">
+            <div>
+                <div class="pdf-section">
+                    <h3>屬性 Attributes</h3>
+                    <div id="pdf-attrs"></div>
+                </div>
+                <div class="pdf-section">
+                    <h3>狀態 Vitals</h3>
+                    <div class="pdf-stat-grid">
+                        <div class="pdf-stat-box"><span class="pdf-stat-val" id="pdf-hp"></span><span class="pdf-stat-label">HP (生命)</span></div>
+                        <div class="pdf-stat-box"><span class="pdf-stat-val" id="pdf-wp"></span><span class="pdf-stat-label">WP (意志)</span></div>
+                        <div class="pdf-stat-box"><span class="pdf-stat-val" id="pdf-mov"></span><span class="pdf-stat-label">MOV (移動)</span></div>
+                        <div class="pdf-stat-box"><span class="pdf-stat-val" id="pdf-enc"></span><span class="pdf-stat-label">ENC (負重)</span></div>
+                        <div class="pdf-stat-box" style="grid-column: span 2"><span class="pdf-stat-val" id="pdf-dmg"></span><span class="pdf-stat-label">DMG 加值 (力/敏)</span></div>
+                    </div>
+                </div>
+                <div class="pdf-section">
+                    <h3>特徵 Traits</h3>
+                    <div id="pdf-traits"></div>
+                </div>
+            </div>
+
+            <div>
+                <div class="pdf-section">
+                    <h3>技能 Skills</h3>
+                    <div class="pdf-skill-list" id="pdf-skills"></div>
+                </div>
+                
+                <div class="pdf-section">
+                    <h3>能力 Abilities</h3>
+                    <div id="pdf-abilities"></div>
+                </div>
+
+                <div class="pdf-section">
+                    <h3>裝備 Inventory</h3>
+                    <div class="pdf-inventory" id="pdf-gear"></div>
+                    <div style="margin-top:10px; border-top:1px dashed #555; padding-top:5px;">
+                        <span style="margin-right:15px; color:#d4af37;">銀幣: <span id="pdf-money">0</span></span>
+                        <span style="color:#d4af37;">口糧: <span id="pdf-food">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ================= 完整資料庫 ================= */
+    const RACES = {
+        human: { 
+            name: "人類", id: "human", baseMove: 10,
+            ability: "<span class='highlight'>【通權達變】</span><br><span class='wp-cost'>WP: 3</span><br>當你進行技能檢定時，你可以選擇使用其他技能進行檢定。你必須合理地描述你是如何使用另一項技能。",
+            subraces: { 
+                maztican: {name:"馬茲提卡人 (意志+1)",id:"maztican",bonus:{WIL:1},ability:"你的初始 <span class='wp'>意志+1</span>。（上限為18）"}, 
+                payit: {name:"帕伊特人 (智力+1)",id:"payit",bonus:{INT:1},ability:"你的初始 <span class='wp'>智力+1</span>。（上限為18）"}, 
+                kulkata: {name:"庫塔卡人 (力量+1)",id:"kulkata",bonus:{STR:1},ability:"你的初始 <span class='wp'>力量+1</span>。（上限為18）"}, 
+                itza: {name:"伊察人 (魅力+1)",id:"itza",bonus:{CHA:1},ability:"你的初始 <span class='wp'>魅力+1</span>。（上限為18）"}, 
+                dog: {name:"狗民 (體質+1)",id:"dog",bonus:{CON:1},ability:"你的初始 <span class='wp'>體質+1</span>。（上限為18）"}, 
+                green: {name:"綠民 (敏捷+1)",id:"green",bonus:{AGL:1},ability:"你的初始 <span class='wp'>敏捷+1</span>。（上限為18）"} 
+            } 
+        },
+        halfling: { name: "半身人", id: "halfling", baseMove: 8, ability: "<span class='highlight'>【動如脫兔】</span><br><span class='wp-cost'>WP: 3</span> 當你閃避攻擊時，你可以發動此能力，讓你的閃避檢定獲得 1 個優勢。<br><span class='highlight'>【庫拉里製作】</span> 你懂得怎麼製作麻痺毒藥－庫拉里的方法。你獲得並受訓次要技能【庫拉里】(智力)，可花一班時間製作1-3劑庫拉里毒藥(每劑1重量)：<br>．2點WP可製作1劑弱效麻痺毒藥。<br>．4點WP可製作1劑中效麻痺毒藥。<br>．6點WP可製作1劑強效麻痺毒藥。<br>在戰鬥中，你可以用一個動作將毒藥抹在武器上並同時進行攻擊。" },
+        elf: { name: "精靈", id: "elf", baseMove: 10, ability: "<span class='highlight'>【心如止水】</span> 你可以在短休時進行深度冥想。你可以額外回復 1D6 HP 和 1D6 WP，並恢復一個狀態。你在冥想期間完全無法回應周遭世界，甚至無法被喚醒。", subraces: { earth: {name:"土精靈",id:"earth", ability:"<span class='highlight'>【泥土皮膚】</span> 當你受到鈍擊傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到霜凍傷害時會損失 1d3 WP。"}, wood: {name:"木精靈",id:"wood", ability:"<span class='highlight'>【樹質皮膚】</span> 當你受到穿刺傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到火焰傷害時會損失 1d3 WP。"}, gold: {name:"金精靈",id:"gold", ability:"<span class='highlight'>【金屬皮膚】</span> 當你受到穿刺傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到火焰傷害時會損失 1d3 WP。"} } },
+        dwarf: { name: "矮人", id: "dwarf", baseMove: 8, ability: "<span class='highlight'>【刻骨銘心】</span><br><span class='wp-cost'>WP: 3</span> 當你攻擊曾經傷害過你（至少 1 點傷害）的人時，你可以發動此能力，讓該次攻擊檢定獲得 1 個優勢。那個人是什麼時候傷害過你一點都不重要，所以你最好將所有傷害過你的人都記下來，以免忘記。<br><span class='highlight'>【沙漠耐性】</span><br><span class='wp-cost'>WP: 2</span> 當在極端環境下，環境對你造成的影響將會減輕（由GM判定）。此外，當你因為一整天沒有進食將獲得【飢餓】狀態，或一整天沒有睡眠將獲得【睡眠不足】時。你可以進行體質檢定，成功可避免獲得該狀態。每多一天未進食或睡眠，該檢定便多一個劣勢。" },
+        eagle: { name: "鷹人", id: "eagle", baseMove: 12, ability: "<span class='highlight'>【銳眼】</span> 你可以看到最遠 200 米外的人或物體，就像在眼前一樣清楚。且對超出武器有效射程的目標進行攻擊不會獲得 1 個劣勢。<br><span class='highlight'>【飛翼】</span><br><span class='wp-cost'>WP: 2</span>翅膀讓你可以用移動力在空中自由飛翔。在戰鬥時，你必須控制雙翅來穩定地進行戰鬥，每輪需消耗 2 WP 才能維持飛行。非戰鬥時，每一刻飛行時間消耗 1 WP。" },
+        lizard: { name: "蜥蜴人", id: "lizard", baseMove: 10, ability: "<span class='highlight'>【屏氣】</span><br><span class='wp-cost'>WP: 1</span> 當你在水中時，你可以消耗1點WP來自動通過溺水時的體質檢定。此外，你也可以發動此能力來合理地避開某些危險情況(由GM判斷)。<br><span class='highlight'>【肉食者】</span><br><span class='wp-cost'>WP: 3</span> 你每餐都要吃肉，如果一整天沒有吃肉，你會陷入憤怒狀態，此情況造成的憤怒狀態只能靠吃肉來消除(短休和長休無法消除)。此外，你可以對有血肉的生物進行特殊的徒手攻擊。發動此能力並花費3WP，攻擊命中時造成揮砍傷害並撕扯下血肉吃掉，恢復你造成傷害的一半HP。（但亂吃有可能會出事）" },
+        panther: { 
+            name: "豹人", id: "panther", baseMove: 12, 
+            ability: "<span class='highlight'>【叢林伏擊】</span><br><span class='wp-cost'>WP: 2</span> 當你處在茂密的樹林中時，你可以發動此能力在隱匿檢定中獲得一個優勢。", 
+            subraces: { 
+                hunter: {name:"狩豹人", id:"hunter", ability:"<span class='highlight'>【狩獵本能】</span><br><span class='wp-cost'>WP: 3</span> 你可以發動此能力來鎖定一個處於你視線範圍內，或你可以聞到氣味的生物，作為你的獵物（在戰鬥中需要一個動作）。你可以追蹤獵物的氣味一整天，且當你攻擊獵物時，你可以消耗 1 WP 讓該次攻擊獲得 1 個優勢。"}, 
+                ocelot: {name:"豹貓人", id:"ocelot", ability:"<span class='highlight'>【迅捷攀爬】</span><br><span class='wp-cost'>WP: 2</span> 你在進行攀爬相關活動時，你可以發動此能力在體操檢定獲得一個優勢。"} 
+            } 
+        },
+        frog: { name: "蛙人", id: "frog", baseMove: 10, ability: "<span class='highlight'>【猛力彈跳】</span><br><span class='wp-cost'>WP: 3</span> 你可以發動此能力來水平跳躍等於移動力的距離，或是垂直跳躍等於移動力一半的距離（都不需要進行體操檢定）。若你在跳躍後進行一次近戰攻擊，該次攻擊會獲得 1 個優勢。<br><span class='highlight'>【休聲美譽】</span><br><span class='wp-cost'>WP: 2</span> 由於蛙人在外的良好名聲，在合理的情況下(由GM判定)，你可以在一次交易、欺瞞、遊說或表演檢定中獲得優勢。" }
+    };
+
+    const PROFESSIONS = {
+        artisan: { name: "工匠", id: "artisan", attr: "STR", skills: ["工藝", "巧手", "調查", "徒手", "斧", "棍棒", "劍", "小刀"], heroAbilities: {a:"【鍛匠大師】<span class='wp-cost'>WP: 3</span> 此能力需要鍛匠工具。你可以利用鍛匠工具做以下的事情：<br>．在一刻時間內，你可以消耗 3 WP，銳化一把帶有黑曜石刀刃或尖端的武器。當使用銳化武器進行攻擊時，目標的護甲值會視為降低 2 點。一旦在戰鬥中使用銳化武器進行過攻擊或格擋，銳化效果會在該戰鬥結束後終止。<br>．在一班時間內，你可以嘗試從裝備列表中打造一把黑曜石武器。這個過程需要重量為 1 的黑曜石。消耗的 WP 等於物品的金幣價格（向上取整）。若你沒有足夠的 WP，你可以將工作分成好幾班的時間來處理。<br>或者，你可以使用蒐集到的材料試圖強化黑曜石裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", b:"【木匠大師】<span class='wp-cost'>WP: 1</span> 此能力需要木匠工具。你可以利用木匠工具做以下的事情：<br>．以一個動作，你可以消耗 1 WP 對門、牆壁或其他無生命物體造成 1d12 傷害（無視護甲值）。<br>．在一班時間內，你可以嘗試從裝備列表中打造一個木製物品，例如棍棒、長棍。這個過程需要重量為 1 的木頭。消耗的 WP 等於物品的金幣價格（向上取整）。<br>或者，你可以使用蒐集到的材料試圖強化木材裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", c:"【皮匠大師】此能力需要皮匠工具。你可以利用皮匠工具做以下的事情：<br>．你可以嘗試從將一隻動物或怪物的皮做成一套獸皮甲。該皮甲的護甲值等於野獸護甲值的一半（向上取整），至少為 1。這個過程耗時一班時間，消耗的 WP 等於物品的護甲值。<br>或者，你可以使用蒐集到的材料試圖強化毛皮裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", d:"【羽匠大師】此能力需要織布工具。你可以利用織布工具做以下的事情：<br>．在一班時間內，你可以嘗試從裝備列表中打造一套服裝。這個過程需要重量為 1 的植物纖維或羽毛。消耗的 WP 等於物品的金幣價格（向上取整）。若你沒有足夠的 WP，你可以將工作分成好幾班的時間來處理。<br>或者，你可以試圖製作羽毛護身符，這些護身符有特殊的效果（詳見「鍛造＆強化」章節），可以當成單獨的飾品配戴，也可以再加工到服裝上。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的打造結果。"}, gear: [{name:"1.劍/鍛造",items:["馬卡劍","棉甲","鍛匠工具","火炬","打火匣"]},{name:"2.棒/木工",items:["碎骨棒","棉甲","木匠工具","火炬","10米麻繩","打火匣"]},{name:"3.斧/皮匠",items:["黑曜石斧","獸皮甲","皮匠工具","提燈","燈油","打火匣"]},{name:"4.刀/織布",items:["黑曜石小刀","棉甲","織布工具","火炬","毛毯","打火匣"]}] },
+        hunter: { name: "獵人", id: "hunter", attr: "AGL", skills: ["體操", "狩獵", "隱匿", "察覺", "求生", "小刀", "弓", "吹箭"], heroAbilities: {a:"【動物夥伴】<span class='wp-cost'>WP: 3</span> 你可以發動此能力，將一隻動物馴服為你的夥伴。此過程需耗時一刻時間，且你同時只能擁有一隻動物夥伴。<br>只要你待在該動物的自然棲息地，牠就會一直跟著你。牠可以為你偵察附近環境，而不需要消耗額外的 WP。在戰鬥中，你可以額外消耗 3 WP，命令夥伴攻擊一名敵人（不需要花費你的動作）。", b:"【雙重射擊】<span class='wp-cost'>WP: 3</span> 當你使用 弓 或 吹箭筒 進行攻擊時，你可以發動此能力來射出兩支箭矢/吹箭。你可以指定同一個目標、或兩個不同的目標<br>無論如何，都只進行一次帶有 1 個劣勢的攻擊檢定。傷害分開計算。", c:"【陷阱大師】花時間製作各種陷阱。"}, gear: [{name:"1.弓箭",items:["小刀","戰弓","箭袋","獸皮甲","睡袋","火炬","打火匣","繩索","陷阱"]},{name:"2.投石",items:["小刀","投石繩","彈丸","獸皮甲","睡袋","火炬","打火匣","繩索","釣竿"]},{name:"3.吹箭",items:["短劍","吹箭筒","吹箭","獸皮甲","睡袋","火炬","打火匣","繩索","陷阱"]}] },
+        bard: { name: "詩人", id: "bard", attr: "CHA", skills: ["體操", "閃避", "語言", "祕聞傳說", "欺瞞", "表演", "遊說", "小刀"], heroAbilities: {a:"【音樂家】<span class='wp-cost'>WP: 3</span> 你動人的聲音可以鼓舞你的盟友或挫敗你的敵人。<br>發動此能力（一個動作）可以讓 10 米內所有盟友的所有檢定獲得 1 個優勢，或讓相同範圍內的所有敵人獲得 1 個劣勢（選擇其中一種）。效果持續到你下一個回合開始。",b:"【頌神曲】<span class='wp-cost'>WP: 3</span> 你精通讚揚神祇的祭文禱詞。<br>每日一次，在適當的地方耗時一刻時間向當日侍神誠心唸頌禱詞，進行表演檢定。若成功，則侍神將會聽到你的祈禱，並降下神賜給整個隊伍。<br>降下何種神賜取決於當日的守護侍神。（詳見曆法章節）",c:"【戰歌】<span class='wp-cost'>WP: 3</span> 你精通鼓舞士氣和振奮人心的激昂戰歌。<br>你可以耗時一刻時間鼓舞隊友，消除其他人的畏縮和沮喪狀態，每個消除的狀態可回復該隊友2WP。<br>此外，在戰鬥時，你也可以用一個動作吼出激勵的戰鬥誓言，聽得見你的所有其他同伴立刻自選 1 個狀態消除。"}, gear: [{name:"1.骨銼",items:["骨銼","小刀","油燈","燈油","打火匣"]},{name:"2.長笛",items:["長笛","小刀","繩索","火炬","打火匣"]},{name:"3.號角",items:["號角","小刀","火炬","打火匣"]}] },
+        warrior: { name: "戰士", id: "warrior", attr: "STR", skills: ["閃避", "徒手", "斧", "棍棒", "矛", "劍", "弓", "投槍器"], heroAbilities: {a:"【老兵】<span class='wp-cost'>WP: 1</span> 多年來的實戰經驗，讓你能在戰場上持續把握主動權，不被局勢的混亂所動搖。<br>(創角時)你從武器技能裡選擇一項，該武器的技能數值成長1點。<br>此外，在每一輪開始時，你可以發動此能力來保留你上一輪的先攻卡，而不抽取新的先攻卡。",b:"【狂暴】<span class='wp-cost'>WP: 3</span> 你立即獲得「憤怒」狀態，並立即對最近的敵人進行一次近戰攻擊。狂暴持續到戰場上沒有敵人，或你 HP 歸零為止。<br>狂暴期間：<br>．你的近戰攻擊獲得一個優勢。<br>．若你攻擊前額外消耗 1 WP ，該次命中額外造成 +1D4 傷害。<br>．擊殺一個敵人後，你可以立刻移動2米。<br>．你不能格擋或閃避。<br>戰鬥結束之後，你會陷入力竭狀態。",c:"【雙重斬擊】<span class='wp-cost'>WP: 3</span> 當你持握揮砍武器時，你可以同時對兩個相距你 2 米內的敵人進行一次攻擊。<br>你只進行一次攻擊檢定，若成功則同時命中兩個敵人。敵人可以分別進行格擋或閃避。傷害骰也分開計算。<br>此能力可以與「雙持戰鬥」能力結合。"}, gear: [{name:"1.近戰",items:["馬夸維爾特","圓盾","皮革戰甲","火炬","打火匣"]},{name:"2.輕裝",items:["馬卡短劍","投槍器","黑曜石箭袋","棉甲","火炬","打火匣"]},{name:"3.長柄",items:["木矛","皮革戰甲","木製戰盔","打火匣"]}] },
+        knight: { name: "騎士", id: "knight", attr: "STR", skills: ["野獸知識", "祕聞傳說", "表演", "遊說", "棍棒", "矛", "劍", "投槍器"], heroAbilities: {a:"【守護者】<span class='wp-cost'>WP: 2</span> 你願意毫不猶豫地為盟友擋下攻擊。<br>若你和另一名盟友都與同一名敵人相距 2 米內，當該敵人嘗試攻擊你的盟友時，你可以發動此能力，強迫敵人改為攻擊你。<br>此能力可以在你的回合外使用，且不需要花費動作。",b:"【舉盾格擋】<span class='wp-cost'>WP: 3</span> 當你使用盾牌進行格擋時，你可以發動此能力讓該次格擋檢定獲得 1 個優勢。<br>另外，你也可以使用此能力用盾牌格擋通常無法被格擋的怪物物理攻擊（AOE由GM判斷）。<br>此能力可以和「堅強防禦」能力結合。",c:"【堅強防禦】<span class='wp-cost'>WP: 3</span> 你可以在不消耗該輪動作的情況下嘗試格擋一次攻擊。<br>你只能對同一次攻擊嘗試格擋一次，且你無法再對該次攻擊進行閃避或格擋。<br>只要你有足夠的 WP，你在同一輪中可以多次發動此能力。"}, extraLabel:"騎士團", extraOptions:{eagle:{name:"鷹騎士團",desc:"<span class='highlight'>【羽父之祝福】</span> 每一位真正的鷹騎士，都背負著羽父的羽翼。這份羽翼只會展開一次，帶領你越過死亡，直至最後的榮耀。<br>當你死亡時，下一輪你的身體將會發出神性的光輝，你視為獲得復活術的效果，且不會受到負面影響。一旦此祝福發動後，你將永久失去此項特性。",addSkills:[]}, jaguar:{name:"豹騎士團",desc:"<span class='highlight'>【噬心者之怒】</span> 當豹騎士殞落時，他的心臟化為復仇的祭品，帶著札爾特克的憤怒爆裂而出，血肉為祭，怒火燃燒，將敵人一併拖入獻祭的火焰之中。<br>當你死亡時，下一輪你的心臟將會爆裂而出，血肉為祭，以你為中心施放威力等級3的「札爾特克之怒」法術，且該法術的範圍和傷害都變成2倍。",addSkills:[]}}, gear: [{name:"騎士標準",items:["騎士戰甲","投槍器","投射標槍","馬夸維爾特","圓盾","木製戰盔","火炬","打火匣"]}] },
+        shaman: { name: "薩滿", id: "shaman", attr: "WIL", skills: ["閃避", "棍棒"], heroAbilities: {a:"【魔法】身為薩滿，你創角時不會獲得英雄能力，而是可以施放魔法。你必須選擇一個魔法流派，該流派魔法會成為你的受訓次要技能(智力)。<br>另外，你可以選擇「三個戲法」和「三個 1 階法術」。你只能從通用魔法或你的流派魔法中選擇。這些法術都會記載到你起始裝備的魔導書裡。"}, extraLabel:"魔法流派", extraOptions:{soul:{name:"靈魂流派",desc:"馬茲提卡人和崇拜馬茲提克諸神的靈魂被稱為托那利(tonalli)，在死亡的那一刻，他們會到達一座宏偉的神廟。<br>研究靈魂能量的薩滿，尊敬祖先的靈魂或世界本身的精神能量。<br>他們相信靈魂是力量的源泉，透過儀式可治癒、強化，甚至操縱他人精神。",addSkills:["靈魂流派","體操","察覺","醫療","語言","祕聞傳說"]}, beast:{name:"獸術流派",desc:"蟲噬、獸爪與毒液的魔法，是邪神噬心者札爾特克賜予人類的黑暗贈禮。<br>這些法術暴力而無情，模仿野獸的殘酷與掠食，但這些薩滿認為這是生存在殘酷大地上的必要力量。<br>唯有藉由獸術，他們才能以野性的殘暴對抗荒野中的威脅，確保族群得以存續。",addSkills:["獸術流派","狩獵","隱匿","野獸知識","求生","小刀"]}, pluma:{name:"羽術流派",desc:"由大地母神馬茲提卡親自創造，並由其子夸爾特賜予人類，用以對抗札爾特克的大軍。<br>羽術薩滿透過羽毛、光輝與聖歌施法，象徵純潔、保護與秩序。",addSkills:["羽術流派","體操","隱匿","野獸知識","求生","醫療","察覺"]}, elem:{name:"元素流派",desc:"相信火、風、水、土是構成萬物的根本。他們透過操縱這四種元素來釋放力量，展現出大自然原始而無情的威能。",addSkills:["元素流派","察覺","醫療","語言","祕聞傳說","調查"]}}, gear: [{name:"1.水晶球",items:["硬木棒","水晶球","魔導書","火炬","打火匣"]},{name:"2.魔杖",items:["小刀","魔杖","魔導書","火炬","打火匣"]},{name:"3.聖徽",items:["聖徽","魔導書","睡袋","火炬","打火匣"]}] },
+        scholar: { name: "學者", id: "scholar", attr: "INT", skills: ["閃避", "察覺", "野獸知識", "求生", "醫療", "語言", "祕聞傳說", "調查"], heroAbilities: {a:"【直覺思考】<span class='wp-cost'>WP: 3</span> 當面臨困難抉擇時，你可以發動此能力，直接詢問 GM 一個問題，並得到一個有用的答案。<br>該答案代表你的廣泛知識，僅有助於你的決策，無法揭示所有需要知道的事情。",b:"【現場教學】<span class='wp-cost'>WP: 3</span> 你可以快速講述知識來幫助所有人。當你在協助他人時，你可以協助複數盟友進行同一項檢定。<br>但你協助的對象有人檢定失敗的話你陷入憤怒狀態（若你還未憤怒）。",c:"【經驗分享】在技能成長階段開始前，你可以放棄一項技能成長機會，將自身經驗傳授給其他夥伴，讓最多兩位盟友額外獲得該項技能成長機會，之後正常進行技能成長流程。<br>你不能選擇已經標記該技能的盟友。"}, extraLabel:"術業有專攻", extraOptions:{celest:{name:"【天律學】",desc:"你能解讀日月星辰的運行，辨明天體之間的軌跡。天象既是神祇的語言，也是未來的暗示。<br>．獲得「天律學」(智力)次要技能。<br>．當你進行技能檢定時，合理狀況下（由GM判定）可發動此能力改用「天律學」，並獲得 1 個優勢。<br>．在第四班長休時，你可耗費一刻時間觀看星象。發動此能力進行「天律學」檢定，你將捕捉到星律——天體運行所揭示的恆定秩序。在該次團務剩下的時間內，你可以發動此能力將一個失敗(大失敗除外)的檢定改為成功。（每場團務限一次）",addSkills:["天律學"]}, theo:{name:"【神律學】",desc:"你並非以祈禱祈求神蹟，而是以研究神祇的律法與祭儀來獲取力量。你知道該如何取悅神祇，才能讓神意在凡世迴響。<br>．獲得「神律學」(智力)次要技能。<br>．當你進行技能檢定時，合理狀況下可發動此能力改用「神律學」，並獲得 1 個優勢。<br>．此外，當你身處與某位神祇相關的場所（神廟、祭壇、聖徽或象徵領域）時，你可以花費一刻時間進行「神律學」檢定。若成功，你得以理解此地所運行的神之法則，並以理論推演模擬其邏輯。在該次團務剩下的時間內檢定出現大失敗時，你可宣告「引用神律」來重構事件的結果，使該檢定重新擲骰一次並取較佳結果（每場團務限一次）。這代表你以對神法的理解暫時干預了命運的演算。",addSkills:["神律學"]}, num:{name:"【數律學】",desc:"你精通神聖的數字與曆法，能從秩序的奧秘中看見世界的規律。數字不是單純的計算，而是眾神遺留於世的密碼。<br>．獲得「數律學」(智力)次要技能。<br>．當你進行技能檢定時，合理的狀況下（由GM判定）可發動此能力改用「數律學」，並獲得 1 個優勢。<br>．此外，你能快速測算敵人的站位與距離來找到反擊的機會。當戰鬥的一輪結束時，你可以在抽下一輪的先攻卡前發動此能力。進行「數律學」檢定，若成功，你可以讓所有敵人先抽取先攻卡，剩下的先攻卡你可以自行分配給所有隊友。（每場戰鬥限一次）",addSkills:["數律學"]}, vita:{name:"【生知學】",desc:"你從生命的經驗中學習世界的法則。每一次錯誤、傷痕與發現，都是知識的印記；唯有親身體驗，才能真正理解世界的運作。<br>．你從智力相關的核心技能中選擇一項，該技能的技能等級提升 1。<br>．當你使用你選擇提升的技能進行檢定時，你可發動此能力來獲得 1 個優勢。<br>．此外，你能從錯誤中累積經驗並快速學習。當你技能檢定失敗時，你可以發動此能力，直接將該技能標上提升標記。（每場團務限一次）",addSkills:[]}}, gear: [{name:"1.筆記",items:["硬木棒","筆記本","羽毛筆","睡袋","火炬","打火匣"]},{name:"2.書籍",items:["黑曜石小刀","書本","睡袋","油燈","燈油","打火匣"]},{name:"3.醫療",items:["投石繩","繃帶","催眠毒藥","睡袋","提燈","燈油","打火匣"]}] },
+        thief: { name: "盜賊", id: "thief", attr: "AGL", skills: ["巧手","隱匿","體操","閃避","察覺","調查","欺瞞","小刀"], heroAbilities: {a:"【背刺】<span class='wp-cost'>WP: 3</span> 當你對一名敵人進行近戰攻擊時，若該敵人和你的另一個盟友相距 2 米內，你可以發動此能力。<br>你的攻擊會視為偷襲，代表敵人無法閃避或格擋、你的攻擊檢定獲得 1 個優勢、傷害骰數量增加一顆（例如 1D8 變成 2D8）。<br>只有靈巧武器才能發動此能力。",b:"【迅捷步法】<span class='wp-cost'>WP: 3</span> 你可以在不消耗該輪動作的情況下嘗試閃避一次攻擊。<br>你只能對同一次攻擊嘗試閃避一次，且你無法再對該次攻擊進行躲閃避或格擋。<br>只要你有足夠的 WP，你在同一輪中可以多次使用此能力。",c:"【閃電速度】<span class='wp-cost'>WP: 2</span> 當戰鬥開始抽先攻卡時，你可以抽兩張卡，並選擇想要的其中一張。"}, gear: [{name:"1.爪鉤",items:["黑曜石小刀","投石繩","黑曜石彈丸袋","10米麻繩","爪鉤","火炬","打火匣"]},{name:"2.開鎖",items:["黑曜石小刀","簡易開鎖器","火炬","打火匣"]},{name:"3.滾珠",items:["黑曜石小刀","吹箭筒","吹箭袋","滾珠","火炬","打火匣"]}] },
+        pochteca: { name: "旅商", id: "pochteca", attr: "CHA", skills: ["交易","遊說","閃避","騎術","察覺","調查","欺瞞","小刀"], heroAbilities: {a:"【察言觀色】<span class='wp-cost'>WP: 3</span> 你對人心的觀察遠超常人。在你與另一個人的談話中，你可以發動此能力進行察覺檢定。依照檢定結果，你可獲得下列一項或多項資訊（大成功則全部獲得）。<br>．失敗/成功：對方目前的情緒（害怕、緊張、焦躁、誠懇、傲慢等）。<br>．成功：對方是否在說謊。<br>．成功：對方對你／某人／某事的真實態度（敵意、戒心、好感、利益）。<br>．大成功：你能判斷對方潛在的動機或弱點（例如「他在保護某人」、「他在隱瞞交易」、「他受金錢驅使」）。",b:"【商隊領袖】<span class='wp-cost'>WP: 3</span> 你熟悉商路捷徑，能縮短長途旅行所需時間，並在遭遇危險時能迅速指揮眾人應對。<br>當隊伍在荒野上長途旅行（兩天以上的路程）時，你可以發動此能力來縮短1d4班的路程。<br>此外，若旅行過程中的探路檢定失敗而遇到危險時，你可以發動此能力來讓所有人面對危險的檢定獲得一個優勢。",c:"【情報掮客】<span class='wp-cost'>WP: 3</span> 在重要城邦、市集或貿易路口停留至少一天時間後，你可以發動此能力向 GM 提出一個針對當地的問題，獲得可靠訊息。這些訊息可能包括附近部族的動向、危險怪物出沒、政治陰謀或市場需求，實際能獲得什麼資訊由GM決定。"}, gear: [{name:"1.野炊",items:["黑曜石小刀","野炊工具","馬車","火炬","打火匣"]},{name:"2.提燈",items:["黑曜石小刀","提燈","馬車","燈油","打火匣"]}] },
+        farmer: { name: "農民", id: "farmer", attr: "INT", skills: ["求生","工藝","狩獵","野獸知識","察覺","游泳","調查","徒手"], heroAbilities: {a:"【浮田耕藝】你獲得並受訓「浮田術」(智力)次要技能。<br>耗費一班時間，你可以在濕地或河湖上建造「簡易小型浮田」，能夠讓你種植少量的作物並收成，提供隊伍所需的糧食。<br>實際種植所需消耗的WP和收成時間詳見「烹飪&種植」章節。",b:"【水獵巧技】<span class='wp-cost'>WP: 2</span> 你擅長在水域裡捕獵，能在水中迅速應對情況。<br>．當你嘗試釣魚時，你可以發動此能力來讓狩獵檢定獲得優勢。<br>．當你在水中進行近戰攻擊時，你可以發動此能力來避免該次攻擊獲得劣勢。<br>．你在水中受到攻擊時，你可以發動此能力使用游泳來取代閃避檢定。",c:"【大廚】你獲得並受訓「廚藝」(智力)次要技能。你可以為隊伍製作美味好吃的菜餚而非單純飽腹的糧食。<br>現在你烹飪時改為進行「廚藝」檢定。<br>每道菜譜有各自所需的時間、WP和食材，成功烹調將製作出有額外增益的食物。<br>你一開始可以學會兩道1星料理和一道2星料理。詳見「烹飪&種植」章節。"}, gear: [{name:"1.槌子",items:["槌子","野炊工具","火炬","打火匣"]},{name:"2.鎬",items:["十字鎬","睡袋","油燈","燈油","打火匣"]},{name:"3.鏟子",items:["鏟子","釣竿","火炬","打火匣"]}] }
+    };
+
+    const ALL_SKILLS = ["工藝", "巧手", "調查", "徒手", "斧", "棍棒", "劍", "小刀", "弓", "投槍器", "投石繩", "吹箭筒", "矛", "體操", "狩獵", "隱匿", "察覺", "求生", "騎術", "游泳", "醫療", "語言", "祕聞傳說", "船藝", "交易", "欺瞞", "表演", "遊說", "野獸知識"];
+    // 技能屬性對照 (用於計算與JSON)
+    const SKILL_ATTR_MAP = {
+        "工藝": "STR", "巧手": "AGL", "調查": "INT", "徒手": "STR", "斧": "STR", "棍棒": "STR", "劍": "STR", "小刀": "AGL",
+        "弓": "AGL", "投槍器": "STR", "投石繩": "AGL", "吹箭筒": "AGL", "矛": "STR", "體操": "AGL", "狩獵": "AGL", "隱匿": "AGL",
+        "察覺": "INT", "求生": "INT", "騎術": "AGL", "游泳": "AGL", "醫療": "INT", "語言": "INT", "祕聞傳說": "INT", "船藝": "INT",
+        "交易": "CHA", "欺瞞": "CHA", "表演": "CHA", "遊說": "CHA", "野獸知識": "INT"
+    };
+
+    const MEMENTOS = ["一雙舒適耐穿的舊鞋子", "一面樸素的銀製獎章", "一封來自老友或親戚的信", "一本破爛的舊日記本", "一個你家族代代相傳的手鐲", "一尊你童年時獲得的木雕像", "一顆形狀怪異的石頭", "父母送你的一枚紀念銅幣", "一個老舊的錫製酒杯", "作為戰利品的怪物犄角", "幾顆骨製骰子", "繫著一小束頭髮的吊墜盒", "一把華麗的鑰匙", "一張你繼承的手繪地圖", "一只刻有銘文的戒指", "一個骨製哨子", "頂你父母的舊帽子", "格里芬的一根羽毛", "一根雕塑精美的煙斗"];
+    const WEAKNESSES = ["輕信：我相信別人告訴我的一切。", "貪婪：我想要更多的財富。", "臉皮薄：我絕不容忍被挑釁。", "莽撞：我總是第一個衝入危險。", "懦弱：我總是待在隊伍的最後面。", "怪物殺手：所有怪物都是邪惡的，必須殺掉。", "憎恨：蝰手獸皆該被剷除。", "懶惰：我一抓到機會就想休息。", "	貪吃：我會把握吃到美食的所有機會。", "虛榮：我會幫助任何稱讚我的人。", "魯莽：我總是不考慮後果地冒險。", "竊盜癖：我看到貴重物品就手癢想偷。", "害怕魔法：魔法是邪惡的力量，不能相信薩滿。", "渴求知識：知識比朋友更重要。", "荒野之子：我從不在室內睡覺。", "吹牛：我總是誇大我的成就。", "暴力：我訴諸暴力來克服每一個障礙。", "霸道：我總是命令別人該怎麼做。", "悲觀：我總是認為事情會往最壞方向發展。", "傲慢：我看不起所有人。"];
+    const APPEARANCES = ["臉頰上有一道難看的疤痕", "戴著奇怪的頭飾", "皮膚異常蒼白", "臉上總是掛著微笑", "眼神冰冷且銳利", "肚子有一圈贅肉", "消瘦但精實", "體毛異常地多", "禿頭", "顯眼的紋身", "難聞的體味", "華麗的髮型", "走路一跛一跛", "骯髒沒洗澡", "誠實的藍色眼睛", "一顆銀製假牙", "濃重的香水味", "異色瞳", "聲音沙啞", "飽經風霜的皺紋"];
+    const SPELLS = {
+        gen: ["亮","取","彈","開/關","縫補","感應魔法","上鎖/開鎖","清理","烹飪","理髮","魔法凳","解消術","防護術"],
+        soul: ["感應靈魂","奇術","安定靈魂","放逐術","療傷術","靈魂之楔","靈魂低語","遙視術"],
+        beast: ["伏擊","野獸感官","感應心跳","蛇臂術","噴射銳石","毒刃術","野獸低語","獵者之令","爪刃術","獸甲強化","大步奔行"],
+        pluma: ["花徑","鳥語","感應氣息","羽落","電光一閃","纏繞之根","動物低語","漂浮術","飛羽鏢","綻放術","夸爾特之息"],
+        elem: ["升溫/冷卻","煙團","點燃","火球術","石柱術","碎裂術","強風術","寒霜術"]
+    };
+
+    /* ================= 狀態 ================= */
+    let char = {
+        race: 'human', subrace: 'maztican', age: 'adult',
+        prof: 'warrior', heroKey: null, extraKey: null, gearIndex: 0,
+        attrs: {STR:10, CON:10, AGL:10, INT:10, WIL:10, CHA:10},
+        calculatedAttrs: {STR:10, CON:10, AGL:10, INT:10, WIL:10, CHA:10},
+        coreSkills: [], freeSkills: [],
+        spells: { t0:[], t1:[] }
+    };
+
+    /* ================= 數學公式與輔助函式 ================= */
+    function getSkillBase(attrVal) {
+        if(attrVal <= 5) return 3;
+        if(attrVal <= 8) return 4;
+        if(attrVal <= 12) return 5;
+        if(attrVal <= 15) return 6;
+        return 7;
+    }
+
+    function getDmgBonus(attrVal) {
+        if(attrVal <= 12) return "-";
+        if(attrVal <= 16) return "+1D4";
+        return "+1D6";
+    }
+
+    /* ================= 輪盤邏輯 ================= */
+    let outerAngle = 0; 
+    let innerAngle = 0;
+    const raceKeys = Object.keys(RACES);
+    const classKeys = Object.keys(PROFESSIONS);
+
+    function getIconPath(id) { return `images/icon_${id}.webp`; }
+
+    function initWheel() {
+        const classRing = document.getElementById('class-ring');
+        const raceRing = document.getElementById('race-ring');
+        
+        createRingItems(classRing, classKeys, PROFESSIONS, 220, 'outer', (index) => {
+            rotateToItem('outer', index, classKeys.length);
+            char.prof = classKeys[index];
+            updateClassOptions();
+            updateLabelDisplay();
+        });
+
+        createRingItems(raceRing, raceKeys, RACES, 132, 'inner', (index) => {
+            rotateToItem('inner', index, raceKeys.length);
+            char.race = raceKeys[index];
+            updateRaceOptions();
+            updateLabelDisplay();
+        });
+
+        updateActiveItem('class-ring', 0);
+        updateActiveItem('race-ring', 0);
+        updateLabelDisplay();
+    }
+
+    function createRingItems(ring, keys, dataObj, radius, type, callback) {
+        const step = 360 / keys.length;
+        ring.innerHTML = "";
+        
+        keys.forEach((key, i) => {
+            const itemData = dataObj[key];
+            const el = document.createElement('div');
+            el.className = 'wheel-item';
+            el.innerHTML = `<img src="${getIconPath(key)}" alt="${itemData.name}" onerror="this.style.display='none';this.parentNode.innerText='${itemData.name[0]}'">`;
+            
+            const angle = i * step - 90;
+            el.style.transform = `rotate(${angle}deg) translate(${radius}px) rotate(${-angle}deg)`;
+            el.onclick = () => callback(i);
+            
+            el.onmouseenter = () => updateLabelHover(type, itemData.name);
+            el.onmouseleave = () => updateLabelDisplay();
+
+            ring.appendChild(el);
+        });
+    }
+
+    function rotateToItem(type, index, total) {
+        const step = 360 / total;
+        const targetAngle = -(index * step);
+        let currentAngle = (type === 'outer') ? outerAngle : innerAngle;
+        let delta = targetAngle - (currentAngle % 360);
+        if (delta > 180) delta -= 360; else if (delta < -180) delta += 360;
+        const finalAngle = currentAngle + delta;
+        const ringId = (type === 'outer') ? 'class-ring' : 'race-ring';
+        const radius = (type === 'outer') ? 220 : 132;
+        const ringEl = document.getElementById(ringId);
+        
+        if (type === 'outer') outerAngle = finalAngle; else innerAngle = finalAngle;
+        ringEl.style.transform = `rotate(${finalAngle}deg)`;
+        
+        updateItemRotation(ringEl, finalAngle, radius, total);
+        updateActiveItem(ringId, index);
+    }
+
+    function updateItemRotation(ring, ringRotation, radius, total) {
+        const items = ring.querySelectorAll('.wheel-item');
+        const step = 360 / total;
+        items.forEach((item, i) => {
+            const itemBaseAngle = i * step - 90;
+            item.style.transform = `rotate(${itemBaseAngle}deg) translate(${radius}px) rotate(${-itemBaseAngle - ringRotation}deg)`;
+        });
+    }
+
+    function updateActiveItem(ringId, activeIndex) {
+        const items = document.querySelectorAll(`#${ringId} .wheel-item`);
+        items.forEach((item, i) => {
+            if (i === activeIndex) item.classList.add('active'); else item.classList.remove('active');
+        });
+    }
+
+    function updateLabelDisplay() {
+        const rName = RACES[char.race].name.split(' ')[0];
+        const cName = PROFESSIONS[char.prof].name.split(' ')[0];
+        document.getElementById('race-label-display').innerText = rName;
+        document.getElementById('class-label-display').innerText = cName;
+        updateAvatar();
+    }
+
+    function updateLabelHover(type, name) {
+        const simpleName = name.split(' ')[0];
+        if(type==='inner') document.getElementById('race-label-display').innerText = simpleName;
+        else document.getElementById('class-label-display').innerText = simpleName;
+    }
+
+    /* ================= UI 更新邏輯 ================= */
+    function init() {
+        const attrDiv = document.getElementById('attr-inputs');
+        for(let k in char.attrs) {
+            attrDiv.innerHTML += `
+                <div class="attr-row">
+                    <span style="font-size:0.9em; color:#bbb; font-weight:bold;">${k}</span>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <input type="number" id="base-${k}" value="10" min="3" max="18" class="stat-input" onchange="updateStatsAndSkills()">
+                        <span style="color:#666;">►</span>
+                        <span id="final-${k}" class="final-val">10</span>
+                    </div>
+                </div>`;
+        }
+
+        fillSimpleSelect('memento-select', MEMENTOS, "隨機 / 自選");
+        fillSimpleSelect('weakness-select', WEAKNESSES, "隨機 / 自選");
+        fillSimpleSelect('appearance-select', APPEARANCES, "隨機 / 自選");
+
+        initWheel();
+        updateRaceOptions();
+        updateClassOptions();
+    }
+
+    function fillSimpleSelect(id, list, defaultTxt) {
+        const el = document.getElementById(id);
+        el.add(new Option(defaultTxt, "random"));
+        list.forEach(i => el.add(new Option(i, i)));
+        el.add(new Option("【自訂...】", "custom"));
+    }
+
+    function updateRaceOptions() {
+        const rData = RACES[char.race];
+        const subSel = document.getElementById('subrace-select');
+        const subDiv = document.getElementById('subrace-container');
+        subSel.innerHTML = "";
+        
+        if(rData.subraces) {
+            subDiv.style.display = 'block';
+            for(let k in rData.subraces) subSel.add(new Option(rData.subraces[k].name, k));
+            char.subrace = subSel.value;
+        } else {
+            subDiv.style.display = 'none';
+            char.subrace = null;
+        }
+        updateRaceAbility();
+    }
+
+    function updateRaceAbility() {
+        char.subrace = document.getElementById('subrace-select').value;
+        const rData = RACES[char.race];
+        let text = rData.ability;
+        if(char.subrace && rData.subraces && rData.subraces[char.subrace]) {
+            text += `<br><br><span class="highlight">亞種特性:</span> ` + rData.subraces[char.subrace].ability;
+        }
+        document.getElementById('race-ability-box').innerHTML = text;
+        updateStatsAndSkills();
+    }
+
+    function updateClassOptions() {
+        const pData = PROFESSIONS[char.prof];
+        const heroDiv = document.getElementById('hero-ability-container');
+        const heroSel = document.getElementById('hero-ability-select');
+        heroSel.innerHTML = "";
+        if(pData.heroAbilities) {
+            heroDiv.style.display = 'block';
+            for(let k in pData.heroAbilities) heroSel.add(new Option(pData.heroAbilities[k].split('】')[0]+'】', k));
+        } else { heroDiv.style.display = 'none'; char.heroKey = null; }
+
+        const extraDiv = document.getElementById('extra-trait-container');
+        const extraSel = document.getElementById('extra-trait-select');
+        extraSel.innerHTML = "";
+        if(pData.extraOptions) {
+            extraDiv.style.display = 'block';
+            document.getElementById('extra-trait-label').innerText = pData.extraLabel.toUpperCase();
+            for(let k in pData.extraOptions) extraSel.add(new Option(pData.extraOptions[k].name, k));
+        } else { extraDiv.style.display = 'none'; char.extraKey = null; }
+
+        const eqSel = document.getElementById('equip-select');
+        eqSel.innerHTML = "";
+        pData.gear.forEach((g,i) => eqSel.add(new Option(g.name, i)));
+
+        updateHeroDesc();
+    }
+
+    function updateHeroDesc() {
+        const pData = PROFESSIONS[char.prof];
+        if (pData.heroAbilities) {
+            char.heroKey = document.getElementById('hero-ability-select').value;
+            document.getElementById('hero-desc').innerHTML = pData.heroAbilities[char.heroKey];
+        }
+        updateExtraTrait();
+    }
+
+    function updateExtraTrait() {
+        const pData = PROFESSIONS[char.prof];
+        if (pData.extraOptions) {
+            char.extraKey = document.getElementById('extra-trait-select').value;
+            document.getElementById('extra-desc').innerHTML = pData.extraOptions[char.extraKey].desc;
+        }
+        const spellSel = document.getElementById('spell-selector');
+        if (char.prof === 'shaman') {
+            spellSel.style.display = 'block';
+            char.spells = {t0:[], t1:[]};
+            renderSpellButtons();
+        } else { spellSel.style.display = 'none'; }
+        renderCoreSkills();
+        updateInventory(); 
+    }
+
+    function renderCoreSkills() {
+        const pData = PROFESSIONS[char.prof];
+        let pool = [...pData.skills];
+        if(char.prof==='shaman' && char.extraKey) pool = [...new Set([...pool, ...pData.extraOptions[char.extraKey].addSkills])];
+        else if((char.prof==='knight'||char.prof==='scholar'||char.prof==='farmer') && char.extraKey && pData.extraOptions[char.extraKey].addSkills) {
+             pool = [...new Set([...pool, ...pData.extraOptions[char.extraKey].addSkills])];
+        }
+        
+        const div = document.getElementById('core-skill-list');
+        div.innerHTML = "";
+        const previouslySelected = [...char.coreSkills];
+        char.coreSkills = []; 
+
+        pool.forEach(s => {
+            const btn = document.createElement('div');
+            btn.className = 'skill-check';
+            const attrKey = SKILL_ATTR_MAP[s] || "STR";
+            const attrVal = char.calculatedAttrs[attrKey] || 10;
+            const baseVal = getSkillBase(attrVal);
+            
+            let currentVal = baseVal;
+            if (previouslySelected.includes(s)) {
+                btn.classList.add('active');
+                char.coreSkills.push(s);
+                currentVal = baseVal * 2;
+            }
+            
+            btn.innerHTML = `<span>${s}</span><span class="skill-val" id="skill-val-${s}">${currentVal}</span>`;
+            
+            btn.onclick = () => {
+                const valSpan = btn.querySelector('.skill-val');
+                const isTrained = btn.classList.contains('active');
+                
+                if(isTrained) {
+                    char.coreSkills = char.coreSkills.filter(x=>x!==s);
+                    btn.classList.remove('active');
+                    valSpan.innerText = baseVal;
+                } else {
+                    if(char.coreSkills.length>=6) { alert("核心技能最多選 6 項！"); return; }
+                    char.coreSkills.push(s);
+                    btn.classList.add('active');
+                    valSpan.innerText = baseVal * 2;
+                }
+                updateFreeSkillOptions();
+            };
+            div.appendChild(btn);
+        });
+        updateFreeSkillOptions();
+    }
+
+    function updateFreeSkillOptions() {
+        const sel = document.getElementById('free-skill-select');
+        sel.innerHTML = "";
+        const allTrainedSkills = [...char.coreSkills, ...char.freeSkills];
+        const availableSkills = ALL_SKILLS.filter(s => !allTrainedSkills.includes(s));
+        availableSkills.forEach(s => {
+            sel.add(new Option(s, s));
+        });
+    }
+
+    function addFreeSkill() {
+        let max = char.age==='young'?2:(char.age==='old'?6:4);
+        if(char.freeSkills.length>=max) { alert(`你最多只能選擇 ${max} 個自由受訓技能！`); return; }
+        const s = document.getElementById('free-skill-select').value;
+        if(char.coreSkills.includes(s) || char.freeSkills.includes(s)) { alert("該技能已被選為核心或自由受訓技能！"); return; }
+        
+        char.freeSkills.push(s);
+        renderFreeSkills();
+        updateFreeSkillOptions(); 
+    }
+    
+    function renderFreeSkills() {
+        const div = document.getElementById('free-skill-list');
+        div.innerHTML = char.freeSkills.map((s,i) => {
+            const attrKey = SKILL_ATTR_MAP[s] || "STR";
+            const attrVal = char.calculatedAttrs[attrKey] || 10;
+            const baseVal = getSkillBase(attrVal);
+            return `<span class="tag removable" onclick="char.freeSkills.splice(${i},1);renderFreeSkills();updateFreeSkillOptions()">${s} (${baseVal*2}) ×</span>`;
+        }).join('');
+        let max = char.age==='young'?2:(char.age==='old'?6:4);
+        document.getElementById('skill-pts').innerText = `自由點數: ${max - char.freeSkills.length}/${max}`;
+    }
+
+    function updateInventory() {
+        char.gearIndex = document.getElementById('equip-select').value;
+        const pData = PROFESSIONS[char.prof];
+        let items = [...pData.gear[char.gearIndex].items];
+        
+        if(char.prof === 'knight' && char.extraKey) {
+            const orderName = PROFESSIONS.knight.extraOptions[char.extraKey].name.replace('團','');
+            items = items.map(i => i.replace("騎士戰甲", orderName+"戰甲"));
+        }
+
+        const memInput = document.getElementById('memento-custom');
+        const memVal = memInput.style.display==='none' ? document.getElementById('memento-select').value : memInput.value;
+        if(memVal && memVal!=='random' && memVal!=='custom') items.push("★ "+memVal);
+
+        document.getElementById('inventory-list').innerHTML = items.map(i=>`<div class="tag item">${i}</div>`).join('');
+        updateAvatar();
+    }
+
+    function updateAvatar() {
+        const rData = RACES[char.race];
+        const pData = PROFESSIONS[char.prof];
+        const img = document.getElementById('char-img');
+        
+        let imgName = "";
+        if (rData.subraces && char.subrace) {
+            const subId = rData.subraces[char.subrace].id;
+            imgName = `${rData.id}_${subId}_${pData.id}.webp`;
+        } else {
+            imgName = `${rData.id}_${pData.id}.webp`;
+        }
+        const imgSrc = `images/${imgName}`;
+        
+        img.onerror = () => { 
+            // Fallback
+            if (imgName.split('_').length > 2) {
+                const fallbackName = `${rData.id}_${pData.id}.webp`;
+                img.src = `images/${fallbackName}`;
+                img.onerror = () => {
+                    img.src = `https://placehold.co/600x600/333/gold?text=${rData.name}`;
+                    img.onerror = null;
+                }
+            } else {
+                img.src = `https://placehold.co/600x600/333/gold?text=${rData.name}`;
+                img.style.opacity = 1;
+            }
+        };
+        img.onload = () => { img.style.opacity = 1; };
+        img.src = imgSrc;
+    }
+
+    // --- [核心] 屬性計算與連動 ---
+    function updateStatsAndSkills() {
+        char.age = document.getElementById('age-select').value;
+        let final = {};
+        
+        for(let k in char.attrs) final[k] = parseInt(document.getElementById(`base-${k}`).value) || 10;
+        
+        if(char.race==='human' && char.subrace && RACES.human.subraces[char.subrace]) {
+            let bonus = RACES.human.subraces[char.subrace].bonus;
+            for(let k in bonus) final[k] += bonus[k];
+        }
+        
+        if(char.age==='young') { final.AGL+=1; final.CON+=1; }
+        if(char.age==='old') { final.STR-=2; final.AGL-=2; final.CON-=2; final.INT+=1; final.WIL+=1; }
+
+        for(let k in final) {
+            if(final[k]>18) final[k]=18; if(final[k]<3) final[k]=3;
+            char.calculatedAttrs[k] = final[k];
+            
+            const el = document.getElementById(`final-${k}`);
+            el.innerText = final[k];
+            el.className = "final-val";
+            let base = parseInt(document.getElementById(`base-${k}`).value);
+            if(final[k]>base) el.classList.add('bonus');
+            if(final[k]<base) el.classList.add('malus');
+        }
+
+        document.getElementById('val-hp').innerText = final.CON;
+        document.getElementById('val-wp').innerText = final.WIL;
+        document.getElementById('val-enc').innerText = Math.ceil(final.STR/2);
+        
+        const strBonus = getDmgBonus(final.STR);
+        const aglBonus = getDmgBonus(final.AGL);
+        document.getElementById('val-dmg').innerText = `${strBonus} / ${aglBonus}`;
+        
+        let move = RACES[char.race].baseMove;
+        if(final.AGL <= 6) move -= 4; else if(final.AGL <= 9) move -= 2; else if(final.AGL >= 16) move += 4; else if(final.AGL >= 13) move += 2;
+        document.getElementById('val-move').innerText = move;
+        
+        renderCoreSkills(); 
+        renderFreeSkills();
+    }
+
+    function updateAgeLogic() {
+        char.age = document.getElementById('age-select').value;
+        let max = char.age==='young'?2:(char.age==='old'?6:4);
+        if(char.freeSkills.length > max) char.freeSkills = char.freeSkills.slice(0,max);
+        updateStatsAndSkills(); 
+    }
+
+    function handleCustomInput(type) {
+        const sel = document.getElementById(type+'-select');
+        const input = document.getElementById(type+'-custom');
+        if(sel.value==='custom') { input.style.display='block'; input.value=''; input.focus(); }
+        else if(sel.value==='random') { input.style.display='none'; }
+        else { input.style.display='none'; input.value=sel.value; }
+        if(type==='memento') updateInventory();
+    }
+
+    function renderSpellButtons() {
+        const flow = char.extraKey; if(!flow) return;
+        const poolT0 = [...SPELLS.gen.slice(0,11), ...(SPELLS[flow] ? SPELLS[flow].slice(0, 3) : [])]; 
+        const poolT1 = [...SPELLS.gen.slice(11), ...(SPELLS[flow] ? SPELLS[flow].slice(3) : [])];
+        renderGrid('grid-t0', poolT0, 't0');
+        renderGrid('grid-t1', poolT1, 't1');
+    }
+
+    function renderGrid(id, list, tier) {
+        const div = document.getElementById(id);
+        div.innerHTML = "";
+        list.forEach(s => {
+            const btn = document.createElement('div');
+            btn.className = 'tag removable';
+            btn.style.cursor = 'pointer';
+            btn.innerText = s;
+            if(char.spells[tier].includes(s)) {
+                btn.style.borderColor = 'var(--gold-primary)';
+                btn.style.color = '#fff';
+                btn.style.backgroundColor = 'rgba(212, 175, 55, 0.1)';
+            } else {
+                btn.style.borderColor = '#444';
+            }
+            btn.onclick = () => {
+                if(char.spells[tier].includes(s)) char.spells[tier] = char.spells[tier].filter(x=>x!==s);
+                else {
+                    if(char.spells[tier].length >= 3) { alert("該階法術已滿 3 個！"); return; }
+                    char.spells[tier].push(s);
+                }
+                renderSpellButtons();
+                updateSpellDisplay();
+            };
+            div.appendChild(btn);
+        });
+        document.getElementById('cnt-'+tier).innerText = `${char.spells[tier].length}/3`;
+    }
+
+    function updateSpellDisplay() {
+        const div = document.getElementById('spell-summary');
+        const tags = document.getElementById('spell-tags');
+        const all = [...char.spells.t0, ...char.spells.t1];
+        if(all.length > 0) {
+            div.style.display = 'block';
+            tags.innerHTML = all.map(s => `<span class="tag spell">${s}</span>`).join('');
+        } else {
+            div.style.display = 'none';
+        }
+    }
+
+    /* ================= FVTT JSON 生成器 (智慧物品分類) ================= */
+    function downloadFVTTJson() {
+        if(char.coreSkills.length !== 6) { alert("請選擇 6 個核心技能！"); return; }
+        
+        const name = document.getElementById('char-name').value || "未命名英雄";
+        const finalAttrs = {};
+        for(let k in char.calculatedAttrs) finalAttrs[k.toLowerCase()] = char.calculatedAttrs[k];
+        
+        const hp = parseInt(document.getElementById('val-hp').innerText);
+        const wp = parseInt(document.getElementById('val-wp').innerText);
+        const move = parseInt(document.getElementById('val-move').innerText);
+        const enc = parseInt(document.getElementById('val-enc').innerText);
+
+        const actor = {
+            "name": name,
+            "type": "character",
+            "img": "icons/svg/mystery-man.svg",
+            "system": {
+                "attributes": {
+                    "str": { "value": finalAttrs.str, "base": finalAttrs.str },
+                    "con": { "value": finalAttrs.con, "base": finalAttrs.con },
+                    "agl": { "value": finalAttrs.agl, "base": finalAttrs.agl },
+                    "int": { "value": finalAttrs.int, "base": finalAttrs.int },
+                    "wil": { "value": finalAttrs.wil, "base": finalAttrs.wil },
+                    "cha": { "value": finalAttrs.cha, "base": finalAttrs.cha }
+                },
+                "hitPoints": { "value": hp, "max": hp, "base": hp },
+                "willPoints": { "value": wp, "max": wp, "base": wp },
+                "movement": { "value": move, "base": move },
+                "encumbrance": { "value": 0, "max": enc },
+                "bio": { "description": `<p>種族: ${RACES[char.race].name.split(' ')[0]} / 職業: ${PROFESSIONS[char.prof].name.split(' ')[0]}</p>` }
+            },
+            "items": []
+        };
+
+        const rData = RACES[char.race];
+        let raceName = rData.name.split(' ')[0];
+        let raceDesc = rData.ability;
+        if(char.subrace && rData.subraces && rData.subraces[char.subrace]) {
+            raceName += ` (${rData.subraces[char.subrace].name.split(' ')[0]})`;
+            raceDesc += `<hr><strong>亞種特性:</strong> ${rData.subraces[char.subrace].ability}`;
+        }
+        actor.items.push(createItem("kin", raceName, raceDesc));
+
+        const pData = PROFESSIONS[char.prof];
+        actor.items.push(createItem("profession", pData.name.split(' ')[0], `<p>核心屬性: ${pData.attr}</p>`));
+
+        const allTrainedSkills = [...char.coreSkills, ...char.freeSkills];
+        allTrainedSkills.forEach(s => {
+            const attrVal = finalAttrs[SKILL_ATTR_MAP[s].toLowerCase()] || 10;
+            const base = getSkillBase(attrVal);
+            actor.items.push(createSkillItem(s, SKILL_ATTR_MAP[s], base * 2));
+        });
+
+        if(char.heroKey && pData.heroAbilities) {
+            const hNameFull = pData.heroAbilities[char.heroKey].split('】');
+            const hName = hNameFull[0].replace('【','');
+            const hDesc = hNameFull[1];
+            actor.items.push(createAbilityItem(hName, hDesc, "heroic"));
+        }
+        if(char.extraKey && pData.extraOptions) {
+            const exInfo = pData.extraOptions[char.extraKey];
+            actor.items.push(createAbilityItem(exInfo.name, exInfo.desc, "kin"));
+        }
+
+        if(char.prof === 'shaman') {
+            [...char.spells.t0, ...char.spells.t1].forEach(s => {
+                actor.items.push(createSpellItem(s));
+            });
+        }
+
+        const gearList = [];
+        document.querySelectorAll('#inventory-list .tag.item').forEach(el => {
+            let txt = el.innerText;
+            if(!txt.includes("1D")) gearList.push(txt);
+        });
+        
+        gearList.forEach(itemName => {
+            let type = "item";
+            if(itemName.includes("甲") || itemName.includes("衣") || itemName.includes("戰甲")) type = "armor";
+            else if(itemName.includes("盔") || itemName.includes("帽") || itemName.includes("戰盔")) type = "helmet";
+            else if(["劍", "斧", "弓", "矛", "棍", "刀", "槍", "彈", "箭", "吹箭"].some(k => itemName.includes(k))) type = "weapon";
+            
+            actor.items.push(createGearItem(itemName, type));
+        });
+
+        const money = document.getElementById('money-input').value;
+        if(money > 0) actor.items.push(createGearItem("銀幣", "item", money));
+        const food = document.getElementById('food-input').value;
+        if(food > 0) actor.items.push(createGearItem("口糧", "item", food));
+
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(actor, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", `${name}_fvtt.json`);
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    /* --- PDF 功能函式 --- */
+    function openPDFPreview() {
+        const name = document.getElementById('char-name').value || "未命名英雄";
+        
+        // 1. 填入數據到預覽視窗
+        document.getElementById('pdf-char-name').innerText = name;
+        const rName = RACES[char.race].name.split(' ')[0];
+        const cName = PROFESSIONS[char.prof].name.split(' ')[0];
+        document.getElementById('pdf-char-desc').innerText = `${rName} ${cName} (${document.getElementById('age-select').options[document.getElementById('age-select').selectedIndex].text})`;
+
+        // 屬性
+        let attrsHtml = "";
+        for(let k in char.calculatedAttrs) {
+            attrsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">${k}</span><span class="pdf-attr-val">${char.calculatedAttrs[k]}</span></div>`;
+        }
+        document.getElementById('pdf-attrs').innerHTML = attrsHtml;
+
+        // 狀態
+        document.getElementById('pdf-hp').innerText = document.getElementById('val-hp').innerText;
+        document.getElementById('pdf-wp').innerText = document.getElementById('val-wp').innerText;
+        document.getElementById('pdf-mov').innerText = document.getElementById('val-move').innerText;
+        document.getElementById('pdf-enc').innerText = document.getElementById('val-enc').innerText;
+        document.getElementById('pdf-dmg').innerText = document.getElementById('val-dmg').innerText;
+
+        // 技能
+        let skillsHtml = "";
+        const allSkills = [...ALL_SKILLS];
+        allSkills.forEach(s => {
+            const attrKey = SKILL_ATTR_MAP[s] || "STR";
+            const attrVal = char.calculatedAttrs[attrKey] || 10;
+            const baseVal = getSkillBase(attrVal);
+            let val = baseVal;
+            let isTrained = false;
+            
+            if (char.coreSkills.includes(s) || char.freeSkills.includes(s)) {
+                val = baseVal * 2;
+                isTrained = true;
+            }
+            
+            skillsHtml += `<div class="pdf-skill-item ${isTrained ? 'trained' : ''}"><span>${s} <small style="color:#666">(${attrKey})</small></span><span>${val}</span></div>`;
+        });
+        document.getElementById('pdf-skills').innerHTML = skillsHtml;
+
+        // 能力
+        let abilitiesHtml = "";
+        const rData = RACES[char.race];
+        abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${rData.name} 特性</div><div class="pdf-ability-desc">${rData.ability}</div></div>`;
+        if(char.subrace && rData.subraces[char.subrace]) {
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">亞種: ${rData.subraces[char.subrace].name}</div><div class="pdf-ability-desc">${rData.subraces[char.subrace].ability}</div></div>`;
+        }
+        const pData = PROFESSIONS[char.prof];
+        if(char.heroKey && pData.heroAbilities) {
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">英雄能力</div><div class="pdf-ability-desc">${pData.heroAbilities[char.heroKey]}</div></div>`;
+        }
+        if(char.extraKey && pData.extraOptions) {
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${pData.extraLabel}</div><div class="pdf-ability-desc">${pData.extraOptions[char.extraKey].desc}</div></div>`;
+        }
+        
+        // 法術
+        if (char.prof === 'shaman') {
+             const allSpells = [...char.spells.t0, ...char.spells.t1];
+             if (allSpells.length > 0) {
+                 abilitiesHtml += `<div class="pdf-ability-box" style="margin-top:10px; border-top:1px solid #444; padding-top:5px;"><div class="pdf-ability-name">法術</div><div class="pdf-inventory">${allSpells.map(s=>`<div class="pdf-item">${s}</div>`).join('')}</div></div>`;
+             }
+        }
+        document.getElementById('pdf-abilities').innerHTML = abilitiesHtml;
+
+        // 特徵
+        let traitsHtml = "";
+        const weak = document.getElementById('weakness-select').value;
+        if(weak && weak!=='random') traitsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">弱點</span><span>${weak}</span></div>`;
+        const app = document.getElementById('appearance-select').value;
+        if(app && app!=='random') traitsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">外觀</span><span>${app}</span></div>`;
+        const memInput = document.getElementById('memento-custom');
+        const memVal = memInput.style.display==='none' ? document.getElementById('memento-select').value : memInput.value;
+        if(memVal && memVal!=='random' && memVal!=='custom') traitsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">紀念物</span><span>${memVal}</span></div>`;
+        document.getElementById('pdf-traits').innerHTML = traitsHtml;
+
+        // 裝備
+        let gearHtml = "";
+        document.querySelectorAll('#inventory-list .tag.item').forEach(el => {
+            gearHtml += `<div class="pdf-item">${el.innerText}</div>`;
+        });
+        document.getElementById('pdf-gear').innerHTML = gearHtml;
+        document.getElementById('pdf-money').innerText = document.getElementById('money-input').value;
+        document.getElementById('pdf-food').innerText = document.getElementById('food-input').value;
+
+        // 顯示 Modal
+        document.getElementById('pdf-preview-modal').classList.add('show');
+    }
+
+    function closePreview() {
+        document.getElementById('pdf-preview-modal').classList.remove('show');
+    }
+
+    function confirmDownloadPDF() {
+        const element = document.getElementById('pdf-content');
+        const name = document.getElementById('char-name').value || "未命名英雄";
+        
+        const opt = {
+          margin:       0,
+          filename:     `${name}_character_sheet.pdf`,
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#111' },
+          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // 隱藏 toolbar 避免被截圖到 (雖然它在 content 外，但保險起見)
+        document.querySelector('.pdf-toolbar').style.display = 'none';
+        
+        html2pdf().set(opt).from(element).save().then(() => {
+            document.querySelector('.pdf-toolbar').style.display = 'flex';
+            closePreview();
+        });
+    }
+
+    function createItem(type, name, desc) { return { "name": name, "type": type, "img": `icons/svg/${type === 'kin' ? 'mystery-man' : 'book'}.svg`, "system": { "description": desc } }; }
+    function createSkillItem(name, attr, val) { const isWeapon = ["斧","棍棒","劍","小刀","弓","投槍器","投石繩","吹箭筒","矛"].includes(name); return { "name": name, "type": "skill", "img": "icons/svg/sword.svg", "system": { "description": "", "attribute": attr.toLowerCase(), "skillType": isWeapon ? "weapon" : "core", "value": val } }; }
+    function createAbilityItem(name, desc, type) { return { "name": name, "type": "ability", "img": "icons/svg/aura.svg", "system": { "description": desc, "abilityType": type } }; }
+    function createSpellItem(name) { return { "name": name, "type": "spell", "img": "icons/svg/daze.svg", "system": { "school": "general", "rank": 0 } }; }
+    function createGearItem(name, type, qty=1) { let icon = "item-bag"; if(type === 'weapon') icon = "sword"; if(type === 'armor') icon = "chest"; if(type === 'helmet') icon = "helmet"; return { "name": name, "type": type, "img": `icons/svg/${icon}.svg`, "system": { "quantity": parseInt(qty) } }; }
+
+    init();
+</script>
+</body>
+</html>
