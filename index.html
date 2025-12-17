@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>馬茲提卡：傳奇起源 - 完美預覽版</title>
+    <title>馬茲提卡：傳奇起源 - 最終完美版</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -26,7 +26,6 @@
         
         body {
             background-color: var(--bg-dark);
-            /* 若沒有圖片，會使用漸層黑底 */
             background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('images/texture_stone.webp');
             background-size: cover;
             background-position: center;
@@ -175,6 +174,8 @@
         .character-img {
             width: 100%; height: 100%; object-fit: cover;
             animation: breathe 6s ease-in-out infinite;
+            opacity: 1; /* 預設顯示 */
+            transition: opacity 0.3s ease-in-out; /* 淡入淡出效果 */
         }
         .portrait-rim {
             position: absolute; top: -8px; left: -8px; right: -8px; bottom: -8px;
@@ -195,7 +196,7 @@
             50% { transform: scale(1.15); }
         }
 
-        /* --- 標籤 UI (純文字+光暈) --- */
+        /* --- 標籤 UI --- */
         .wheel-label {
             position: absolute;
             top: -40px; 
@@ -299,82 +300,43 @@
         .hud-val { display: block; font-size: 1.2em; color: var(--gold-primary); font-family: var(--font-title); }
         .hud-label { font-size: 0.6em; color: var(--jade); letter-spacing: 1px; }
 
-        /* --- PDF Preview Modal (關鍵修正：預覽視窗) --- */
+        /* --- PDF Preview Modal --- */
         #pdf-preview-modal {
-            display: none; /* 預設隱藏 */
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 9999;
-            flex-direction: column; align-items: center; justify-content: center;
-            overflow: auto;
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 9999;
+            flex-direction: column; align-items: center; justify-content: center; overflow: auto;
         }
         #pdf-preview-modal.show { display: flex; }
         
         .pdf-preview-container {
-            /* A4 比例與樣式 */
-            width: 210mm; 
-            min-height: 297mm;
-            padding: 15mm;
-            background: #111;
-            border: 2px solid var(--gold-dim);
-            box-shadow: 0 0 50px rgba(0,0,0,1);
-            color: #ddd;
-            font-family: 'Noto Sans TC', sans-serif;
-            position: relative;
-            margin: 20px 0;
-            transform-origin: top center;
+            width: 210mm; min-height: 297mm; padding: 15mm;
+            background: #111; border: 2px solid var(--gold-dim);
+            box-shadow: 0 0 50px rgba(0,0,0,1); color: #ddd;
+            font-family: 'Noto Sans TC', sans-serif; position: relative; margin: 20px 0; transform-origin: top center;
         }
-        
-        /* 關閉與下載按鈕列 */
-        .pdf-toolbar {
-            position: fixed; top: 20px; right: 20px;
-            display: flex; gap: 10px; z-index: 10000;
-        }
-        .tool-btn {
-            padding: 10px 20px; font-size: 1.2em; cursor: pointer; font-family: var(--font-title);
-            border: 1px solid #fff; color: #fff; background: #333;
-        }
+        .pdf-toolbar { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10000; }
+        .tool-btn { padding: 10px 20px; font-size: 1.2em; cursor: pointer; font-family: var(--font-title); border: 1px solid #fff; color: #fff; background: #333; }
         .tool-btn.download { background: var(--gold-primary); border-color: var(--gold-orange); color: #000; }
 
-        /* PDF 內部樣式 (專為列印設計) */
         .pdf-header { text-align: center; border-bottom: 3px double var(--gold-primary); margin-bottom: 20px; padding-bottom: 10px; }
         .pdf-title { font-family: var(--font-title); font-size: 3em; color: var(--gold-orange); margin: 0; text-transform: uppercase; }
         .pdf-subtitle { color: var(--jade); font-size: 1.5em; margin-top: 5px; font-weight: bold; }
-        
         .pdf-grid { display: grid; grid-template-columns: 1fr 1.8fr; gap: 25px; }
-        
-        .pdf-section { 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid #444; 
-            padding: 15px; 
-            margin-bottom: 20px; 
-            border-radius: 4px;
-        }
-        .pdf-section h3 { 
-            color: var(--gold-primary); 
-            border-bottom: 1px solid #666; 
-            padding-bottom: 5px; margin-top: 0; 
-            font-family: var(--font-title); 
-            font-size: 1.4em; 
-        }
-        
+        .pdf-section { background: rgba(255,255,255,0.03); border: 1px solid #444; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
+        .pdf-section h3 { color: var(--gold-primary); border-bottom: 1px solid #666; padding-bottom: 5px; margin-top: 0; font-family: var(--font-title); font-size: 1.4em; }
         .pdf-attr-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding: 6px 0; font-size: 1.1em; }
         .pdf-attr-name { font-weight: bold; color: #bbb; }
         .pdf-attr-val { color: var(--gold-orange); font-weight: bold; font-family: var(--font-title); font-size: 1.2em; }
-        
         .pdf-stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 10px; }
         .pdf-stat-box { border: 1px solid var(--jade-dark); padding: 8px; background: rgba(0,50,50,0.2); }
         .pdf-stat-val { font-size: 1.8em; color: #fff; display: block; font-weight: bold; font-family: var(--font-title); }
         .pdf-stat-label { font-size: 0.8em; color: var(--jade); letter-spacing: 1px; }
-
         .pdf-skill-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.95em; }
         .pdf-skill-item { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #333; }
         .pdf-skill-item.trained { color: var(--gold-orange); font-weight: bold; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-dim); }
-
         .pdf-ability-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dotted #444; }
         .pdf-ability-name { color: var(--jade); font-weight: bold; margin-bottom: 5px; font-size: 1.1em; }
         .pdf-ability-desc { font-size: 0.9em; line-height: 1.6; color: #ccc; text-align: justify; }
-        
         .pdf-inventory { font-size: 0.9em; display: flex; flex-wrap: wrap; gap: 8px; }
         .pdf-item { border: 1px solid #555; padding: 4px 10px; background: #222; border-radius: 4px; color: #ddd; }
     </style>
@@ -389,18 +351,18 @@
     
     <div class="panel panel-left">
         <div class="control-group">
-            <div class="section-title">I. 族裔</div>
+            <div class="section-title">I. 身份細節</div>
             <div id="subrace-container" style="display:none; margin-top:15px;">
-                <label style="font-size:0.8em; color:var(--jade);">亞種</label>
+                <label style="font-size:0.8em; color:var(--jade);">血脈分支 (亞種)</label>
                 <select id="subrace-select" onchange="updateRaceAbility()"></select>
             </div>
             <div class="info-box" id="race-ability-box" style="margin-top:10px;"></div>
         </div>
 
         <div class="control-group">
-            <div class="section-title">II. 職業範型</div>
+            <div class="section-title">II. 職業專精</div>
             <div id="hero-ability-container">
-                <label style="font-size:0.8em; color:var(--jade);">英雄能力</label>
+                <label style="font-size:0.8em; color:var(--jade);">英雄能力 (起始專長)</label>
                 <select id="hero-ability-select" onchange="updateHeroDesc()"></select>
                 <div class="info-box" id="hero-desc"></div>
             </div>
@@ -426,16 +388,16 @@
             <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
                 <span style="font-size:0.9em; color:var(--gold-dim);">年齡:</span>
                 <select id="age-select" onchange="updateStatsAndSkills()" style="flex:1;">
-                   <option value="young">少年 (敏捷和體質+1/自選受訓技能2)</option>
-                    <option value="adult" selected>成年 (自選受訓技能4)</option>
-                    <option value="old">老年 (力量.敏捷.體質-2/智力.意志+1/自選受訓技能6)</option>
+                    <option value="young">少年 (敏+1 體+1)</option>
+                    <option value="adult" selected>成年 (標準)</option>
+                    <option value="old">老年 (力敏體-2 智意+1)</option>
                 </select>
             </div>
         </div>
     </div>
 
     <div class="panel-center">
-        <input type="text" class="name-input" id="char-name" placeholder="冒險者姓名">
+        <input type="text" class="name-input" id="char-name" placeholder="輸入傳奇之名">
         
         <div class="aztec-wheel-container">
             <div class="wheel-label label-left" id="race-label-display">人類</div>
@@ -762,12 +724,62 @@
         });
     }
 
+    // --- 淡入淡出與預加載 ---
+    let currentAvatarRequest = 0; 
+
+    function updateAvatar() {
+        const rData = RACES[char.race];
+        const pData = PROFESSIONS[char.prof];
+        const img = document.getElementById('char-img');
+        
+        let targetSrc = `images/${rData.id}_${pData.id}.webp`;
+        if (rData.subraces && char.subrace) {
+            const subId = rData.subraces[char.subrace].id;
+            targetSrc = `images/${rData.id}_${subId}_${pData.id}.webp`;
+        }
+
+        const requestId = ++currentAvatarRequest;
+        img.style.opacity = 0;
+
+        const tryLoad = (src) => {
+            return new Promise((resolve, reject) => {
+                const temp = new Image();
+                temp.onload = () => resolve(src);
+                temp.onerror = () => reject();
+                temp.src = src;
+            });
+        };
+
+        setTimeout(async () => {
+            if (requestId !== currentAvatarRequest) return; 
+
+            try {
+                await tryLoad(targetSrc);
+                if (requestId !== currentAvatarRequest) return;
+                img.src = targetSrc;
+            } catch (e) {
+                try {
+                    const fallbackSrc = `images/${rData.id}_${pData.id}.webp`;
+                    if (targetSrc === fallbackSrc) throw "No fallback"; 
+                    await tryLoad(fallbackSrc);
+                    if (requestId !== currentAvatarRequest) return;
+                    img.src = fallbackSrc;
+                } catch (e2) {
+                    if (requestId !== currentAvatarRequest) return;
+                    img.src = `https://placehold.co/600x600/333/gold?text=${rData.name}`;
+                }
+            }
+            
+            img.style.opacity = 1;
+        }, 300);
+    }
+
     function updateLabelDisplay() {
         const rName = RACES[char.race].name.split(' ')[0];
         const cName = PROFESSIONS[char.prof].name.split(' ')[0];
         document.getElementById('race-label-display').innerText = rName;
         document.getElementById('class-label-display').innerText = cName;
-        updateAvatar();
+        // updateAvatar() removed from here to prevent flicker
     }
 
     function updateLabelHover(type, name) {
@@ -833,6 +845,7 @@
         }
         document.getElementById('race-ability-box').innerHTML = text;
         updateStatsAndSkills();
+        updateAvatar(); // Called here because changing subrace changes image
     }
 
     function updateClassOptions() {
@@ -984,39 +997,6 @@
         if(memVal && memVal!=='random' && memVal!=='custom') items.push("★ "+memVal);
 
         document.getElementById('inventory-list').innerHTML = items.map(i=>`<div class="tag item">${i}</div>`).join('');
-        updateAvatar();
-    }
-
-    function updateAvatar() {
-        const rData = RACES[char.race];
-        const pData = PROFESSIONS[char.prof];
-        const img = document.getElementById('char-img');
-        
-        let imgName = "";
-        if (rData.subraces && char.subrace) {
-            const subId = rData.subraces[char.subrace].id;
-            imgName = `${rData.id}_${subId}_${pData.id}.webp`;
-        } else {
-            imgName = `${rData.id}_${pData.id}.webp`;
-        }
-        const imgSrc = `images/${imgName}`;
-        
-        img.onerror = () => { 
-            // Fallback
-            if (imgName.split('_').length > 2) {
-                const fallbackName = `${rData.id}_${pData.id}.webp`;
-                img.src = `images/${fallbackName}`;
-                img.onerror = () => {
-                    img.src = `https://placehold.co/600x600/333/gold?text=${rData.name}`;
-                    img.onerror = null;
-                }
-            } else {
-                img.src = `https://placehold.co/600x600/333/gold?text=${rData.name}`;
-                img.style.opacity = 1;
-            }
-        };
-        img.onload = () => { img.style.opacity = 1; };
-        img.src = imgSrc;
     }
 
     // --- [核心] 屬性計算與連動 ---
@@ -1060,71 +1040,6 @@
         
         renderCoreSkills(); 
         renderFreeSkills();
-    }
-
-    function updateAgeLogic() {
-        char.age = document.getElementById('age-select').value;
-        let max = char.age==='young'?2:(char.age==='old'?6:4);
-        if(char.freeSkills.length > max) char.freeSkills = char.freeSkills.slice(0,max);
-        updateStatsAndSkills(); 
-    }
-
-    function handleCustomInput(type) {
-        const sel = document.getElementById(type+'-select');
-        const input = document.getElementById(type+'-custom');
-        if(sel.value==='custom') { input.style.display='block'; input.value=''; input.focus(); }
-        else if(sel.value==='random') { input.style.display='none'; }
-        else { input.style.display='none'; input.value=sel.value; }
-        if(type==='memento') updateInventory();
-    }
-
-    function renderSpellButtons() {
-        const flow = char.extraKey; if(!flow) return;
-        const poolT0 = [...SPELLS.gen.slice(0,11), ...(SPELLS[flow] ? SPELLS[flow].slice(0, 3) : [])]; 
-        const poolT1 = [...SPELLS.gen.slice(11), ...(SPELLS[flow] ? SPELLS[flow].slice(3) : [])];
-        renderGrid('grid-t0', poolT0, 't0');
-        renderGrid('grid-t1', poolT1, 't1');
-    }
-
-    function renderGrid(id, list, tier) {
-        const div = document.getElementById(id);
-        div.innerHTML = "";
-        list.forEach(s => {
-            const btn = document.createElement('div');
-            btn.className = 'tag removable';
-            btn.style.cursor = 'pointer';
-            btn.innerText = s;
-            if(char.spells[tier].includes(s)) {
-                btn.style.borderColor = 'var(--gold-primary)';
-                btn.style.color = '#fff';
-                btn.style.backgroundColor = 'rgba(212, 175, 55, 0.1)';
-            } else {
-                btn.style.borderColor = '#444';
-            }
-            btn.onclick = () => {
-                if(char.spells[tier].includes(s)) char.spells[tier] = char.spells[tier].filter(x=>x!==s);
-                else {
-                    if(char.spells[tier].length >= 3) { alert("該階法術已滿 3 個！"); return; }
-                    char.spells[tier].push(s);
-                }
-                renderSpellButtons();
-                updateSpellDisplay();
-            };
-            div.appendChild(btn);
-        });
-        document.getElementById('cnt-'+tier).innerText = `${char.spells[tier].length}/3`;
-    }
-
-    function updateSpellDisplay() {
-        const div = document.getElementById('spell-summary');
-        const tags = document.getElementById('spell-tags');
-        const all = [...char.spells.t0, ...char.spells.t1];
-        if(all.length > 0) {
-            div.style.display = 'block';
-            tags.innerHTML = all.map(s => `<span class="tag spell">${s}</span>`).join('');
-        } else {
-            div.style.display = 'none';
-        }
     }
 
     /* ================= FVTT JSON 生成器 (智慧物品分類) ================= */
@@ -1208,7 +1123,7 @@
             let type = "item";
             if(itemName.includes("甲") || itemName.includes("衣") || itemName.includes("戰甲")) type = "armor";
             else if(itemName.includes("盔") || itemName.includes("帽") || itemName.includes("戰盔")) type = "helmet";
-            else if(["劍", "斧", "弓", "矛", "棍", "刀", "槍", "彈", "箭", "吹箭"].some(k => itemName.includes(k))) type = "weapon";
+            else if(["劍", "斧", "弓", "矛", "棍", "刀", "槍", "彈", "箭", "吹箭", "箭袋", "投石繩", "馬夸"].some(k => itemName.includes(k))) type = "weapon";
             
             actor.items.push(createGearItem(itemName, type));
         });
@@ -1334,7 +1249,7 @@
           jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
-        // 隱藏 toolbar 避免被截圖到 (雖然它在 content 外，但保險起見)
+        // 隱藏 toolbar 避免被截圖到
         document.querySelector('.pdf-toolbar').style.display = 'none';
         
         html2pdf().set(opt).from(element).save().then(() => {
