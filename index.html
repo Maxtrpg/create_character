@@ -451,7 +451,7 @@
             <div style="font-size:0.8em; color:var(--jade); margin-bottom:8px;">核心技能 (選 6 項)</div>
             <div id="core-skill-list" class="skill-grid"></div>
             
-            <div style="font-size:0.8em; color:var(--gold-primary); margin-top:18px; margin-bottom:8px; border-top:1px solid #333; padding-top:8px;">自由受訓 / 天賦</div>
+            <div style="font-size:0.8em; color:var(--gold-primary); margin-top:18px; margin-bottom:8px; border-top:1px solid #333; padding-top:8px;">額外受訓 / 次要技能</div>
             <div style="display:flex; gap:8px;">
                 <select id="free-skill-select"></select>
                 <button onclick="addFreeSkill()" style="background:#333; border:1px solid #555; color:#fff; cursor:pointer; padding:0 15px;">+</button>
@@ -574,7 +574,7 @@
                     <div class="pdf-inventory" id="pdf-gear"></div>
                     <div style="margin-top:10px; border-top:1px dashed #555; padding-top:5px;">
                         <span style="margin-right:15px; color:#d4af37;">銀幣: <span id="pdf-money">0</span></span>
-                        <span style="color:#d4af37;">口糧: <span id="pdf-food">0</span></span>
+                        <span style="color:#d4af37;">食物: <span id="pdf-food">0</span></span>
                     </div>
                 </div>
             </div>
@@ -587,61 +587,61 @@
     const RACES = {
         human: { 
             name: "人類", id: "human", baseMove: 10,
-            ability: "<span class='highlight'>【通權達變】</span><br><span class='wp-cost'>WP: 3</span><br>當你進行技能檢定時，你可以選擇使用其他技能進行檢定。",
+            ability: "<span class='highlight'>【通權達變】</span><br><span class='wp-cost'>WP: 3</span><br>當你進行技能檢定時，你可以選擇使用其他技能進行檢定。你必須合理地描述你是如何使用另一項技能。",
             subraces: { 
-                maztican: {name:"馬茲提卡人 (意志+1)",id:"maztican",bonus:{WIL:1},ability:"你的初始 <span class='highlight'>意志+1</span>。（上限為18）"}, 
-                payit: {name:"帕伊特人 (智力+1)",id:"payit",bonus:{INT:1},ability:"你的初始 <span class='highlight'>智力+1</span>。（上限為18）"}, 
-                kulkata: {name:"庫塔卡人 (力量+1)",id:"kulkata",bonus:{STR:1},ability:"你的初始 <span class='highlight'>力量+1</span>。（上限為18）"}, 
-                itza: {name:"伊察人 (魅力+1)",id:"itza",bonus:{CHA:1},ability:"你的初始 <span class='highlight'>魅力+1</span>。（上限為18）"}, 
-                dog: {name:"狗民 (體質+1)",id:"dog",bonus:{CON:1},ability:"你的初始 <span class='highlight'>體質+1</span>。（上限為18）"}, 
-                green: {name:"綠民 (敏捷+1)",id:"green",bonus:{AGL:1},ability:"你的初始 <span class='highlight'>敏捷+1</span>。（上限為18）"} 
+                maztican: {name:"馬茲提卡人",id:"maztican",bonus:{WIL:1},ability:"你的初始 <span class='wp'>意志+1</span>。（上限為18）"}, 
+                payit: {name:"帕伊特人",id:"payit",bonus:{INT:1},ability:"你的初始 <span class='wp'>智力+1</span>。（上限為18）"}, 
+                kulkata: {name:"庫塔卡人",id:"kulkata",bonus:{STR:1},ability:"你的初始 <span class='wp'>力量+1</span>。（上限為18）"}, 
+                itza: {name:"伊察人",id:"itza",bonus:{CHA:1},ability:"你的初始 <span class='wp'>魅力+1</span>。（上限為18）"}, 
+                dog: {name:"狗民",id:"dog",bonus:{CON:1},ability:"你的初始 <span class='wp'>體質+1</span>。（上限為18）"}, 
+                green: {name:"綠民",id:"green",bonus:{AGL:1},ability:"你的初始 <span class='wp'>敏捷+1</span>。（上限為18）"} 
             } 
         },
-        halfling: { name: "半身人", id: "halfling", baseMove: 8, extraSkill: "庫拉里", ability: "<span class='highlight'>【動如脫兔】</span><br><span class='wp-cost'>WP: 3</span> 閃避獲優勢。<br><span class='highlight'>【庫拉里製作】</span> 受訓【庫拉里】技能。" },
-        elf: { name: "精靈", id: "elf", baseMove: 10, ability: "<span class='highlight'>【心如止水】</span> 短休冥想額外回復HP/WP。", subraces: { earth: {name:"土精靈",id:"earth", ability:"<span class='highlight'>【泥土皮膚】</span> 鈍擊護甲+2，畏寒。"}, wood: {name:"木精靈",id:"wood", ability:"<span class='highlight'>【樹質皮膚】</span> 穿刺護甲+2，畏火。"}, gold: {name:"金精靈",id:"gold", ability:"<span class='highlight'>【金屬皮膚】</span> 穿刺護甲+2，畏火。"} } },
-        dwarf: { name: "矮人", id: "dwarf", baseMove: 8, ability: "<span class='highlight'>【刻骨銘心】</span><br><span class='wp-cost'>WP: 3</span> 對仇敵攻擊獲優勢。<br><span class='highlight'>【沙漠耐性】</span><br><span class='wp-cost'>WP: 2</span> 抵抗飢餓/睡眠不足。" },
-        eagle: { name: "鷹人", id: "eagle", baseMove: 12, ability: "<span class='highlight'>【銳眼】</span> 遠距無劣勢。<br><span class='highlight'>【飛翼】</span><br><span class='wp-cost'>WP: 2</span> 戰鬥中飛行。" },
-        lizard: { name: "蜥蜴人", id: "lizard", baseMove: 10, ability: "<span class='highlight'>【屏氣】</span><br><span class='wp-cost'>WP: 1</span> 水下閉氣。<br><span class='highlight'>【肉食者】</span><br><span class='wp-cost'>WP: 3</span> 撕咬回血，不吃肉會憤怒。" },
+        halfling: { name: "半身人", id: "halfling", baseMove: 8, extraSkill: "庫拉里", ability: "<span class='highlight'>【動如脫兔】</span><br><span class='wp-cost'>WP: 3</span> 當你閃避攻擊時，你可以發動此能力，讓你的閃避檢定獲得 1 個優勢。<br><span class='highlight'>【庫拉里製作】</span> 你懂得怎麼製作麻痺毒藥－庫拉里的方法。你獲得並受訓次要技能【庫拉里】(智力)，可花一班時間製作1-3劑庫拉里毒藥(每劑1重量)：<br>．2點WP可製作1劑弱效麻痺毒藥。<br>．4點WP可製作1劑中效麻痺毒藥。<br>．6點WP可製作1劑強效麻痺毒藥。<br>在戰鬥中，你可以用一個動作將毒藥抹在武器上並同時進行攻擊。" },
+        elf: { name: "精靈", id: "elf", baseMove: 10, ability: "<span class='highlight'>【心如止水】</span> 你可以在短休時進行深度冥想。你可以額外回復 1D6 HP 和 1D6 WP，並恢復一個狀態。你在冥想期間完全無法回應周遭世界，甚至無法被喚醒。", subraces: { earth: {name:"土精靈",id:"earth", ability:"<span class='highlight'>【泥土皮膚】</span> 當你受到鈍擊傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到霜凍傷害時會損失 1d3 WP。"}, wood: {name:"木精靈",id:"wood", ability:"<span class='highlight'>【樹質皮膚】</span> 當你受到穿刺傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到火焰傷害時會損失 1d3 WP。"}, gold: {name:"金精靈",id:"gold", ability:"<span class='highlight'>【金屬皮膚】</span> 當你受到穿刺傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到火焰傷害時會損失 1d3 WP。"} } },
+        dwarf: { name: "矮人", id: "dwarf", baseMove: 8, ability: "<span class='highlight'>【刻骨銘心】</span><br><span class='wp-cost'>WP: 3</span> 當你攻擊曾經傷害過你（至少 1 點傷害）的人時，你可以發動此能力，讓該次攻擊檢定獲得 1 個優勢。那個人是什麼時候傷害過你一點都不重要，所以你最好將所有傷害過你的人都記下來，以免忘記。<br><span class='highlight'>【沙漠耐性】</span><br><span class='wp-cost'>WP: 2</span> 當在極端環境下，環境對你造成的影響將會減輕（由GM判定）。此外，當你因為一整天沒有進食將獲得【飢餓】狀態，或一整天沒有睡眠將獲得【睡眠不足】時。你可以進行體質檢定，成功可避免獲得該狀態。每多一天未進食或睡眠，該檢定便多一個劣勢。" },
+        eagle: { name: "鷹人", id: "eagle", baseMove: 12, ability: "<span class='highlight'>【銳眼】</span> 你可以看到最遠 200 米外的人或物體，就像在眼前一樣清楚。且對超出武器有效射程的目標進行攻擊不會獲得 1 個劣勢。<br><span class='highlight'>【飛翼】</span><br><span class='wp-cost'>WP: 2</span>翅膀讓你可以用移動力在空中自由飛翔。在戰鬥時，你必須控制雙翅來穩定地進行戰鬥，每輪需消耗 2 WP 才能維持飛行。非戰鬥時，每一刻飛行時間消耗 1 WP。" },
+        lizard: { name: "蜥蜴人", id: "lizard", baseMove: 10, ability: "<span class='highlight'>【屏氣】</span><br><span class='wp-cost'>WP: 1</span> 當你在水中時，你可以消耗1點WP來自動通過溺水時的體質檢定。此外，你也可以發動此能力來合理地避開某些危險情況(由GM判斷)。<br><span class='highlight'>【肉食者】</span><br><span class='wp-cost'>WP: 3</span> 你每餐都要吃肉，如果一整天沒有吃肉，你會陷入憤怒狀態，此情況造成的憤怒狀態只能靠吃肉來消除(短休和長休無法消除)。此外，你可以對有血肉的生物進行特殊的徒手攻擊。發動此能力並花費3WP，攻擊命中時造成揮砍傷害並撕扯下血肉吃掉，恢復你造成傷害的一半HP。（但亂吃有可能會出事）" },
         panther: { 
             name: "豹人", id: "panther", baseMove: 12, 
-            ability: "<span class='highlight'>【叢林伏擊】</span><br><span class='wp-cost'>WP: 2</span> 叢林隱匿獲優勢。", 
+            ability: "<span class='highlight'>【叢林伏擊】</span><br><span class='wp-cost'>WP: 2</span> 當你處在茂密的樹林中時，你可以發動此能力在隱匿檢定中獲得一個優勢。", 
             subraces: { 
-                hunter: {name:"狩豹人", id:"hunter", ability:"<span class='highlight'>【狩獵本能】</span><br><span class='wp-cost'>WP: 3</span> 鎖定獵物獲優勢。"}, 
-                ocelot: {name:"豹貓人", id:"ocelot", ability:"<span class='highlight'>【迅捷攀爬】</span><br><span class='wp-cost'>WP: 2</span> 攀爬檢定獲優勢。"} 
+                hunter: {name:"狩豹人", id:"hunter", ability:"<span class='highlight'>【狩獵本能】</span><br><span class='wp-cost'>WP: 3</span> 你可以發動此能力來鎖定一個處於你視線範圍內，或你可以聞到氣味的生物，作為你的獵物（在戰鬥中需要一個動作）。你可以追蹤獵物的氣味一整天，且當你攻擊獵物時，你可以消耗 1 WP 讓該次攻擊獲得 1 個優勢。"}, 
+                ocelot: {name:"豹貓人", id:"ocelot", ability:"<span class='highlight'>【迅捷攀爬】</span><br><span class='wp-cost'>WP: 2</span> 你在進行攀爬相關活動時，你可以發動此能力在體操檢定獲得一個優勢。"} 
             } 
         },
-        frog: { name: "蛙人", id: "frog", baseMove: 10, ability: "<span class='highlight'>【猛力彈跳】</span><br><span class='wp-cost'>WP: 3</span> 跳躍攻擊獲優勢。<br><span class='highlight'>【休聲美譽】</span><br><span class='wp-cost'>WP: 2</span> 社交檢定獲優勢。" }
+        frog: { name: "蛙人", id: "frog", baseMove: 10, ability: "<span class='highlight'>【猛力彈跳】</span><br><span class='wp-cost'>WP: 3</span> 你可以發動此能力來水平跳躍等於移動力的距離，或是垂直跳躍等於移動力一半的距離（都不需要進行體操檢定）。若你在跳躍後進行一次近戰攻擊，該次攻擊會獲得 1 個優勢。<br><span class='highlight'>【休聲美譽】</span><br><span class='wp-cost'>WP: 2</span> 由於蛙人在外的良好名聲，在合理的情況下(由GM判定)，你可以在一次交易、欺瞞、遊說或表演檢定中獲得優勢。" }
     };
 
     const PROFESSIONS = {
-        artisan: { name: "工匠", id: "artisan", attr: "STR", resource: "1D8 食物, 1D8 銀幣", skills: ["工藝", "巧手", "調查", "徒手", "斧", "棍棒", "劍", "小刀"], heroAbilities: {a:"【鍛匠大師】<span class='wp-cost'>WP: 3</span> 銳化武器。", b:"【木匠大師】<span class='wp-cost'>WP: 1</span> 破門或打造木器。", c:"【皮匠大師】製作獸皮甲。", d:"【羽匠大師】製作羽毛護身符。"}, gear: [{name:"1.劍/鍛造",items:["馬卡劍","棉甲","鍛匠工具","火炬","打火匣"]},{name:"2.棒/木工",items:["碎骨棒","棉甲","木匠工具","火炬","10米麻繩","打火匣"]},{name:"3.斧/皮匠",items:["黑曜石斧","獸皮甲","皮匠工具","提燈","燈油","打火匣"]},{name:"4.刀/織布",items:["黑曜石小刀","棉甲","織布工具","火炬","毛毯","打火匣"]}] },
-        hunter: { name: "獵人", id: "hunter", attr: "AGL", resource: "1D8 食物, 1D6 銀幣", skills: ["體操", "狩獵", "隱匿", "察覺", "求生", "小刀", "弓", "吹箭"], heroAbilities: {a:"【動物夥伴】<span class='wp-cost'>WP: 3</span> 擁有一隻偵查與助戰動物。", b:"【雙重射擊】<span class='wp-cost'>WP: 3</span> 弓/吹箭一次射兩發。", c:"【陷阱大師】花時間製作各種陷阱。"}, gear: [{name:"1.弓箭",items:["小刀","戰弓","箭袋","獸皮甲","睡袋","火炬","打火匣","繩索","陷阱"]},{name:"2.投石",items:["小刀","投石繩","彈丸","獸皮甲","睡袋","火炬","打火匣","繩索","釣竿"]},{name:"3.吹箭",items:["短劍","吹箭筒","吹箭","獸皮甲","睡袋","火炬","打火匣","繩索","陷阱"]}] },
-        bard: { name: "詩人", id: "bard", attr: "CHA", resource: "1D6 食物, 1D8 銀幣", skills: ["體操", "閃避", "語言", "祕聞傳說", "欺瞞", "表演", "遊說", "小刀"], heroAbilities: {a:"【音樂家】<span class='wp-cost'>WP: 3</span> 盟友優勢或敵人劣勢。",b:"【頌神曲】<span class='wp-cost'>WP: 3</span> 祈禱獲神賜。",c:"【戰歌】<span class='wp-cost'>WP: 3</span> 消除狀態回WP。"}, gear: [{name:"1.骨銼",items:["骨銼","小刀","油燈","燈油","打火匣"]},{name:"2.長笛",items:["長笛","小刀","繩索","火炬","打火匣"]},{name:"3.號角",items:["號角","小刀","火炬","打火匣"]}] },
-        warrior: { name: "戰士", id: "warrior", attr: "STR", resource: "1D6 食物, 1D6 銀幣", skills: ["閃避", "徒手", "斧", "棍棒", "矛", "劍", "弓", "投槍器"], heroAbilities: {a:"【老兵】<span class='wp-cost'>WP: 1</span> 保留先攻，武器技能+1。",b:"【狂暴】<span class='wp-cost'>WP: 3</span> 獲憤怒，攻擊優勢增傷。",c:"【雙重斬擊】<span class='wp-cost'>WP: 3</span> 同時攻擊兩人。"}, 
+        artisan: { name: "工匠", id: "artisan", attr: "STR", resource: "1D8 食物, 1D8 銀幣", skills: ["工藝", "巧手", "調查", "徒手", "斧", "棍棒", "劍", "小刀"], heroAbilities: {a:"【鍛匠大師】<span class='wp-cost'>WP: 3</span> 此能力需要鍛匠工具。你可以利用鍛匠工具做以下的事情：<br>．在一刻時間內，你可以消耗 3 WP，銳化一把帶有黑曜石刀刃或尖端的武器。當使用銳化武器進行攻擊時，目標的護甲值會視為降低 2 點。一旦在戰鬥中使用銳化武器進行過攻擊或格擋，銳化效果會在該戰鬥結束後終止。<br>．在一班時間內，你可以嘗試從裝備列表中打造一把黑曜石武器。這個過程需要重量為 1 的黑曜石。消耗的 WP 等於物品的金幣價格（向上取整）。若你沒有足夠的 WP，你可以將工作分成好幾班的時間來處理。<br>或者，你可以使用蒐集到的材料試圖強化黑曜石裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", b:"【木匠大師】<span class='wp-cost'>WP: 1</span> 此能力需要木匠工具。你可以利用木匠工具做以下的事情：<br>．以一個動作，你可以消耗 1 WP 對門、牆壁或其他無生命物體造成 1d12 傷害（無視護甲值）。<br>．在一班時間內，你可以嘗試從裝備列表中打造一個木製物品，例如棍棒、長棍。這個過程需要重量為 1 的木頭。消耗的 WP 等於物品的金幣價格（向上取整）。<br>或者，你可以使用蒐集到的材料試圖強化木材裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", c:"【皮匠大師】此能力需要皮匠工具。你可以利用皮匠工具做以下的事情：<br>．你可以嘗試從將一隻動物或怪物的皮做成一套獸皮甲。該皮甲的護甲值等於野獸護甲值的一半（向上取整），至少為 1。這個過程耗時一班時間，消耗的 WP 等於物品的護甲值。<br>或者，你可以使用蒐集到的材料試圖強化毛皮裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", d:"【羽匠大師】此能力需要織布工具。你可以利用織布工具做以下的事情：<br>．在一班時間內，你可以嘗試從裝備列表中打造一套服裝。這個過程需要重量為 1 的植物纖維或羽毛。消耗的 WP 等於物品的金幣價格（向上取整）。若你沒有足夠的 WP，你可以將工作分成好幾班的時間來處理。<br>或者，你可以試圖製作羽毛護身符，這些護身符有特殊的效果（詳見「鍛造＆強化」章節），可以當成單獨的飾品配戴，也可以再加工到服裝上。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的打造結果。"}, gear: [{name:"1.劍/鍛造",items:["馬卡劍","棉甲","鍛匠工具","火炬","打火匣"]},{name:"2.棒/木工",items:["碎骨棒","棉甲","木匠工具","火炬","10米麻繩","打火匣"]},{name:"3.斧/皮匠",items:["黑曜石斧","獸皮甲","皮匠工具","提燈","燈油","打火匣"]},{name:"4.刀/織布",items:["黑曜石小刀","棉甲","織布工具","火炬","毛毯","打火匣"]}] },
+        hunter: { name: "獵人", id: "hunter", attr: "AGL", resource: "1D8 食物, 1D6 銀幣", skills: ["體操", "狩獵", "隱匿", "察覺", "求生", "小刀", "弓", "吹箭"], heroAbilities: {a:"【動物夥伴】<span class='wp-cost'>WP: 3</span> 你可以發動此能力，將一隻動物馴服為你的夥伴。此過程需耗時一刻時間，且你同時只能擁有一隻動物夥伴。<br>只要你待在該動物的自然棲息地，牠就會一直跟著你。牠可以為你偵察附近環境，而不需要消耗額外的 WP。在戰鬥中，你可以額外消耗 3 WP，命令夥伴攻擊一名敵人（不需要花費你的動作）。", b:"【雙重射擊】<span class='wp-cost'>WP: 3</span> 當你使用 弓 或 吹箭筒 進行攻擊時，你可以發動此能力來射出兩支箭矢/吹箭。你可以指定同一個目標、或兩個不同的目標<br>無論如何，都只進行一次帶有 1 個劣勢的攻擊檢定。傷害分開計算。", c:"【陷阱大師】當你在森林中時，你可以耗時一刻時間蒐集材料，並在你指定的地點設置陷阱。花費的WP和陷阱作用詳見下表。<br>．圈套陷阱<span class='wp-cost'>WP: 2</span> 用纖維繩（龍舌蘭纖維、藤蔓）做成繩圈，固定在樹根或木樁上，連接觸發機關。每當有生物觸發陷阱時，需進行閃避檢定，失敗視為被擒抱。繩子可以被割斷。<br>．囚籠陷阱：<span class='wp-cost'>WP: 2</span> 用藤蔓或木條製成簡易籠子，內部放置誘餌，一旦觸動機關，籠子扣下並鎖住獵物。使目標「被困」在籠內，行動受限，只能嘗試破壞或推翻籠子。<br>．陷坑陷阱：<span class='wp-cost'>WP: 3</span> 挖一個偽裝的深坑，底部插入削尖的木樁，再用樹葉或泥土覆蓋。每當有生物觸發陷阱時，需進行閃避檢定，失敗將跌入3米陷坑，並受到2D4穿刺傷害。<br>．落石陷阱：<span class='wp-cost'>WP: 3</span> 用繩索懸掛一塊巨石，設計觸發點讓石頭砸落。每當有生物觸發陷阱時，需進行閃避檢定，失敗被擊倒伏地，並受到2D6鈍擊傷害。<br>．藤鞭陷阱：<span class='wp-cost'>WP: 3</span> 將彈力強的細樹枝或藤條拉緊，綁上尖刺或石頭，觸發後迅速彈出。每當有生物觸發陷阱時，需進行閃避檢定，失敗被擊飛2D6米，並受到等量揮砍傷害。"}, gear: [{name:"1.弓箭",items:["小刀","戰弓","箭袋","獸皮甲","睡袋","火炬","打火匣","繩索","陷阱"]},{name:"2.投石",items:["小刀","投石繩","彈丸","獸皮甲","睡袋","火炬","打火匣","繩索","釣竿"]},{name:"3.吹箭",items:["短劍","吹箭筒","吹箭","獸皮甲","睡袋","火炬","打火匣","繩索","陷阱"]}] },
+        bard: { name: "詩人", id: "bard", attr: "CHA", resource: "1D6 食物, 1D8 銀幣", skills: ["體操", "閃避", "語言", "祕聞傳說", "欺瞞", "表演", "遊說", "小刀"], heroAbilities: {a:"【音樂家】<span class='wp-cost'>WP: 3</span> 你動人的聲音可以鼓舞你的盟友或挫敗你的敵人。<br>發動此能力（一個動作）可以讓 10 米內所有盟友的所有檢定獲得 1 個優勢，或讓相同範圍內的所有敵人獲得 1 個劣勢（選擇其中一種）。效果持續到你下一個回合開始。",b:"【頌神曲】<span class='wp-cost'>WP: 3</span> 你精通讚揚神祇的祭文禱詞。<br>每日一次，在適當的地方耗時一刻時間向當日侍神誠心唸頌禱詞，進行表演檢定。若成功，則侍神將會聽到你的祈禱，並降下神賜給整個隊伍。<br>降下何種神賜取決於當日的守護侍神。（詳見曆法章節）",c:"【戰歌】<span class='wp-cost'>WP: 3</span> 你精通鼓舞士氣和振奮人心的激昂戰歌。<br>你可以耗時一刻時間鼓舞隊友，消除其他人的畏縮和沮喪狀態，每個消除的狀態可回復該隊友2WP。<br>此外，在戰鬥時，你也可以用一個動作吼出激勵的戰鬥誓言，聽得見你的所有其他同伴立刻自選 1 個狀態消除。"}, gear: [{name:"1.骨銼",items:["骨銼","小刀","油燈","燈油","打火匣"]},{name:"2.長笛",items:["長笛","小刀","繩索","火炬","打火匣"]},{name:"3.號角",items:["號角","小刀","火炬","打火匣"]}] },
+        warrior: { name: "戰士", id: "warrior", attr: "STR", resource: "1D6 食物, 1D6 銀幣", skills: ["閃避", "徒手", "斧", "棍棒", "矛", "劍", "弓", "投槍器"], heroAbilities: {a:"【老兵】<span class='wp-cost'>WP: 1</span> 多年來的實戰經驗，讓你能在戰場上持續把握主動權，不被局勢的混亂所動搖。<br>(創角時)你從武器技能裡選擇一項，該武器的技能數值成長1點。<br>此外，在每一輪開始時，你可以發動此能力來保留你上一輪的先攻卡，而不抽取新的先攻卡。",b:"【狂暴】<span class='wp-cost'>WP: 3</span> 你立即獲得「憤怒」狀態，並立即對最近的敵人進行一次近戰攻擊。狂暴持續到戰場上沒有敵人，或你 HP 歸零為止。<br>狂暴期間：<br>．你的近戰攻擊獲得一個優勢。<br>．若你攻擊前額外消耗 1 WP ，該次命中額外造成 +1D4 傷害。<br>．擊殺一個敵人後，你可以立刻移動2米。<br>．你不能格擋或閃避。<br>戰鬥結束之後，你會陷入力竭狀態。",c:"【雙重斬擊】<span class='wp-cost'>WP: 3</span> 當你持握揮砍武器時，你可以同時對兩個相距你 2 米內的敵人進行一次攻擊。<br>你只進行一次攻擊檢定，若成功則同時命中兩個敵人。敵人可以分別進行格擋或閃避。傷害骰也分開計算。<br>此能力可以與「雙持戰鬥」能力結合。"}, 
             gear: [
                 {name:"1.近戰", choices:["馬卡劍","銅斧","碎骨棒"], items:["圓盾","皮革戰甲","火炬","打火匣"]},
                 {name:"2.輕裝", choices:["馬卡短劍","黑曜石斧","投射標槍"], items:["投槍器","黑曜石箭袋","棉甲","火炬","打火匣"]},
                 {name:"3.長柄", items:["木矛","皮革戰甲","木製戰盔","打火匣"]}
             ] 
         },
-        knight: { name: "騎士", id: "knight", attr: "STR", resource: "1D6 食物, 1D12 銀幣", skills: ["野獸知識", "祕聞傳說", "表演", "遊說", "棍棒", "矛", "劍", "投槍器"], heroAbilities: {a:"【守護者】<span class='wp-cost'>WP: 2</span> 為盟友擋刀。",b:"【舉盾格擋】<span class='wp-cost'>WP: 3</span> 盾擋獲優勢。",c:"【堅強防禦】<span class='wp-cost'>WP: 3</span> 反應格擋。"}, extraLabel:"騎士團", extraOptions:{eagle:{name:"鷹騎士團",desc:"<span class='highlight'>【羽父之祝福】</span> 死亡時復活一次。",addSkills:[]}, jaguar:{name:"豹騎士團",desc:"<span class='highlight'>【噬心者之怒】</span> 死亡時心臟自爆。",addSkills:[]}}, 
+        knight: { name: "騎士", id: "knight", attr: "STR", resource: "1D6 食物, 1D12 銀幣", skills: ["野獸知識", "祕聞傳說", "表演", "遊說", "棍棒", "矛", "劍", "投槍器"], heroAbilities: {a:"【守護者】<span class='wp-cost'>WP: 2</span> 你願意毫不猶豫地為盟友擋下攻擊。<br>若你和另一名盟友都與同一名敵人相距 2 米內，當該敵人嘗試攻擊你的盟友時，你可以發動此能力，強迫敵人改為攻擊你。<br>此能力可以在你的回合外使用，且不需要花費動作。",b:"【舉盾格擋】<span class='wp-cost'>WP: 3</span> 當你使用盾牌進行格擋時，你可以發動此能力讓該次格擋檢定獲得 1 個優勢。<br>另外，你也可以使用此能力用盾牌格擋通常無法被格擋的怪物物理攻擊（AOE由GM判斷）。<br>此能力可以和「堅強防禦」能力結合。",c:"【堅強防禦】<span class='wp-cost'>WP: 3</span> 你可以在不消耗該輪動作的情況下嘗試格擋一次攻擊。<br>你只能對同一次攻擊嘗試格擋一次，且你無法再對該次攻擊進行閃避或格擋。<br>只要你有足夠的 WP，你在同一輪中可以多次發動此能力。"}, extraLabel:"騎士團", extraOptions:{eagle:{name:"鷹騎士團",desc:"<span class='highlight'>【羽父之祝福】</span> 每一位真正的鷹騎士，都背負著羽父的羽翼。這份羽翼只會展開一次，帶領你越過死亡，直至最後的榮耀。<br>當你死亡時，下一輪你的身體將會發出神性的光輝，你視為獲得復活術的效果，且不會受到負面影響。一旦此祝福發動後，你將永久失去此項特性。",addSkills:[]}, jaguar:{name:"豹騎士團",desc:"<span class='highlight'>【噬心者之怒】</span> 當豹騎士殞落時，他的心臟化為復仇的祭品，帶著札爾特克的憤怒爆裂而出，血肉為祭，怒火燃燒，將敵人一併拖入獻祭的火焰之中。<br>當你死亡時，下一輪你的心臟將會爆裂而出，血肉為祭，以你為中心施放威力等級3的「札爾特克之怒」法術，且該法術的範圍和傷害都變成2倍。",addSkills:[]}}, 
             gear: [
                 {name:"騎士標準", choices:["馬卡劍","馬卡短劍","銅斧","碎骨棒","木矛"], items:["投槍器","投射標槍","圓盾","木製戰盔","火炬","打火匣"]}
             ]
         },
         shaman: { name: "薩滿", id: "shaman", attr: "WIL", resource: "1D6 食物, 1D8 銀幣", skills: ["閃避", "棍棒"], heroAbilities: {a:"【魔法】身為薩滿，你創角時不會獲得英雄能力，而是可以施放魔法。"}, extraLabel:"魔法流派", 
             extraOptions:{
-                soul:{name:"靈魂流派",desc:"掌控靈魂與精神。",addSkills:["靈魂流派","體操","閃避","察覺","醫療","語言","祕聞傳說","棍棒"], mainSkill:"靈魂流派"}, 
-                beast:{name:"獸術流派",desc:"野性與狩獵之力。",addSkills:["獸術流派","閃避","狩獵","隱匿","野獸知識","求生","棍棒","小刀"], mainSkill:"獸術流派"}, 
-                pluma:{name:"羽術流派",desc:"生命與保護之力。",addSkills:["羽術流派","閃避","體操","隱匿","野獸知識","求生","醫療","察覺"], mainSkill:"羽術流派"}, 
-                elem:{name:"元素流派",desc:"操控四大元素。",addSkills:["元素流派","閃避","察覺","醫療","語言","祕聞傳說","調查","棍棒"], mainSkill:"元素流派"}
+                soul:{name:"靈魂流派",desc:"馬茲提卡人和崇拜馬茲提克諸神的靈魂被稱為托那利(tonalli)，在死亡的那一刻，他們會到達一座宏偉的神廟。<br>研究靈魂能量的薩滿，尊敬祖先的靈魂或世界本身的精神能量。<br>他們相信靈魂是力量的源泉，透過儀式可治癒、強化，甚至操縱他人精神。",addSkills:["靈魂流派","體操","閃避","察覺","醫療","語言","祕聞傳說","棍棒"], mainSkill:"靈魂流派"}, 
+                beast:{name:"獸術流派",desc:"蟲噬、獸爪與毒液的魔法，是邪神噬心者札爾特克賜予人類的黑暗贈禮。<br>這些法術暴力而無情，模仿野獸的殘酷與掠食，但這些薩滿認為這是生存在殘酷大地上的必要力量。<br>唯有藉由獸術，他們才能以野性的殘暴對抗荒野中的威脅，確保族群得以存續。",addSkills:["獸術流派","閃避","狩獵","隱匿","野獸知識","求生","棍棒","小刀"], mainSkill:"獸術流派"}, 
+                pluma:{name:"羽術流派",desc:"由大地母神馬茲提卡親自創造，並由其子夸爾特賜予人類，用以對抗札爾特克的大軍。<br>羽術薩滿透過羽毛、光輝與聖歌施法，象徵純潔、保護與秩序。",addSkills:["羽術流派","閃避","體操","隱匿","野獸知識","求生","醫療","察覺"], mainSkill:"羽術流派"}, 
+                elem:{name:"元素流派",desc:"相信火、風、水、土是構成萬物的根本。他們透過操縱這四種元素來釋放力量，展現出大自然原始而無情的威能。",addSkills:["元素流派","閃避","察覺","醫療","語言","祕聞傳說","調查","棍棒"], mainSkill:"元素流派"}
             }, 
             gear: [{name:"1.水晶球",items:["硬木棒","水晶球","魔導書","火炬","打火匣"]},{name:"2.魔杖",items:["小刀","魔杖","魔導書","火炬","打火匣"]},{name:"3.聖徽",items:["聖徽","魔導書","睡袋","火炬","打火匣"]}] 
         },
-        scholar: { name: "學者", id: "scholar", attr: "INT", resource: "1D6 食物, 1D10 銀幣", skills: ["閃避", "察覺", "野獸知識", "求生", "醫療", "語言", "祕聞傳說", "調查"], heroAbilities: {a:"【直覺思考】<span class='wp-cost'>WP: 3</span> 詢問GM獲提示。",b:"【現場教學】<span class='wp-cost'>WP: 3</span> 協助複數盟友。",c:"【經驗分享】傳授技能成長機會。"}, extraLabel:"術業有專攻", extraOptions:{celest:{name:"天律",desc:"改寫失敗", extraSkill:"天律學"}, theo:{name:"神律",desc:"重骰", extraSkill:"神律學"}, num:{name:"數律",desc:"操縱先攻", extraSkill:"數律學"}, vita:{name:"生知",desc:"失敗獲升級標記"}}, gear: [{name:"1.筆記",items:["硬木棒","筆記本","羽毛筆","睡袋","火炬","打火匣"]},{name:"2.書籍",items:["黑曜石小刀","書本","睡袋","油燈","燈油","打火匣"]},{name:"3.醫療",items:["投石繩","繃帶","催眠毒藥","睡袋","提燈","燈油","打火匣"]}] },
-        thief: { name: "盜賊", id: "thief", attr: "AGL", resource: "1D6 食物, 1D10 銀幣", skills: ["巧手","隱匿","體操","閃避","察覺","調查","欺瞞","小刀"], heroAbilities: {a:"【背刺】<span class='wp-cost'>WP: 3</span> 偷襲獲優勢增傷。",b:"【迅捷步法】<span class='wp-cost'>WP: 3</span> 反應閃避。",c:"【閃電速度】<span class='wp-cost'>WP: 2</span> 先攻二選一。"}, gear: [{name:"1.爪鉤",items:["黑曜石小刀","投石繩","黑曜石彈丸袋","10米麻繩","爪鉤","火炬","打火匣"]},{name:"2.開鎖",items:["黑曜石小刀","簡易開鎖器","火炬","打火匣"]},{name:"3.滾珠",items:["黑曜石小刀","吹箭筒","吹箭袋","滾珠","火炬","打火匣"]}] },
-        pochteca: { name: "旅商", id: "pochteca", attr: "CHA", resource: "1D6 食物, 1D12 銀幣", skills: ["交易","遊說","閃避","騎術","察覺","調查","欺瞞","小刀"], heroAbilities: {a:"【察言觀色】<span class='wp-cost'>WP: 3</span> 判斷情緒謊言。",b:"【商隊領袖】<span class='wp-cost'>WP: 3</span> 縮短旅行時間。",c:"【情報掮客】<span class='wp-cost'>WP: 3</span> 獲取情報。"}, gear: [{name:"1.野炊",items:["黑曜石小刀","野炊工具","馬車","火炬","打火匣"]},{name:"2.提燈",items:["黑曜石小刀","提燈","馬車","燈油","打火匣"]}] },
-        farmer: { name: "農民", id: "farmer", attr: "INT", resource: "1D8 食物, 1D10 銀幣", skills: ["求生","工藝","狩獵","野獸知識","察覺","游泳","調查","徒手"], heroAbilities: {a:"【浮田耕藝】種植浮田(習得浮田術)。",b:"【水獵巧技】<span class='wp-cost'>WP: 2</span> 水中優勢。",c:"【大廚】烹飪美食。", extraSkill:"廚藝"}, gear: [{name:"1.槌子",items:["槌子","野炊工具","火炬","打火匣"]},{name:"2.鎬",items:["十字鎬","睡袋","油燈","燈油","打火匣"]},{name:"3.鏟子",items:["鏟子","釣竿","火炬","打火匣"]}] }
+        scholar: { name: "學者", id: "scholar", attr: "INT", resource: "1D6 食物, 1D10 銀幣", skills: ["閃避", "察覺", "野獸知識", "求生", "醫療", "語言", "祕聞傳說", "調查"], heroAbilities: {a:"【直覺思考】<span class='wp-cost'>WP: 3</span> 當面臨困難抉擇時，你可以發動此能力，直接詢問 GM 一個問題，並得到一個有用的答案。<br>該答案代表你的廣泛知識，僅有助於你的決策，無法揭示所有需要知道的事情。",b:"【現場教學】<span class='wp-cost'>WP: 3</span> 你可以快速講述知識來幫助所有人。當你在協助他人時，你可以協助複數盟友進行同一項檢定。<br>但你協助的對象有人檢定失敗的話你陷入憤怒狀態（若你還未憤怒）。",c:"【經驗分享】在技能成長階段開始前，你可以放棄一項技能成長機會，將自身經驗傳授給其他夥伴，讓最多兩位盟友額外獲得該項技能成長機會，之後正常進行技能成長流程。<br>你不能選擇已經標記該技能的盟友。"}, extraLabel:"術業有專攻", extraOptions:{celest:{name:"天律",desc:"你能解讀日月星辰的運行，辨明天體之間的軌跡。天象既是神祇的語言，也是未來的暗示。<br>．獲得「天律學」(智力)次要技能。<br>．當你進行技能檢定時，合理狀況下（由GM判定）可發動此能力改用「天律學」，並獲得 1 個優勢。<br>．在第四班長休時，你可耗費一刻時間觀看星象。發動此能力進行「天律學」檢定，你將捕捉到星律——天體運行所揭示的恆定秩序。在該次團務剩下的時間內，你可以發動此能力將一個失敗(大失敗除外)的檢定改為成功。（每場團務限一次）", extraSkill:"天律學"}, theo:{name:"神律",desc:"你並非以祈禱祈求神蹟，而是以研究神祇的律法與祭儀來獲取力量。你知道該如何取悅神祇，才能讓神意在凡世迴響。<br>．獲得「神律學」(智力)次要技能。<br>．當你進行技能檢定時，合理狀況下可發動此能力改用「神律學」，並獲得 1 個優勢。<br>．此外，當你身處與某位神祇相關的場所（神廟、祭壇、聖徽或象徵領域）時，你可以花費一刻時間進行「神律學」檢定。若成功，你得以理解此地所運行的神之法則，並以理論推演模擬其邏輯。在該次團務剩下的時間內檢定出現大失敗時，你可宣告「引用神律」來重構事件的結果，使該檢定重新擲骰一次並取較佳結果（每場團務限一次）。這代表你以對神法的理解暫時干預了命運的演算。", extraSkill:"神律學"}, num:{name:"數律",desc:"當你進行技能檢定時，合理的狀況下（由GM判定）可發動此能力改用「數律學」，並獲得 1 個優勢。<br>．此外，你能快速測算敵人的站位與距離來找到反擊的機會。當戰鬥的一輪結束時，你可以在抽下一輪的先攻卡前發動此能力。進行「數律學」檢定，若成功，你可以讓所有敵人先抽取先攻卡，剩下的先攻卡你可以自行分配給所有隊友。（每場戰鬥限一次）", extraSkill:"數律學"}, vita:{name:"生知",desc:"你從生命的經驗中學習世界的法則。每一次錯誤、傷痕與發現，都是知識的印記；唯有親身體驗，才能真正理解世界的運作。<br>．你從智力相關的核心技能中選擇一項，該技能的技能等級提升 1。<br>．當你使用你選擇提升的技能進行檢定時，你可發動此能力來獲得 1 個優勢。<br>．此外，你能從錯誤中累積經驗並快速學習。當你技能檢定失敗時，你可以發動此能力，直接將該技能標上提升標記。（每場團務限一次）"}}, gear: [{name:"1.筆記",items:["硬木棒","筆記本","羽毛筆","睡袋","火炬","打火匣"]},{name:"2.書籍",items:["黑曜石小刀","書本","睡袋","油燈","燈油","打火匣"]},{name:"3.醫療",items:["投石繩","繃帶","催眠毒藥","睡袋","提燈","燈油","打火匣"]}] },
+        thief: { name: "盜賊", id: "thief", attr: "AGL", resource: "1D6 食物, 1D10 銀幣", skills: ["巧手","隱匿","體操","閃避","察覺","調查","欺瞞","小刀"], heroAbilities: {a:"【背刺】<span class='wp-cost'>WP: 3</span> 當你對一名敵人進行近戰攻擊時，若該敵人和你的另一個盟友相距 2 米內，你可以發動此能力。<br>你的攻擊會視為偷襲，代表敵人無法閃避或格擋、你的攻擊檢定獲得 1 個優勢、傷害骰數量增加一顆（例如 1D8 變成 2D8）。<br>只有靈巧武器才能發動此能力。",b:"【迅捷步法】<span class='wp-cost'>WP: 3</span> 你可以在不消耗該輪動作的情況下嘗試閃避一次攻擊。<br>你只能對同一次攻擊嘗試閃避一次，且你無法再對該次攻擊進行躲閃避或格擋。<br>只要你有足夠的 WP，你在同一輪中可以多次使用此能力。",c:"【閃電速度】<span class='wp-cost'>WP: 2</span> 當戰鬥開始抽先攻卡時，你可以抽兩張卡，並選擇想要的其中一張。"}, gear: [{name:"1.爪鉤",items:["黑曜石小刀","投石繩","黑曜石彈丸袋","10米麻繩","爪鉤","火炬","打火匣"]},{name:"2.開鎖",items:["黑曜石小刀","簡易開鎖器","火炬","打火匣"]},{name:"3.滾珠",items:["黑曜石小刀","吹箭筒","吹箭袋","滾珠","火炬","打火匣"]}] },
+        pochteca: { name: "旅商", id: "pochteca", attr: "CHA", resource: "1D6 食物, 1D12 銀幣", skills: ["交易","遊說","閃避","騎術","察覺","調查","欺瞞","小刀"], heroAbilities: {a:"【察言觀色】<span class='wp-cost'>WP: 3</span> 你對人心的觀察遠超常人。在你與另一個人的談話中，你可以發動此能力進行察覺檢定。依照檢定結果，你可獲得下列一項或多項資訊（大成功則全部獲得）。<br>．失敗/成功：對方目前的情緒（害怕、緊張、焦躁、誠懇、傲慢等）。<br>．成功：對方是否在說謊。<br>．成功：對方對你／某人／某事的真實態度（敵意、戒心、好感、利益）。<br>．大成功：你能判斷對方潛在的動機或弱點（例如「他在保護某人」、「他在隱瞞交易」、「他受金錢驅使」）。",b:"【商隊領袖】<span class='wp-cost'>WP: 3</span> 你熟悉商路捷徑，能縮短長途旅行所需時間，並在遭遇危險時能迅速指揮眾人應對。<br>當隊伍在荒野上長途旅行（兩天以上的路程）時，你可以發動此能力來縮短1d4班的路程。<br>此外，若旅行過程中的探路檢定失敗而遇到危險時，你可以發動此能力來讓所有人面對危險的檢定獲得一個優勢。",c:"【情報掮客】<span class='wp-cost'>WP: 3</span> 在重要城邦、市集或貿易路口停留至少一天時間後，你可以發動此能力向 GM 提出一個針對當地的問題，獲得可靠訊息。這些訊息可能包括附近部族的動向、危險怪物出沒、政治陰謀或市場需求，實際能獲得什麼資訊由GM決定。"}, gear: [{name:"1.野炊",items:["黑曜石小刀","野炊工具","馬車","火炬","打火匣"]},{name:"2.提燈",items:["黑曜石小刀","提燈","馬車","燈油","打火匣"]}] },
+        farmer: { name: "農民", id: "farmer", attr: "INT", resource: "1D8 食物, 1D10 銀幣", skills: ["求生","工藝","狩獵","野獸知識","察覺","游泳","調查","徒手"], heroAbilities: {a:"【浮田耕藝】你獲得並受訓「浮田術」(智力)次要技能。<br>耗費一班時間，你可以在濕地或河湖上建造「簡易小型浮田」，能夠讓你種植少量的作物並收成，提供隊伍所需的糧食。<br>實際種植所需消耗的WP和收成時間詳見「烹飪&種植」章節。",b:"【水獵巧技】<span class='wp-cost'>WP: 2</span> 你擅長在水域裡捕獵，能在水中迅速應對情況。<br>．當你嘗試釣魚時，你可以發動此能力來讓狩獵檢定獲得優勢。<br>．當你在水中進行近戰攻擊時，你可以發動此能力來避免該次攻擊獲得劣勢。<br>．你在水中受到攻擊時，你可以發動此能力使用游泳來取代閃避檢定。",c:"【大廚】你獲得並受訓「廚藝」(智力)次要技能。你可以為隊伍製作美味好吃的菜餚而非單純飽腹的糧食。<br>現在你烹飪時改為進行「廚藝」檢定。<br>每道菜譜有各自所需的時間、WP和食材，成功烹調將製作出有額外增益的食物。<br>你一開始可以學會兩道1星料理和一道2星料理。詳見「烹飪&種植」章節。"}, gear: [{name:"1.槌子",items:["槌子","野炊工具","火炬","打火匣"]},{name:"2.鎬",items:["十字鎬","睡袋","油燈","燈油","打火匣"]},{name:"3.鏟子",items:["鏟子","釣竿","火炬","打火匣"]}] }
     };
 
     const ALL_SKILLS = ["工藝", "巧手", "調查", "徒手", "斧", "棍棒", "劍", "小刀", "弓", "投槍器", "投石繩", "吹箭筒", "矛", "體操", "狩獵", "隱匿", "察覺", "求生", "騎術", "游泳", "醫療", "語言", "祕聞傳說", "船藝", "交易", "欺瞞", "表演", "遊說", "野獸知識", "靈魂流派", "獸術流派", "羽術流派", "元素流派", "天律學", "神律學", "數律學", "廚藝", "庫拉里"];
@@ -653,7 +653,7 @@
         "察覺": "INT", "求生": "INT", "騎術": "AGL", "游泳": "AGL", "醫療": "INT", "語言": "INT", "祕聞傳說": "INT", "船藝": "INT",
         "交易": "CHA", "欺瞞": "CHA", "表演": "CHA", "遊說": "CHA", "野獸知識": "INT", "閃避": "AGL",
         "靈魂流派": "INT", "獸術流派": "INT", "羽術流派": "INT", "元素流派": "INT", 
-        "天律學": "INT", "神律學": "INT", "數律學": "INT", "廚藝": "INT", "庫拉里": "INT"
+        "天律學": "INT", "神律學": "INT", "數律學": "INT", "廚藝": "INT", "庫拉里": "INT","浮田術": "INT"
     };
 
     const MEMENTOS = ["一雙舒適耐穿的舊鞋子", "一面樸素的銀製獎章", "一封來自老友或親戚的信", "一本破爛的舊日記本", "一個你家族代代相傳的手鐲", "一尊你童年時獲得的木雕像", "一顆形狀怪異的石頭", "父母送你的一枚紀念銅幣", "一個老舊的錫製酒杯", "作為戰利品的怪物犄角", "幾顆骨製骰子", "繫著一小束頭髮的吊墜盒", "一把華麗的鑰匙", "一張你繼承的手繪地圖", "一只刻有銘文的戒指", "一個骨製哨子", "頂你父母的舊帽子", "格里芬的一根羽毛", "一根雕塑精美的煙斗"];
@@ -1008,9 +1008,11 @@
         }
 
         // 2. 職業/能力贈送
-        if(char.prof === 'farmer' && char.heroKey && pData.heroAbilities[char.heroKey].includes("大廚")) {
-            char.bonusSkills.push("廚藝");
-        }
+if(char.prof === 'farmer' && char.heroKey) {
+    const abilityText = pData.heroAbilities[char.heroKey];
+    if(abilityText.includes("大廚")) char.bonusSkills.push("廚藝");
+    if(abilityText.includes("浮田耕藝")) char.bonusSkills.push("浮田術"); // <--- 新增這一行
+}
         if(char.prof === 'scholar' && char.extraKey && pData.extraOptions[char.extraKey].extraSkill) {
             char.bonusSkills.push(pData.extraOptions[char.extraKey].extraSkill);
         }
@@ -1106,7 +1108,7 @@
 
     function addFreeSkill() {
         let max = char.age==='young'?2:(char.age==='old'?6:4);
-        if(char.freeSkills.length>=max) { alert(`你最多只能選擇 ${max} 個自由受訓技能！`); return; }
+        if(char.freeSkills.length>=max) { alert(`你最多只能額外選擇 ${max} 個受訓技能！`); return; }
         const s = document.getElementById('free-skill-select').value;
         if(!s) return;
         
@@ -1130,12 +1132,12 @@
             const attrKey = SKILL_ATTR_MAP[s] || "STR";
             const attrVal = char.calculatedAttrs[attrKey] || 10;
             const baseVal = getSkillBase(attrVal);
-            html += `<span class="tag bonus">${s} (${baseVal*2}) [天賦]</span>`;
+            html += `<span class="tag bonus">${s} (${baseVal*2}) [額外習得]</span>`;
         });
 
         div.innerHTML = html;
         let max = char.age==='young'?2:(char.age==='old'?6:4);
-        document.getElementById('skill-pts').innerText = `自由點數: ${max - char.freeSkills.length}/${max}`;
+        document.getElementById('skill-pts').innerText = `自選數量: ${max - char.freeSkills.length}/${max}`;
     }
 
     function updateInventory() {
