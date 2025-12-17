@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>馬茲提卡：傳奇起源</title>
+    <title>馬茲提卡：命運之輪創角網站</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -368,18 +368,18 @@
     
     <div class="panel panel-left">
         <div class="control-group">
-            <div class="section-title">I. 身份細節</div>
+            <div class="section-title">I. 族裔</div>
             <div id="subrace-container" style="display:none; margin-top:15px;">
-                <label style="font-size:0.8em; color:var(--jade);">血脈分支 (亞種)</label>
+                <label style="font-size:0.8em; color:var(--jade);">亞種</label>
                 <select id="subrace-select" onchange="updateRaceAbility()"></select>
             </div>
             <div class="info-box" id="race-ability-box" style="margin-top:10px;"></div>
         </div>
 
         <div class="control-group">
-            <div class="section-title">II. 職業專精</div>
+            <div class="section-title">II. 職業範型</div>
             <div id="hero-ability-container">
-                <label style="font-size:0.8em; color:var(--jade);">英雄能力 (起始專長)</label>
+                <label style="font-size:0.8em; color:var(--jade);">英雄能力</label>
                 <select id="hero-ability-select" onchange="updateHeroDesc()"></select>
                 <div class="info-box" id="hero-desc"></div>
             </div>
@@ -405,16 +405,16 @@
             <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
                 <span style="font-size:0.9em; color:var(--gold-dim);">年齡:</span>
                 <select id="age-select" onchange="updateStatsAndSkills()" style="flex:1;">
-                    <option value="young">少年 (敏+1 體+1)</option>
-                    <option value="adult" selected>成年 (標準)</option>
-                    <option value="old">老年 (力敏體-2 智意+1)</option>
+                   <option value="young">少年 (敏捷和體質+1/自選受訓技能2)</option>
+                    <option value="adult" selected>成年 (自選受訓技能4)</option>
+                    <option value="old">老年 (力量.敏捷.體質-2/智力.意志+1/自選受訓技能6)</option>
                 </select>
             </div>
         </div>
     </div>
 
     <div class="panel-center">
-        <input type="text" class="name-input" id="char-name" placeholder="輸入傳奇之名">
+        <input type="text" class="name-input" id="char-name" placeholder="冒險者名稱">
         
         <div class="aztec-wheel-container">
             <div class="wheel-label-group label-group-left">
@@ -473,7 +473,7 @@
                     <input type="number" id="money-input" value="0">
                 </div>
                 <div style="flex:1">
-                    <label style="font-size:0.8em; color:#888;">口糧</label>
+                    <label style="font-size:0.8em; color:#888;">食物</label>
                     <input type="number" id="food-input" value="0">
                 </div>
             </div>
