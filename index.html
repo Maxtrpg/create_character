@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>馬茲提卡：命運之輪創角網站</title>
+    <title>馬茲提卡：創角網站</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* --- 0. 視覺核心 --- */
+        /* --- 0. 視覺核心 (Aztec Dark Fantasy) --- */
         :root {
             --bg-dark: #0a0a0a;
             --panel-bg: rgba(15, 15, 15, 0.96);
@@ -68,6 +68,7 @@
             overflow: hidden; 
         }
 
+        /* --- Panels --- */
         .panel {
             background: var(--panel-bg);
             background-image: url('https://www.transparenttextures.com/patterns/black-scales.png');
@@ -89,6 +90,7 @@
         .panel-left { width: 340px; min-width: 340px; }
         .panel-right { width: 360px; min-width: 360px; }
         
+        /* --- Middle: Wheel Stage --- */
         .panel-center {
             flex: 1;
             position: relative;
@@ -110,7 +112,7 @@
         }
         .name-input:focus { box-shadow: 0 10px 30px -10px var(--gold-glow); outline: none; }
 
-        /* --- 命運之輪 (1.1倍) --- */
+        /* --- 命運之輪 --- */
         .aztec-wheel-container {
             position: relative;
             width: 528px; height: 528px; 
@@ -172,7 +174,6 @@
         .character-img {
             width: 100%; height: 100%; object-fit: cover;
             animation: breathe 6s ease-in-out infinite;
-            opacity: 1; transition: opacity 0.3s ease-in-out;
         }
         .portrait-rim {
             position: absolute; top: -8px; left: -8px; right: -8px; bottom: -8px;
@@ -180,6 +181,7 @@
             box-shadow: inset 0 0 35px #000, 0 0 25px var(--gold-glow);
             z-index: 2; pointer-events: none;
         }
+        /* 移除三角形 */
         .wheel-marker { display: none; }
 
         @keyframes breathe {
@@ -187,16 +189,10 @@
             50% { transform: scale(1.15); }
         }
 
-        /* --- 標籤與隨機按鈕 --- */
-        .wheel-label-group {
-            position: absolute; top: -60px;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            pointer-events: auto; 
-        }
-        .label-group-left { left: -80px; }
-        .label-group-right { right: -80px; }
-
+        /* --- 標籤 UI --- */
         .wheel-label {
+            position: absolute;
+            top: -40px; 
             font-family: var(--font-title);
             color: var(--gold-orange); 
             font-size: 2em; 
@@ -204,21 +200,11 @@
             text-transform: uppercase;
             text-shadow: 0 0 10px var(--gold-glow), 0 0 20px rgba(255, 100, 0, 0.6), 2px 2px 0px #000;
             background: transparent; padding: 0; border: none; border-radius: 0;       
-            text-align: center; transition: all 0.2s ease;
+            pointer-events: none; text-align: center; transition: all 0.2s ease;
             box-shadow: none; letter-spacing: 2px;
         }
-        
-        .btn-random {
-            background: rgba(0,0,0,0.6); border: 1px solid var(--jade-dark);
-            color: var(--jade); cursor: pointer; padding: 2px 10px; font-size: 0.9em;
-            border-radius: 10px; transition: 0.2s; display: flex; align-items: center; gap: 5px;
-        }
-        .btn-random:hover { background: var(--jade-dark); color: #fff; border-color: var(--jade); }
-        .btn-random-small {
-            background: transparent; border: none; color: var(--jade); cursor: pointer; font-size: 1.2em;
-            padding: 0 5px; transition: 0.2s;
-        }
-        .btn-random-small:hover { color: #fff; text-shadow: 0 0 5px var(--jade); transform: scale(1.2); }
+        .label-left { left: -60px; } 
+        .label-right { right: -60px; }
 
         /* --- UI Controls --- */
         .section-title {
@@ -239,10 +225,11 @@
         select:focus, input:focus { border-color: var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); background: #000; }
 
         .info-box {
-            font-size: 0.9em; color: #ccc; background: rgba(0, 50, 50, 0.2); 
+            font-size: 1em; color: #ccc; background: rgba(0, 50, 50, 0.2); 
             padding: 12px; border: 1px solid var(--jade-dark);
             margin-top: 5px; line-height: 1.6; white-space: pre-wrap;
             box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            text-align: center;
         }
         .highlight { color: var(--gold-primary); font-weight: bold; }
         .wp-cost { color: #ffeb3b; font-size: 0.85em; background: rgba(0,0,0,0.5); padding: 1px 6px; border-radius: 3px; border: 1px solid #555; margin-right: 5px; }
@@ -256,15 +243,6 @@
             border-color: var(--jade); background: rgba(0, 191, 165, 0.1); color: #fff; 
             box-shadow: 0 0 8px var(--jade-glow);
         }
-        /* 鎖定的技能 (薩滿) */
-        .skill-check.locked {
-            border-color: var(--gold-dim); background: rgba(212, 175, 55, 0.2); 
-            pointer-events: none; /* 禁止點擊取消 */
-            opacity: 1; 
-        }
-        .skill-check.locked span::after {
-            content: " (必修)"; font-size: 0.8em; color: var(--gold-dim);
-        }
         .skill-val { font-size: 0.9em; color: var(--gold-dim); font-weight: bold; }
         .skill-check.active .skill-val { color: var(--gold-primary); }
 
@@ -273,8 +251,23 @@
             display: inline-flex; align-items: center; gap:5px; margin: 2px; color: #bbb;
         }
         .tag.removable:hover { border-color: var(--blood); color: #fff; cursor: pointer; }
-        .tag.item { width: 100%; border-color: #333; justify-content: space-between; background: rgba(0,0,0,0.3); }
-        .tag.bonus { border-color: var(--gold-dim); background: rgba(212, 175, 55, 0.1); color: var(--gold-orange); width: 100%; justify-content: space-between; }
+        
+/* 原本的樣式 */
+.tag.item, .tag.bonus { 
+    width: 100%; 
+    border-color: #333; 
+    justify-content: space-between; 
+    background: rgba(0,0,0,0.3); 
+    padding: 2px 8px;
+    
+    /* ★ 在這裡加入或修改字體大小 ★ */
+    font-size: 0.9em;  /* 預設大約是 0.8em，改大一點例如 1em 或 1.1em */
+}
+        .tag.bonus { border-color: var(--gold-dim); background: rgba(212, 175, 55, 0.1); color: var(--gold-primary); cursor: default; }
+        
+        .gear-select {
+            background: #111; color: var(--gold-primary); border: 1px solid #555; font-size: 0.9em; width: auto; padding: 2px; margin: 0;
+        }
 
         .attr-row { 
             display: flex; justify-content: space-between; align-items: center; 
@@ -319,41 +312,78 @@
 
         /* --- PDF Preview Modal --- */
         #pdf-preview-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 9999;
-            flex-direction: column; align-items: center; justify-content: center; overflow: auto;
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 9999;
+            flex-direction: column; align-items: center; justify-content: center;
+            overflow: auto;
         }
         #pdf-preview-modal.show { display: flex; }
         
         .pdf-preview-container {
-            width: 210mm; min-height: 297mm; padding: 15mm;
-            background: #111; border: 2px solid var(--gold-dim);
-            box-shadow: 0 0 50px rgba(0,0,0,1); color: #ddd;
-            font-family: 'Noto Sans TC', sans-serif; position: relative; margin: 20px 0; transform-origin: top center;
+            width: 210mm; 
+            min-height: 297mm;
+            padding: 15mm;
+            background: #111;
+            border: 2px solid var(--gold-dim);
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+            color: #ddd;
+            font-family: 'Noto Sans TC', sans-serif;
+            position: relative;
+            margin: 20px 0;
+            transform-origin: top center;
         }
-        .pdf-toolbar { position: fixed; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 10000; }
-        .tool-btn { padding: 10px 20px; font-size: 1.2em; cursor: pointer; font-family: var(--font-title); border: 1px solid #fff; color: #fff; background: #333; }
+        
+        .pdf-toolbar {
+            position: fixed; top: 20px; right: 20px;
+            display: flex; gap: 10px; z-index: 10000;
+        }
+        .tool-btn {
+            padding: 10px 20px; font-size: 1.2em; cursor: pointer; font-family: var(--font-title);
+            border: 1px solid #fff; color: #fff; background: #333;
+        }
         .tool-btn.download { background: var(--gold-primary); border-color: var(--gold-orange); color: #000; }
 
+        /* PDF 內部樣式 */
         .pdf-header { text-align: center; border-bottom: 3px double var(--gold-primary); margin-bottom: 20px; padding-bottom: 10px; }
         .pdf-title { font-family: var(--font-title); font-size: 3em; color: var(--gold-orange); margin: 0; text-transform: uppercase; }
         .pdf-subtitle { color: var(--jade); font-size: 1.5em; margin-top: 5px; font-weight: bold; }
+        
         .pdf-grid { display: grid; grid-template-columns: 1fr 1.8fr; gap: 25px; }
-        .pdf-section { background: rgba(255,255,255,0.03); border: 1px solid #444; padding: 15px; margin-bottom: 20px; border-radius: 4px; }
-        .pdf-section h3 { color: var(--gold-primary); border-bottom: 1px solid #666; padding-bottom: 5px; margin-top: 0; font-family: var(--font-title); font-size: 1.4em; }
+        
+        .pdf-section { 
+            background: rgba(255,255,255,0.03); 
+            border: 1px solid #444; 
+            padding: 15px; 
+            margin-bottom: 20px; 
+            border-radius: 4px;
+        }
+        .pdf-section h3 { 
+            color: var(--gold-primary); 
+            border-bottom: 1px solid #666; 
+            padding-bottom: 5px; margin-top: 0; 
+            font-family: var(--font-title); 
+            font-size: 1.4em; 
+        }
+        
         .pdf-attr-row { display: flex; justify-content: space-between; border-bottom: 1px dashed #333; padding: 6px 0; font-size: 1.1em; }
         .pdf-attr-name { font-weight: bold; color: #bbb; }
         .pdf-attr-val { color: var(--gold-orange); font-weight: bold; font-family: var(--font-title); font-size: 1.2em; }
+        
         .pdf-stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; text-align: center; margin-top: 10px; }
         .pdf-stat-box { border: 1px solid var(--jade-dark); padding: 8px; background: rgba(0,50,50,0.2); }
         .pdf-stat-val { font-size: 1.8em; color: #fff; display: block; font-weight: bold; font-family: var(--font-title); }
         .pdf-stat-label { font-size: 0.8em; color: var(--jade); letter-spacing: 1px; }
+
         .pdf-skill-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.95em; }
         .pdf-skill-item { display: flex; justify-content: space-between; padding: 4px 8px; border-bottom: 1px solid #333; }
         .pdf-skill-item.trained { color: var(--gold-orange); font-weight: bold; background: rgba(212, 175, 55, 0.1); border: 1px solid var(--gold-dim); }
+
         .pdf-ability-box { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dotted #444; }
         .pdf-ability-name { color: var(--jade); font-weight: bold; margin-bottom: 5px; font-size: 1.1em; }
         .pdf-ability-desc { font-size: 0.9em; line-height: 1.6; color: #ccc; text-align: justify; }
+        
         .pdf-inventory { font-size: 0.9em; display: flex; flex-wrap: wrap; gap: 8px; }
         .pdf-item { border: 1px solid #555; padding: 4px 10px; background: #222; border-radius: 4px; color: #ddd; }
     </style>
@@ -378,10 +408,63 @@
 
         <div class="control-group">
             <div class="section-title">II. 職業範型</div>
+            
+            <div id="artisan-path-container" style="display:none; margin-bottom:15px; border-bottom:1px dashed #333; padding-bottom:10px;">
+                <label style="font-size:0.8em; color:var(--gold-primary);">工匠傳承</label>
+                <select id="artisan-path-select" onchange="updateArtisanPath()">
+                    <option value="feather">羽織工匠</option>
+                    <option value="bone">獸刻工匠</option>
+                </select>
+                <div class="info-box" id="artisan-path-desc" style="margin-top:5px;"></div>
+                
+                <div style="margin-top:10px;">
+                    <label style="font-size:0.8em; color:var(--jade);">基礎字符 (擇三)</label>
+                    <div id="glyph-selection-container" class="tag-container" style="margin-top:5px; display:flex; flex-wrap:wrap; gap:3px;"></div>
+                    <div style="font-size:0.8em; color:#888; text-align:right;">已選: <span id="glyph-count" style="color:var(--gold-primary)">0</span>/3</div>
+                </div>
+
+                <div style="margin-top:12px; background:rgba(0,0,0,0.3); padding:5px; border:1px solid #444;">
+                    <label style="font-size:0.8em; color:var(--gold-orange);">裝備強化預覽</label>
+                    <div style="display:flex; gap:5px; margin-top:5px;">
+                        <select id="enhance-glyph-select" style="flex:1; font-size:0.8em;"></select>
+                        <select id="enhance-item-select" style="flex:1; font-size:0.8em;"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="knight-order-container" style="display:none; margin-bottom:15px;">
+                <label style="font-size:0.8em; color:var(--gold-primary);">騎士團</label>
+                <select id="knight-order-select" onchange="updateKnightOrder()">
+                    <option value="eagle">鷹騎士團</option>
+                    <option value="jaguar">豹騎士團</option>
+                </select>
+                <div class="info-box" id="knight-order-desc" style="margin-top:5px;"></div>
+            </div>
+
             <div id="hero-ability-container">
-                <label style="font-size:0.8em; color:var(--jade);">英雄能力</label>
-                <select id="hero-ability-select" onchange="updateHeroDesc()"></select>
-                <div class="info-box" id="hero-desc"></div>
+                <label style="font-size:0.8em; color:var(--jade);">英雄能力 <span id="hero-limit-label">(擇二)</span></label>
+                <div id="hero-ability-list" class="skill-grid" style="margin-top:5px;"></div>
+                <div class="info-box" id="hero-desc-preview" style="min-height:50px;"></div>
+            </div>
+
+<div id="chef-recipe-container" style="display:none; margin-top:12px; border-top:1px dashed #333; padding-top:10px;">
+                <label style="font-size:0.8em; color:var(--gold-orange);">大廚食譜</label>
+                
+                <div style="font-size:0.8em; color:#888; margin:5px 0;">一星菜餚 (選 2) <span id="cnt-r1" style="color:var(--gold-primary)">0/2</span></div>
+                <div id="recipe-grid-1" class="tag-container" style="display:flex; flex-wrap:wrap; gap:3px;"></div>
+                
+                <div style="font-size:0.8em; color:#888; margin:10px 0 5px;">二星菜餚 (選 1)</div>
+                <div id="recipe-grid-2" class="tag-container" style="display:flex; flex-wrap:wrap; gap:3px;"></div>
+            </div>
+
+            <div id="knight-tech-container" style="display:none; margin-top:15px; border-top:1px dashed #333; padding-top:10px;">
+                <label style="font-size:0.8em; color:var(--gold-orange);">戰技選擇 (擇一)</label>
+                <div style="margin-bottom:8px; display:flex; gap:10px;">
+                    <label style="cursor:pointer; font-size:0.8em; color:#ccc;"><input type="radio" name="tech-source" value="order" checked onchange="renderKnightTechniques()"> 騎士團戰技</label>
+                    <label style="cursor:pointer; font-size:0.8em; color:#ccc;"><input type="radio" name="tech-source" value="warrior" onchange="renderKnightTechniques()"> 戰士能力</label>
+                </div>
+                <select id="knight-tech-select" onchange="updateKnightTechPreview()"></select>
+                <div class="info-box" id="knight-tech-desc"></div>
             </div>
 
             <div id="extra-trait-container" style="display:none; margin-top:12px;">
@@ -391,11 +474,13 @@
             </div>
 
             <div id="spell-selector" style="display:none; margin-top:18px;">
-                <div class="section-title" style="font-size:1em; border-bottom:none;">法術書</div>
+                <div class="section-title" style="font-size:1em; border-bottom:none;">習得法術</div>
                 <div style="font-size:0.85em; margin-bottom:5px;">0階戲法 <span id="cnt-t0" style="color:var(--gold-primary)">0/3</span></div>
                 <div class="tag-container" id="grid-t0"></div>
                 <div style="font-size:0.85em; margin:12px 0 5px;">1階法術 <span id="cnt-t1" style="color:var(--gold-primary)">0/3</span></div>
                 <div class="tag-container" id="grid-t1"></div>
+                <div style="font-size:0.85em; margin:12px 0 5px; color:var(--gold-orange);">2階法術 <span id="cnt-t2" style="color:var(--gold-primary)">0/1</span></div>
+                <div class="tag-container" id="grid-t2"></div>
             </div>
         </div>
 
@@ -404,7 +489,7 @@
             <div id="attr-inputs"></div>
             <div style="margin-top:12px; display:flex; align-items:center; gap:10px;">
                 <span style="font-size:0.9em; color:var(--gold-dim);">年齡:</span>
-                <select id="age-select" onchange="updateStatsAndSkills()" style="flex:1;">
+                <select id="age-select" onchange="updateAgeLogic()" style="flex:1;">
                    <option value="young">少年 (敏捷和體質+1/自選受訓技能2)</option>
                     <option value="adult" selected>成年 (自選受訓技能4)</option>
                     <option value="old">老年 (力量.敏捷.體質-2/智力.意志+1/自選受訓技能6)</option>
@@ -414,18 +499,11 @@
     </div>
 
     <div class="panel-center">
-        <input type="text" class="name-input" id="char-name" placeholder="冒險者名稱">
+        <input type="text" class="name-input" id="char-name" placeholder="冒險者姓名">
         
         <div class="aztec-wheel-container">
-            <div class="wheel-label-group label-group-left">
-                <div class="wheel-label" id="race-label-display">人類</div>
-                <button class="btn-random" onclick="randomizeRace()">🎲 隨機族裔</button>
-            </div>
-            
-            <div class="wheel-label-group label-group-right">
-                <div class="wheel-label" id="class-label-display">戰士</div>
-                <button class="btn-random" onclick="randomizeClass()">🎲 隨機職業</button>
-            </div>
+            <div class="wheel-label label-left" id="race-label-display">人類</div>
+            <div class="wheel-label label-right" id="class-label-display">工匠</div>
 
             <div class="wheel-ring ring-outer" id="class-ring"></div>
             <div class="wheel-ring ring-inner" id="race-ring"></div>
@@ -451,59 +529,49 @@
             <div style="font-size:0.8em; color:var(--jade); margin-bottom:8px;">核心技能 (選 6 項)</div>
             <div id="core-skill-list" class="skill-grid"></div>
             
-            <div style="font-size:0.8em; color:var(--gold-primary); margin-top:18px; margin-bottom:8px; border-top:1px solid #333; padding-top:8px;">額外受訓 / 次要技能</div>
+            <div style="font-size:0.8em; color:var(--gold-primary); margin-top:18px; margin-bottom:8px; border-top:1px solid #333; padding-top:8px;">自由受訓 (根據年齡)</div>
             <div style="display:flex; gap:8px;">
                 <select id="free-skill-select"></select>
                 <button onclick="addFreeSkill()" style="background:#333; border:1px solid #555; color:#fff; cursor:pointer; padding:0 15px;">+</button>
             </div>
             <div id="free-skill-list" class="tag-container"></div>
+            <div id="bonus-skill-list" style="margin-top:5px;"></div>
         </div>
 
         <div class="control-group">
             <div class="section-title">V. 裝備</div>
             <select id="equip-select" onchange="updateInventory()"></select>
-            <div id="weapon-choice-container" style="display:none; margin-top:10px;">
-                <label style="font-size:0.8em; color:var(--jade);">選擇主武器:</label>
-                <select id="weapon-select" onchange="updateInventory()"></select>
-            </div>
             
-            <div style="display:flex; gap:10px; margin-top:10px; align-items:center;">
+            <div style="display:flex; gap:10px; margin-top:10px;">
                 <div style="flex:1">
-                    <label style="font-size:0.8em; color:#888;">銀幣</label>
+                    <label style="font-size:0.8em; color:#888;">月幣</label>
                     <input type="number" id="money-input" value="0">
                 </div>
                 <div style="flex:1">
-                    <label style="font-size:0.8em; color:#888;">食物</label>
+                    <label style="font-size:0.8em; color:#888;">口糧</label>
                     <input type="number" id="food-input" value="0">
                 </div>
             </div>
-            <div id="resource-hint" style="font-size:0.8em; color:var(--gold-dim); margin-bottom:10px;"></div>
 
             <div style="margin-top:15px;">
-                <div style="font-size:0.85em; color:var(--jade); margin-bottom:6px; display:flex; justify-content:space-between;">紀念物 <button class="btn-random-small" onclick="randomizeTrait('memento')">🎲</button></div>
+                <div style="font-size:0.85em; color:var(--jade); margin-bottom:6px;">紀念物</div>
                 <select id="memento-select" onchange="handleCustomInput('memento')"></select>
                 <input type="text" id="memento-custom" style="display:none; margin-top:6px; border-color:var(--jade);" placeholder="輸入自訂紀念物..." oninput="updateInventory()">
             </div>
 
             <div style="margin-top:15px;">
                 <div style="font-size:0.85em; color:#888; margin-bottom:6px;">物品清單</div>
-                <div id="inventory-list" style="max-height:100px; overflow-y:auto; padding-right:5px;"></div>
+                <div id="inventory-list" style="max-height:200px; overflow-y:auto;overflow-x: hidden;padding-right:5px;"></div>
             </div>
         </div>
 
         <div class="control-group">
             <div class="section-title">VI. 特徵</div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:2px;">
-                <label style="font-size:0.8em; color:#888;">弱點</label>
-                <button class="btn-random-small" onclick="randomizeTrait('weakness')">🎲</button>
-            </div>
+            <label style="font-size:0.8em; color:#888;">弱點</label>
             <select id="weakness-select" onchange="handleCustomInput('weakness')"></select>
             <input type="text" id="weakness-custom" style="display:none;" placeholder="輸入自訂弱點...">
             
-            <div style="display:flex; justify-content:space-between; margin-top:8px; margin-bottom:2px;">
-                <label style="font-size:0.8em; color:#888;">外觀</label>
-                <button class="btn-random-small" onclick="randomizeTrait('appearance')">🎲</button>
-            </div>
+            <label style="font-size:0.8em; color:#888; margin-top:8px; display:block;">外觀</label>
             <select id="appearance-select" onchange="handleCustomInput('appearance')"></select>
             <input type="text" id="appearance-custom" style="display:none;" placeholder="輸入自訂外觀...">
         </div>
@@ -573,8 +641,8 @@
                     <h3>裝備 Inventory</h3>
                     <div class="pdf-inventory" id="pdf-gear"></div>
                     <div style="margin-top:10px; border-top:1px dashed #555; padding-top:5px;">
-                        <span style="margin-right:15px; color:#d4af37;">銀幣: <span id="pdf-money">0</span></span>
-                        <span style="color:#d4af37;">食物: <span id="pdf-food">0</span></span>
+                        <span style="margin-right:15px; color:#d4af37;">月幣: <span id="pdf-money">0</span></span>
+                        <span style="color:#d4af37;">口糧: <span id="pdf-food">0</span></span>
                     </div>
                 </div>
             </div>
@@ -589,15 +657,15 @@
             name: "人類", id: "human", baseMove: 10,
             ability: "<span class='highlight'>【通權達變】</span><br><span class='wp-cost'>WP: 3</span><br>當你進行技能檢定時，你可以選擇使用其他技能進行檢定。你必須合理地描述你是如何使用另一項技能。",
             subraces: { 
-                maztican: {name:"馬茲提卡人",id:"maztican",bonus:{WIL:1},ability:"你的初始 <span class='wp'>意志+1</span>。（上限為18）"}, 
-                payit: {name:"帕伊特人",id:"payit",bonus:{INT:1},ability:"你的初始 <span class='wp'>智力+1</span>。（上限為18）"}, 
-                kulkata: {name:"庫塔卡人",id:"kulkata",bonus:{STR:1},ability:"你的初始 <span class='wp'>力量+1</span>。（上限為18）"}, 
-                itza: {name:"伊察人",id:"itza",bonus:{CHA:1},ability:"你的初始 <span class='wp'>魅力+1</span>。（上限為18）"}, 
-                dog: {name:"狗民",id:"dog",bonus:{CON:1},ability:"你的初始 <span class='wp'>體質+1</span>。（上限為18）"}, 
-                green: {name:"綠民",id:"green",bonus:{AGL:1},ability:"你的初始 <span class='wp'>敏捷+1</span>。（上限為18）"} 
+                maztican: {name:"馬茲提卡人 (意志+1)",id:"maztican",bonus:{WIL:1},ability:"你的初始 <span class='wp'>意志+1</span>。（上限為18）"}, 
+                payit: {name:"帕伊特人 (智力+1)",id:"payit",bonus:{INT:1},ability:"你的初始 <span class='wp'>智力+1</span>。（上限為18）"}, 
+                kulkata: {name:"庫塔卡人 (力量+1)",id:"kulkata",bonus:{STR:1},ability:"你的初始 <span class='wp'>力量+1</span>。（上限為18）"}, 
+                itza: {name:"伊察人 (魅力+1)",id:"itza",bonus:{CHA:1},ability:"你的初始 <span class='wp'>魅力+1</span>。（上限為18）"}, 
+                dog: {name:"狗民 (體質+1)",id:"dog",bonus:{CON:1},ability:"你的初始 <span class='wp'>體質+1</span>。（上限為18）"}, 
+                green: {name:"綠民 (敏捷+1)",id:"green",bonus:{AGL:1},ability:"你的初始 <span class='wp'>敏捷+1</span>。（上限為18）"} 
             } 
         },
-        halfling: { name: "半身人", id: "halfling", baseMove: 8, extraSkill: "庫拉里", ability: "<span class='highlight'>【動如脫兔】</span><br><span class='wp-cost'>WP: 3</span> 當你閃避攻擊時，你可以發動此能力，讓你的閃避檢定獲得 1 個優勢。<br><span class='highlight'>【庫拉里製作】</span> 你懂得怎麼製作麻痺毒藥－庫拉里的方法。你獲得並受訓次要技能【庫拉里】(智力)，可花一班時間製作1-3劑庫拉里毒藥(每劑1重量)：<br>．2點WP可製作1劑弱效麻痺毒藥。<br>．4點WP可製作1劑中效麻痺毒藥。<br>．6點WP可製作1劑強效麻痺毒藥。<br>在戰鬥中，你可以用一個動作將毒藥抹在武器上並同時進行攻擊。" },
+        halfling: { name: "半身人", id: "halfling", baseMove: 8, ability: "<span class='highlight'>【動如脫兔】</span><br><span class='wp-cost'>WP: 3</span> 當你閃避攻擊時，你可以發動此能力，讓你的閃避檢定獲得 1 個優勢。<br><span class='highlight'>【毒藥技術：庫拉里】</span> 你懂得怎麼製作麻痺毒藥－庫拉里的方法。你獲得並受訓次要技能【庫拉里】(智力)，可花一班時間製作1-3劑庫拉里毒藥(每劑1重量)：<br>．2點WP可製作1劑弱效麻痺毒藥。<br>．4點WP可製作1劑中效麻痺毒藥。<br>．6點WP可製作1劑強效麻痺毒藥。<br>在戰鬥中，你可以用一個動作將毒藥抹在武器上並同時進行攻擊。" },
         elf: { name: "精靈", id: "elf", baseMove: 10, ability: "<span class='highlight'>【心如止水】</span> 你可以在短休時進行深度冥想。你可以額外回復 1D6 HP 和 1D6 WP，並恢復一個狀態。你在冥想期間完全無法回應周遭世界，甚至無法被喚醒。", subraces: { earth: {name:"土精靈",id:"earth", ability:"<span class='highlight'>【泥土皮膚】</span> 當你受到鈍擊傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到霜凍傷害時會損失 1d3 WP。"}, wood: {name:"木精靈",id:"wood", ability:"<span class='highlight'>【樹質皮膚】</span> 當你受到穿刺傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到火焰傷害時會損失 1d3 WP。"}, gold: {name:"金精靈",id:"gold", ability:"<span class='highlight'>【金屬皮膚】</span> 當你受到穿刺傷害且未穿護甲（頭盔除外）時，視為有 2 點護甲；但受到火焰傷害時會損失 1d3 WP。"} } },
         dwarf: { name: "矮人", id: "dwarf", baseMove: 8, ability: "<span class='highlight'>【刻骨銘心】</span><br><span class='wp-cost'>WP: 3</span> 當你攻擊曾經傷害過你（至少 1 點傷害）的人時，你可以發動此能力，讓該次攻擊檢定獲得 1 個優勢。那個人是什麼時候傷害過你一點都不重要，所以你最好將所有傷害過你的人都記下來，以免忘記。<br><span class='highlight'>【沙漠耐性】</span><br><span class='wp-cost'>WP: 2</span> 當在極端環境下，環境對你造成的影響將會減輕（由GM判定）。此外，當你因為一整天沒有進食將獲得【飢餓】狀態，或一整天沒有睡眠將獲得【睡眠不足】時。你可以進行體質檢定，成功可避免獲得該狀態。每多一天未進食或睡眠，該檢定便多一個劣勢。" },
         eagle: { name: "鷹人", id: "eagle", baseMove: 12, ability: "<span class='highlight'>【銳眼】</span> 你可以看到最遠 200 米外的人或物體，就像在眼前一樣清楚。且對超出武器有效射程的目標進行攻擊不會獲得 1 個劣勢。<br><span class='highlight'>【飛翼】</span><br><span class='wp-cost'>WP: 2</span>翅膀讓你可以用移動力在空中自由飛翔。在戰鬥時，你必須控制雙翅來穩定地進行戰鬥，每輪需消耗 2 WP 才能維持飛行。非戰鬥時，每一刻飛行時間消耗 1 WP。" },
@@ -613,71 +681,542 @@
         frog: { name: "蛙人", id: "frog", baseMove: 10, ability: "<span class='highlight'>【猛力彈跳】</span><br><span class='wp-cost'>WP: 3</span> 你可以發動此能力來水平跳躍等於移動力的距離，或是垂直跳躍等於移動力一半的距離（都不需要進行體操檢定）。若你在跳躍後進行一次近戰攻擊，該次攻擊會獲得 1 個優勢。<br><span class='highlight'>【休聲美譽】</span><br><span class='wp-cost'>WP: 2</span> 由於蛙人在外的良好名聲，在合理的情況下(由GM判定)，你可以在一次交易、欺瞞、遊說或表演檢定中獲得優勢。" }
     };
 
-    const PROFESSIONS = {
-        artisan: { name: "工匠", id: "artisan", attr: "STR", resource: "1D8 食物, 1D8 銀幣", skills: ["工藝", "巧手", "調查", "徒手", "斧", "棍棒", "劍", "小刀"], heroAbilities: {a:"【鍛匠大師】<span class='wp-cost'>WP: 3</span> 此能力需要鍛匠工具。你可以利用鍛匠工具做以下的事情：<br>．在一刻時間內，你可以消耗 3 WP，銳化一把帶有黑曜石刀刃或尖端的武器。當使用銳化武器進行攻擊時，目標的護甲值會視為降低 2 點。一旦在戰鬥中使用銳化武器進行過攻擊或格擋，銳化效果會在該戰鬥結束後終止。<br>．在一班時間內，你可以嘗試從裝備列表中打造一把黑曜石武器。這個過程需要重量為 1 的黑曜石。消耗的 WP 等於物品的金幣價格（向上取整）。若你沒有足夠的 WP，你可以將工作分成好幾班的時間來處理。<br>或者，你可以使用蒐集到的材料試圖強化黑曜石裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", b:"【木匠大師】<span class='wp-cost'>WP: 1</span> 此能力需要木匠工具。你可以利用木匠工具做以下的事情：<br>．以一個動作，你可以消耗 1 WP 對門、牆壁或其他無生命物體造成 1d12 傷害（無視護甲值）。<br>．在一班時間內，你可以嘗試從裝備列表中打造一個木製物品，例如棍棒、長棍。這個過程需要重量為 1 的木頭。消耗的 WP 等於物品的金幣價格（向上取整）。<br>或者，你可以使用蒐集到的材料試圖強化木材裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", c:"【皮匠大師】此能力需要皮匠工具。你可以利用皮匠工具做以下的事情：<br>．你可以嘗試從將一隻動物或怪物的皮做成一套獸皮甲。該皮甲的護甲值等於野獸護甲值的一半（向上取整），至少為 1。這個過程耗時一班時間，消耗的 WP 等於物品的護甲值。<br>或者，你可以使用蒐集到的材料試圖強化毛皮裝備的效果（詳見「鍛造＆強化」章節）。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的強化結果。", d:"【羽匠大師】此能力需要織布工具。你可以利用織布工具做以下的事情：<br>．在一班時間內，你可以嘗試從裝備列表中打造一套服裝。這個過程需要重量為 1 的植物纖維或羽毛。消耗的 WP 等於物品的金幣價格（向上取整）。若你沒有足夠的 WP，你可以將工作分成好幾班的時間來處理。<br>或者，你可以試圖製作羽毛護身符，這些護身符有特殊的效果（詳見「鍛造＆強化」章節），可以當成單獨的飾品配戴，也可以再加工到服裝上。當一班時間結束後，進行一次【工藝】檢定，檢定結果將決定你這次的打造結果。"}, gear: [{name:"1.劍/鍛造",items:["馬卡劍","棉甲","鍛匠工具","火炬","打火匣"]},{name:"2.棒/木工",items:["碎骨棒","棉甲","木匠工具","火炬","10米麻繩","打火匣"]},{name:"3.斧/皮匠",items:["黑曜石斧","獸皮甲","皮匠工具","提燈","燈油","打火匣"]},{name:"4.刀/織布",items:["黑曜石小刀","棉甲","織布工具","火炬","毛毯","打火匣"]}] },
-        hunter: { name: "獵人", id: "hunter", attr: "AGL", resource: "1D8 食物, 1D6 銀幣", skills: ["體操", "狩獵", "隱匿", "察覺", "求生", "小刀", "弓", "吹箭"], heroAbilities: {a:"【動物夥伴】<span class='wp-cost'>WP: 3</span> 你可以發動此能力，將一隻動物馴服為你的夥伴。此過程需耗時一刻時間，且你同時只能擁有一隻動物夥伴。<br>只要你待在該動物的自然棲息地，牠就會一直跟著你。牠可以為你偵察附近環境，而不需要消耗額外的 WP。在戰鬥中，你可以額外消耗 3 WP，命令夥伴攻擊一名敵人（不需要花費你的動作）。", b:"【雙重射擊】<span class='wp-cost'>WP: 3</span> 當你使用 弓 或 吹箭筒 進行攻擊時，你可以發動此能力來射出兩支箭矢/吹箭。你可以指定同一個目標、或兩個不同的目標<br>無論如何，都只進行一次帶有 1 個劣勢的攻擊檢定。傷害分開計算。", c:"【陷阱大師】當你在森林中時，你可以耗時一刻時間蒐集材料，並在你指定的地點設置陷阱。花費的WP和陷阱作用詳見下表。<br>．圈套陷阱<span class='wp-cost'>WP: 2</span> 用纖維繩（龍舌蘭纖維、藤蔓）做成繩圈，固定在樹根或木樁上，連接觸發機關。每當有生物觸發陷阱時，需進行閃避檢定，失敗視為被擒抱。繩子可以被割斷。<br>．囚籠陷阱：<span class='wp-cost'>WP: 2</span> 用藤蔓或木條製成簡易籠子，內部放置誘餌，一旦觸動機關，籠子扣下並鎖住獵物。使目標「被困」在籠內，行動受限，只能嘗試破壞或推翻籠子。<br>．陷坑陷阱：<span class='wp-cost'>WP: 3</span> 挖一個偽裝的深坑，底部插入削尖的木樁，再用樹葉或泥土覆蓋。每當有生物觸發陷阱時，需進行閃避檢定，失敗將跌入3米陷坑，並受到2D4穿刺傷害。<br>．落石陷阱：<span class='wp-cost'>WP: 3</span> 用繩索懸掛一塊巨石，設計觸發點讓石頭砸落。每當有生物觸發陷阱時，需進行閃避檢定，失敗被擊倒伏地，並受到2D6鈍擊傷害。<br>．藤鞭陷阱：<span class='wp-cost'>WP: 3</span> 將彈力強的細樹枝或藤條拉緊，綁上尖刺或石頭，觸發後迅速彈出。每當有生物觸發陷阱時，需進行閃避檢定，失敗被擊飛2D6米，並受到等量揮砍傷害。"}, gear: [{name:"1.弓箭",items:["小刀","戰弓","箭袋","獸皮甲","睡袋","火炬","打火匣","繩索","陷阱"]},{name:"2.投石",items:["小刀","投石繩","彈丸","獸皮甲","睡袋","火炬","打火匣","繩索","釣竿"]},{name:"3.吹箭",items:["短劍","吹箭筒","吹箭","獸皮甲","睡袋","火炬","打火匣","繩索","陷阱"]}] },
-        bard: { name: "詩人", id: "bard", attr: "CHA", resource: "1D6 食物, 1D8 銀幣", skills: ["體操", "閃避", "語言", "祕聞傳說", "欺瞞", "表演", "遊說", "小刀"], heroAbilities: {a:"【音樂家】<span class='wp-cost'>WP: 3</span> 你動人的聲音可以鼓舞你的盟友或挫敗你的敵人。<br>發動此能力（一個動作）可以讓 10 米內所有盟友的所有檢定獲得 1 個優勢，或讓相同範圍內的所有敵人獲得 1 個劣勢（選擇其中一種）。效果持續到你下一個回合開始。",b:"【頌神曲】<span class='wp-cost'>WP: 3</span> 你精通讚揚神祇的祭文禱詞。<br>每日一次，在適當的地方耗時一刻時間向當日侍神誠心唸頌禱詞，進行表演檢定。若成功，則侍神將會聽到你的祈禱，並降下神賜給整個隊伍。<br>降下何種神賜取決於當日的守護侍神。（詳見曆法章節）",c:"【戰歌】<span class='wp-cost'>WP: 3</span> 你精通鼓舞士氣和振奮人心的激昂戰歌。<br>你可以耗時一刻時間鼓舞隊友，消除其他人的畏縮和沮喪狀態，每個消除的狀態可回復該隊友2WP。<br>此外，在戰鬥時，你也可以用一個動作吼出激勵的戰鬥誓言，聽得見你的所有其他同伴立刻自選 1 個狀態消除。"}, gear: [{name:"1.骨銼",items:["骨銼","小刀","油燈","燈油","打火匣"]},{name:"2.長笛",items:["長笛","小刀","繩索","火炬","打火匣"]},{name:"3.號角",items:["號角","小刀","火炬","打火匣"]}] },
-        warrior: { name: "戰士", id: "warrior", attr: "STR", resource: "1D6 食物, 1D6 銀幣", skills: ["閃避", "徒手", "斧", "棍棒", "矛", "劍", "弓", "投槍器"], heroAbilities: {a:"【老兵】<span class='wp-cost'>WP: 1</span> 多年來的實戰經驗，讓你能在戰場上持續把握主動權，不被局勢的混亂所動搖。<br>(創角時)你從武器技能裡選擇一項，該武器的技能數值成長1點。<br>此外，在每一輪開始時，你可以發動此能力來保留你上一輪的先攻卡，而不抽取新的先攻卡。",b:"【狂暴】<span class='wp-cost'>WP: 3</span> 你立即獲得「憤怒」狀態，並立即對最近的敵人進行一次近戰攻擊。狂暴持續到戰場上沒有敵人，或你 HP 歸零為止。<br>狂暴期間：<br>．你的近戰攻擊獲得一個優勢。<br>．若你攻擊前額外消耗 1 WP ，該次命中額外造成 +1D4 傷害。<br>．擊殺一個敵人後，你可以立刻移動2米。<br>．你不能格擋或閃避。<br>戰鬥結束之後，你會陷入力竭狀態。",c:"【雙重斬擊】<span class='wp-cost'>WP: 3</span> 當你持握揮砍武器時，你可以同時對兩個相距你 2 米內的敵人進行一次攻擊。<br>你只進行一次攻擊檢定，若成功則同時命中兩個敵人。敵人可以分別進行格擋或閃避。傷害骰也分開計算。<br>此能力可以與「雙持戰鬥」能力結合。"}, 
-            gear: [
-                {name:"1.近戰", choices:["馬卡劍","銅斧","碎骨棒"], items:["圓盾","皮革戰甲","火炬","打火匣"]},
-                {name:"2.輕裝", choices:["馬卡短劍","黑曜石斧","投射標槍"], items:["投槍器","黑曜石箭袋","棉甲","火炬","打火匣"]},
-                {name:"3.長柄", items:["木矛","皮革戰甲","木製戰盔","打火匣"]}
-            ] 
+    /* --- 工匠資料 --- */
+    const ARTISAN_DATA = {
+        feather: {
+            name: "羽織工匠",
+            trait: "【羽符編印】",
+            desc: "利用特殊的編織手法將魔力注入羽毛與纖維之中。",
+            attrMap: {"工藝":"AGL"}, 
+            skills: ["工藝", "祕聞傳說", "語言", "巧手", "察覺", "野獸知識", "吹箭筒", "繩索"],
+            bonusGear: ["羽織工具", "一袋羽毛"],
+            glyphs: ["蜂鳥迴路", "岩鷺護盾", "太陽閃光", "鸚鵡回聲", "麻雀之躍", "禿鷹視界", "花舞魅影", "微風偏導", "琵鷺誘餌", "築巢結界"]
         },
-        knight: { name: "騎士", id: "knight", attr: "STR", resource: "1D6 食物, 1D12 銀幣", skills: ["野獸知識", "祕聞傳說", "表演", "遊說", "棍棒", "矛", "劍", "投槍器"], heroAbilities: {a:"【守護者】<span class='wp-cost'>WP: 2</span> 你願意毫不猶豫地為盟友擋下攻擊。<br>若你和另一名盟友都與同一名敵人相距 2 米內，當該敵人嘗試攻擊你的盟友時，你可以發動此能力，強迫敵人改為攻擊你。<br>此能力可以在你的回合外使用，且不需要花費動作。",b:"【舉盾格擋】<span class='wp-cost'>WP: 3</span> 當你使用盾牌進行格擋時，你可以發動此能力讓該次格擋檢定獲得 1 個優勢。<br>另外，你也可以使用此能力用盾牌格擋通常無法被格擋的怪物物理攻擊（AOE由GM判斷）。<br>此能力可以和「堅強防禦」能力結合。",c:"【堅強防禦】<span class='wp-cost'>WP: 3</span> 你可以在不消耗該輪動作的情況下嘗試格擋一次攻擊。<br>你只能對同一次攻擊嘗試格擋一次，且你無法再對該次攻擊進行閃避或格擋。<br>只要你有足夠的 WP，你在同一輪中可以多次發動此能力。"}, extraLabel:"騎士團", extraOptions:{eagle:{name:"鷹騎士團",desc:"<span class='highlight'>【羽父之祝福】</span> 每一位真正的鷹騎士，都背負著羽父的羽翼。這份羽翼只會展開一次，帶領你越過死亡，直至最後的榮耀。<br>當你死亡時，下一輪你的身體將會發出神性的光輝，你視為獲得復活術的效果，且不會受到負面影響。一旦此祝福發動後，你將永久失去此項特性。",addSkills:[]}, jaguar:{name:"豹騎士團",desc:"<span class='highlight'>【噬心者之怒】</span> 當豹騎士殞落時，他的心臟化為復仇的祭品，帶著札爾特克的憤怒爆裂而出，血肉為祭，怒火燃燒，將敵人一併拖入獻祭的火焰之中。<br>當你死亡時，下一輪你的心臟將會爆裂而出，血肉為祭，以你為中心施放威力等級3的「札爾特克之怒」法術，且該法術的範圍和傷害都變成2倍。",addSkills:[]}}, 
-            gear: [
-                {name:"騎士標準", choices:["馬卡劍","馬卡短劍","銅斧","碎骨棒","木矛"], items:["投槍器","投射標槍","圓盾","木製戰盔","火炬","打火匣"]}
-            ]
-        },
-        shaman: { name: "薩滿", id: "shaman", attr: "WIL", resource: "1D6 食物, 1D8 銀幣", skills: ["閃避", "棍棒"], heroAbilities: {a:"【魔法】身為薩滿，你創角時不會獲得英雄能力，而是可以施放魔法。"}, extraLabel:"魔法流派", 
-            extraOptions:{
-                soul:{name:"靈魂流派",desc:"馬茲提卡人和崇拜馬茲提克諸神的靈魂被稱為托那利(tonalli)，在死亡的那一刻，他們會到達一座宏偉的神廟。<br>研究靈魂能量的薩滿，尊敬祖先的靈魂或世界本身的精神能量。<br>他們相信靈魂是力量的源泉，透過儀式可治癒、強化，甚至操縱他人精神。",addSkills:["靈魂流派","體操","閃避","察覺","醫療","語言","祕聞傳說","棍棒"], mainSkill:"靈魂流派"}, 
-                beast:{name:"獸術流派",desc:"蟲噬、獸爪與毒液的魔法，是邪神噬心者札爾特克賜予人類的黑暗贈禮。<br>這些法術暴力而無情，模仿野獸的殘酷與掠食，但這些薩滿認為這是生存在殘酷大地上的必要力量。<br>唯有藉由獸術，他們才能以野性的殘暴對抗荒野中的威脅，確保族群得以存續。",addSkills:["獸術流派","閃避","狩獵","隱匿","野獸知識","求生","棍棒","小刀"], mainSkill:"獸術流派"}, 
-                pluma:{name:"羽術流派",desc:"由大地母神馬茲提卡親自創造，並由其子夸爾特賜予人類，用以對抗札爾特克的大軍。<br>羽術薩滿透過羽毛、光輝與聖歌施法，象徵純潔、保護與秩序。",addSkills:["羽術流派","閃避","體操","隱匿","野獸知識","求生","醫療","察覺"], mainSkill:"羽術流派"}, 
-                elem:{name:"元素流派",desc:"相信火、風、水、土是構成萬物的根本。他們透過操縱這四種元素來釋放力量，展現出大自然原始而無情的威能。",addSkills:["元素流派","閃避","察覺","醫療","語言","祕聞傳說","調查","棍棒"], mainSkill:"元素流派"}
-            }, 
-            gear: [{name:"1.水晶球",items:["硬木棒","水晶球","魔導書","火炬","打火匣"]},{name:"2.魔杖",items:["小刀","魔杖","魔導書","火炬","打火匣"]},{name:"3.聖徽",items:["聖徽","魔導書","睡袋","火炬","打火匣"]}] 
-        },
-        scholar: { name: "學者", id: "scholar", attr: "INT", resource: "1D6 食物, 1D10 銀幣", skills: ["閃避", "察覺", "野獸知識", "求生", "醫療", "語言", "祕聞傳說", "調查"], heroAbilities: {a:"【直覺思考】<span class='wp-cost'>WP: 3</span> 當面臨困難抉擇時，你可以發動此能力，直接詢問 GM 一個問題，並得到一個有用的答案。<br>該答案代表你的廣泛知識，僅有助於你的決策，無法揭示所有需要知道的事情。",b:"【現場教學】<span class='wp-cost'>WP: 3</span> 你可以快速講述知識來幫助所有人。當你在協助他人時，你可以協助複數盟友進行同一項檢定。<br>但你協助的對象有人檢定失敗的話你陷入憤怒狀態（若你還未憤怒）。",c:"【經驗分享】在技能成長階段開始前，你可以放棄一項技能成長機會，將自身經驗傳授給其他夥伴，讓最多兩位盟友額外獲得該項技能成長機會，之後正常進行技能成長流程。<br>你不能選擇已經標記該技能的盟友。"}, extraLabel:"術業有專攻", extraOptions:{celest:{name:"天律",desc:"你能解讀日月星辰的運行，辨明天體之間的軌跡。天象既是神祇的語言，也是未來的暗示。<br>．獲得「天律學」(智力)次要技能。<br>．當你進行技能檢定時，合理狀況下（由GM判定）可發動此能力改用「天律學」，並獲得 1 個優勢。<br>．在第四班長休時，你可耗費一刻時間觀看星象。發動此能力進行「天律學」檢定，你將捕捉到星律——天體運行所揭示的恆定秩序。在該次團務剩下的時間內，你可以發動此能力將一個失敗(大失敗除外)的檢定改為成功。（每場團務限一次）", extraSkill:"天律學"}, theo:{name:"神律",desc:"你並非以祈禱祈求神蹟，而是以研究神祇的律法與祭儀來獲取力量。你知道該如何取悅神祇，才能讓神意在凡世迴響。<br>．獲得「神律學」(智力)次要技能。<br>．當你進行技能檢定時，合理狀況下可發動此能力改用「神律學」，並獲得 1 個優勢。<br>．此外，當你身處與某位神祇相關的場所（神廟、祭壇、聖徽或象徵領域）時，你可以花費一刻時間進行「神律學」檢定。若成功，你得以理解此地所運行的神之法則，並以理論推演模擬其邏輯。在該次團務剩下的時間內檢定出現大失敗時，你可宣告「引用神律」來重構事件的結果，使該檢定重新擲骰一次並取較佳結果（每場團務限一次）。這代表你以對神法的理解暫時干預了命運的演算。", extraSkill:"神律學"}, num:{name:"數律",desc:"當你進行技能檢定時，合理的狀況下（由GM判定）可發動此能力改用「數律學」，並獲得 1 個優勢。<br>．此外，你能快速測算敵人的站位與距離來找到反擊的機會。當戰鬥的一輪結束時，你可以在抽下一輪的先攻卡前發動此能力。進行「數律學」檢定，若成功，你可以讓所有敵人先抽取先攻卡，剩下的先攻卡你可以自行分配給所有隊友。（每場戰鬥限一次）", extraSkill:"數律學"}, vita:{name:"生知",desc:"你從生命的經驗中學習世界的法則。每一次錯誤、傷痕與發現，都是知識的印記；唯有親身體驗，才能真正理解世界的運作。<br>．你從智力相關的核心技能中選擇一項，該技能的技能等級提升 1。<br>．當你使用你選擇提升的技能進行檢定時，你可發動此能力來獲得 1 個優勢。<br>．此外，你能從錯誤中累積經驗並快速學習。當你技能檢定失敗時，你可以發動此能力，直接將該技能標上提升標記。（每場團務限一次）"}}, gear: [{name:"1.筆記",items:["硬木棒","筆記本","羽毛筆","睡袋","火炬","打火匣"]},{name:"2.書籍",items:["黑曜石小刀","書本","睡袋","油燈","燈油","打火匣"]},{name:"3.醫療",items:["投石繩","繃帶","催眠毒藥","睡袋","提燈","燈油","打火匣"]}] },
-        thief: { name: "盜賊", id: "thief", attr: "AGL", resource: "1D6 食物, 1D10 銀幣", skills: ["巧手","隱匿","體操","閃避","察覺","調查","欺瞞","小刀"], heroAbilities: {a:"【背刺】<span class='wp-cost'>WP: 3</span> 當你對一名敵人進行近戰攻擊時，若該敵人和你的另一個盟友相距 2 米內，你可以發動此能力。<br>你的攻擊會視為偷襲，代表敵人無法閃避或格擋、你的攻擊檢定獲得 1 個優勢、傷害骰數量增加一顆（例如 1D8 變成 2D8）。<br>只有靈巧武器才能發動此能力。",b:"【迅捷步法】<span class='wp-cost'>WP: 3</span> 你可以在不消耗該輪動作的情況下嘗試閃避一次攻擊。<br>你只能對同一次攻擊嘗試閃避一次，且你無法再對該次攻擊進行躲閃避或格擋。<br>只要你有足夠的 WP，你在同一輪中可以多次使用此能力。",c:"【閃電速度】<span class='wp-cost'>WP: 2</span> 當戰鬥開始抽先攻卡時，你可以抽兩張卡，並選擇想要的其中一張。"}, gear: [{name:"1.爪鉤",items:["黑曜石小刀","投石繩","黑曜石彈丸袋","10米麻繩","爪鉤","火炬","打火匣"]},{name:"2.開鎖",items:["黑曜石小刀","簡易開鎖器","火炬","打火匣"]},{name:"3.滾珠",items:["黑曜石小刀","吹箭筒","吹箭袋","滾珠","火炬","打火匣"]}] },
-        pochteca: { name: "旅商", id: "pochteca", attr: "CHA", resource: "1D6 食物, 1D12 銀幣", skills: ["交易","遊說","閃避","騎術","察覺","調查","欺瞞","小刀"], heroAbilities: {a:"【察言觀色】<span class='wp-cost'>WP: 3</span> 你對人心的觀察遠超常人。在你與另一個人的談話中，你可以發動此能力進行察覺檢定。依照檢定結果，你可獲得下列一項或多項資訊（大成功則全部獲得）。<br>．失敗/成功：對方目前的情緒（害怕、緊張、焦躁、誠懇、傲慢等）。<br>．成功：對方是否在說謊。<br>．成功：對方對你／某人／某事的真實態度（敵意、戒心、好感、利益）。<br>．大成功：你能判斷對方潛在的動機或弱點（例如「他在保護某人」、「他在隱瞞交易」、「他受金錢驅使」）。",b:"【商隊領袖】<span class='wp-cost'>WP: 3</span> 你熟悉商路捷徑，能縮短長途旅行所需時間，並在遭遇危險時能迅速指揮眾人應對。<br>當隊伍在荒野上長途旅行（兩天以上的路程）時，你可以發動此能力來縮短1d4班的路程。<br>此外，若旅行過程中的探路檢定失敗而遇到危險時，你可以發動此能力來讓所有人面對危險的檢定獲得一個優勢。",c:"【情報掮客】<span class='wp-cost'>WP: 3</span> 在重要城邦、市集或貿易路口停留至少一天時間後，你可以發動此能力向 GM 提出一個針對當地的問題，獲得可靠訊息。這些訊息可能包括附近部族的動向、危險怪物出沒、政治陰謀或市場需求，實際能獲得什麼資訊由GM決定。"}, gear: [{name:"1.野炊",items:["黑曜石小刀","野炊工具","馬車","火炬","打火匣"]},{name:"2.提燈",items:["黑曜石小刀","提燈","馬車","燈油","打火匣"]}] },
-        farmer: { name: "農民", id: "farmer", attr: "INT", resource: "1D8 食物, 1D10 銀幣", skills: ["求生","工藝","狩獵","野獸知識","察覺","游泳","調查","徒手"], heroAbilities: {a:"【浮田耕藝】你獲得並受訓「浮田術」(智力)次要技能。<br>耗費一班時間，你可以在濕地或河湖上建造「簡易小型浮田」，能夠讓你種植少量的作物並收成，提供隊伍所需的糧食。<br>實際種植所需消耗的WP和收成時間詳見「烹飪&種植」章節。",b:"【水獵巧技】<span class='wp-cost'>WP: 2</span> 你擅長在水域裡捕獵，能在水中迅速應對情況。<br>．當你嘗試釣魚時，你可以發動此能力來讓狩獵檢定獲得優勢。<br>．當你在水中進行近戰攻擊時，你可以發動此能力來避免該次攻擊獲得劣勢。<br>．你在水中受到攻擊時，你可以發動此能力使用游泳來取代閃避檢定。",c:"【大廚】你獲得並受訓「廚藝」(智力)次要技能。你可以為隊伍製作美味好吃的菜餚而非單純飽腹的糧食。<br>現在你烹飪時改為進行「廚藝」檢定。<br>每道菜譜有各自所需的時間、WP和食材，成功烹調將製作出有額外增益的食物。<br>你一開始可以學會兩道1星料理和一道2星料理。詳見「烹飪&種植」章節。"}, gear: [{name:"1.槌子",items:["槌子","野炊工具","火炬","打火匣"]},{name:"2.鎬",items:["十字鎬","睡袋","油燈","燈油","打火匣"]},{name:"3.鏟子",items:["鏟子","釣竿","火炬","打火匣"]}] }
+        bone: {
+            name: "獸刻工匠",
+            trait: "【骨鳴雕刻】",
+            desc: "在野獸的骨頭與甲殼上雕刻出能夠引發共鳴的符文。",
+            attrMap: {"工藝":"STR"},
+            skills: ["工藝", "野獸知識", "求生", "漁獵", "調查", "徒手", "劍", "棍棒"],
+            bonusGear: ["獸刻工具", "一袋乾燥的毒囊與牙齒"],
+            glyphs: ["狩豹之鄂", "犰狳骨板", "蝮蛇導管", "壁虎吸盤", "野豬衝角", "尖嘯喉管", "豪豬反擊", "狼群感官", "巨蛙肌腱", "鱷魚咬合"]
+        }
     };
 
-    const ALL_SKILLS = ["工藝", "巧手", "調查", "徒手", "斧", "棍棒", "劍", "小刀", "弓", "投槍器", "投石繩", "吹箭筒", "矛", "體操", "狩獵", "隱匿", "察覺", "求生", "騎術", "游泳", "醫療", "語言", "祕聞傳說", "船藝", "交易", "欺瞞", "表演", "遊說", "野獸知識", "靈魂流派", "獸術流派", "羽術流派", "元素流派", "天律學", "神律學", "數律學", "廚藝", "庫拉里"];
-    
-    // 修正：閃避對應 AGL
+    /* --- 騎士資料 --- */
+    const KNIGHT_DATA = {
+        eagle: {
+            name: "鷹騎士",
+            trait: "【羽父之祝福】",
+            desc: "每一位真正的鷹騎士，都背負著羽父的羽翼。這份羽翼只會展開一次，帶領你越過死亡，直至最後的榮耀。<br>當你死亡時，下一輪你的身體將會發出神性的光輝，你視為獲得復活術的效果，且不會受到負面影響。一旦此祝福發動後，你將永久失去此項特性。",
+            skills: ["劍", "矛", "投槍器", "體操", "察覺", "祕聞傳說", "遊說", "表演"],
+            techniques: {
+                t1: "【猛禽俯衝】<span class='wp-cost'>WP: 3</span> 從高處躍下攻擊，傷害增加且擊倒。",
+                t2: "【耀光戰姿】<span class='wp-cost'>WP: 2</span> 進入防禦姿態，反射強光致盲攻擊者。",
+                t3: "【飛羽偏轉】<span class='wp-cost'>WP: 3</span> 撥擋遠程投射物，甚至反彈回去。",
+                t4: "【生擒者】<span class='wp-cost'>WP: 3</span> 使用投網或索套時優勢，無傷壓制敵人。",
+                t5: "【獵鷹之姿】<span class='wp-cost'>WP: 2</span> 下一次投槍攻擊距離加倍且忽略掩護。",
+                t6: "【雷霆釘刺】<span class='wp-cost'>WP: 4</span> 強力突刺，貫穿一直線上的敵人。"
+            }
+        },
+        jaguar: {
+            name: "豹騎士",
+            trait: "【噬心者之怒】",
+            desc: "當豹騎士殞落時，他的心臟化為復仇的祭品，帶著札爾特克的憤怒爆裂而出，血肉為祭，怒火燃燒，將敵人一併拖入獻祭的火焰之中。<br>當你死亡時，下一輪你的心臟將會爆裂而出，血肉為祭，以你為中心施放威力等級3的「札爾特克之怒」法術，且該法術的範圍和傷害都變成2倍。",
+            skills: ["劍", "棍棒", "隱匿", "漁獵", "求生", "體操", "野獸知識", "表演"],
+            techniques: {
+                t1: "【獵豹突襲】<span class='wp-cost'>WP: 3</span> 衝鋒後第一擊優勢，若命中追加流血。",
+                t2: "【處決準備】<span class='wp-cost'>WP: 2</span> 對受傷或倒地目標的下一次攻擊必定爆擊。",
+                t3: "【弱點打擊】<span class='wp-cost'>WP: 3</span> 攻擊無視護甲值。",
+                t4: "【密林潛獵】<span class='wp-cost'>WP: 2</span> 戰鬥中亦可進行隱匿檢定。",
+                t5: "【鮮血嗅覺】<span class='wp-cost'>WP: 1</span> 感知周圍所有受傷生物的位置。",
+                t6: "【死亡尖嘯】<span class='wp-cost'>WP: 4</span> 發出恐怖尖嘯，範圍內敵人恐懼。"
+            }
+        }
+    };
+
+    /* --- 法術資料庫 --- */
+    const SPELLS = {
+        gen: {
+            t0: ["引路螢火","勤勉的微風","頑皮鬼的彈指","門神的許可","織婆婆的針腳","靈犬的嗅覺","花靈的妝點","灶爺爺的餽贈","掃塵靈的過境","守密者的結","負重龜靈","背夫的韌性","乾燥之觸","歸途的羅盤","商人的舌頭"],
+            t1: ["淨水洗滌","守護犬的圖騰","鑑定真偽","守夜的靈石","靜默之幕"],
+            t2: ["煙鏡反制","借道之請"]
+        },
+        fang: { 
+            t0: ["伏擊","野獸感官","快速銳化","驚嚇","蛇臂術"],
+            t1: ["噴射銳石","大步奔行","獵豹撲襲","爪刃術","掠食者凝視","野獸低語","毒液噴吐","豹爪術","獸甲強化","獵者之令"],
+            t2: ["墓葬術","豹主之靈眼","獸化形體","魔化武器","心跳感知","蝮蛇魔坑","劇毒針雨","神經毒霧"]
+        },
+        pluma: { 
+            t0: ["搔癢術","理羽術","鳥語","羽色術","鴻毛術","花徑"],
+            t1: ["飛矢術","夸爾的低語","飛羽鏢","信使鳥","魅鳥術","漂浮術","纏繞之根","羽風術","靜翼術","織癒術"],
+            t2: ["馭風術","羽靈使","羽刃風暴","氣息感知","蒼鷹飛掠","迷亂術","吞噬之森","卷軸視界"]
+        },
+        sun: { 
+            t0: ["指尖陽炎","凶兆解讀","太陽印記","鑽木喚靈","辨識天命"],
+            t1: ["太陽射線","黃金聖血","日符祝福","撒豆占卜","太陽閃光","父神的凝視","內在之火","喚回天命","天命薪火","意圖解讀"],
+            t2: ["日冕之環","輝煌審判","篡奪日軌","煙鏡神諭","焚魂輝盾","燃燒天命","天命流轉","正午之焦熱"]
+        },
+        blood: { 
+            t0: ["凝血","鮮血視界","代償之儀","血腥氣場","鮮血保存"],
+            t1: ["沸血","心脈賁張","獻祭印記","鮮血長槍","獻祭癒合","鮮血滌罪","血爆","恐懼幻象","鮮血之盾","鮮血連繫"],
+            t2: ["心臟停搏","大沸騰","戰神處決","鮮血控制","鮮血重矛","大血爆","四百恐懼","召喚血豹"]
+        },
+        med: { 
+            t0: ["生命火花","保存草藥","安撫","潔淨之觸","偵測污穢"],
+            t1: ["治癒之手","生命綻放","草藥癒合","瓦蒂爾的哀憐","平靜安息","痛覺阻斷","蒸汽屏障","翡翠淨水","中和毒素","生命感知"],
+            t2: ["生命播撒","癒合撫慰","瓦蒂爾的恩澤","基爾茲的安眠","強心活化","生命繫帶","蒸汽淨化","翡翠淨土"]
+        },
+        elem: { 
+            t0: ["無形之息","源水的予取","岩石感知","指尖的餘燼","靜電羽飾"],
+            t1: ["驅逐之風","風之躍","激流之握","冰霜嘆息","大地之脊","歸塵震顫","烈陽彈","熔火的血脈","電光耀擊","破山雷擊"],
+            t2: ["肅清之風","赤痕狂濤","極冰處刑","恩賜之雨","大地飢渴","黑曜壁壘","火蛇盤踞","天際之蛇的雷噬"]
+        }
+    };
+/* --- 大廚食譜資料 --- */
+    const RECIPES = {
+        r1: ["酪梨醬", "玉米餅", "玉米香草羹", "莧菜蜂蜜塊", "玉米熱飲"],
+        r2: ["南瓜奶油湯", "玉米粥", "辣味焦糖蕉", "奇亞鮮奶布丁", "莧菜餅乾"]
+    };
+
+    const PROFESSIONS = {
+        artisan: { 
+            name: "工匠", id: "artisan", attr: "STR/AGL", 
+            skills: [], 
+            heroAbilities: {
+                a: "【鍛匠大師】",
+                b: "【木匠大師】",
+                c: "【皮匠大師】",
+                d: "【織匠大師】"
+            },
+            gear: [{name:"1.第一組",items:["吹箭筒","吹箭袋","黑曜石小刀","棉甲","睡袋卷","松明火炬","黃鐵礦取火組"]},{name:"2.第二組",items:["馬夸維爾特","圓盾","獸皮甲","松明火炬","黃鐵礦取火組"]},{name:"3.第三組",items:["黑曜石小刀","投石繩","麻繩（10米）","圈套陷阱","背包","松明火炬","黃鐵礦取火組"]}] 
+        },
+        hunter: { 
+            name: "獵人", id: "hunter", attr: "AGL", 
+            skills: ["體操", "漁獵", "隱匿", "察覺", "求生", "小刀", "弓", "吹箭筒"], 
+            heroAbilities: {
+                a:"【動物夥伴】", b:"【雙重射擊】", c:"【陷阱大師】",d:"【鷹眼】",e:"【水獵巧技】",f:"【蝮蛇瞬咬】",
+                g:"【蜂鳥迴身】", h:"【專注追獵】", i:"【快速塗毒】",j:"【熟悉毒物】",k:"【怪物獵人】",l:"【尋路者】"
+            }, 
+            gear: [{name:"1.第一組",items:["黑曜石飛刀","戰弓","黑曜石箭袋","獸皮甲","睡袋卷","松明火炬","黃鐵礦取火組","麻繩（10米）","圈套陷阱","螢火蟲籠"]},{name:"2.第二組",items:["黑曜石小刀","短弓","骨簇箭袋","獸皮甲","睡袋卷","松明火炬","黃鐵礦取火組","麻繩（10米）","蘆葦釣竿","螢火蟲籠"]},{name:"3.第三組",items:["馬卡短劍","吹箭筒","吹箭袋","獸皮甲","睡袋卷","松明火炬","黃鐵礦取火組","麻繩（10米）","圈套陷阱","螢火蟲籠"]}] 
+        },
+        bard: { 
+            name: "詩人", id: "bard", attr: "CHA", 
+            skills: ["體操", "閃避", "語言", "祕聞傳說", "欺瞞", "表演", "遊說", "小刀"], 
+            heroAbilities: {
+                a:"【音樂家】", b:"【頌神曲】", c:"【紓壓曲】",d:"【英雄讚歌】",e:"【博學多聞】",f:"【戰歌】",
+                g:"【龜縮】", h:"【察言觀色】", i:"【王權威儀】",j:"【操弄人心】",k:"【天命宣示】",l:"【氏族羈絆】"
+            }, 
+            gear: [{name:"1.第一組",items:["長鼓","黑曜石小刀","陶碗油燈","油脂（樹脂）"]},{name:"2.第二組",items:["長笛","黑曜石飛刀","麻繩（10米）","松明火炬","黃鐵礦取火組"]},{name:"3.第三組",items:["海貝號角","黑曜石飛刀","松明火炬","黃鐵礦取火組"]}] 
+        },
+        warrior: { 
+            name: "戰士", id: "warrior", attr: "STR", 
+            skills: ["閃避", "徒手", "斧", "棍棒", "矛", "劍", "弓", "投槍器"], 
+            heroAbilities: {
+                a:"【老兵】", b:"【無畏】", c:"【狂暴】",d:"【雙重斬擊】",e:"【鐵拳重擊】",f:"【強力一擊】",
+                g:"【銅斧鉤殺】", h:"【強力投擲】", i:"【鋸裂處刑】",j:"【破甲強襲】",k:"【不屈意志】",l:"【碎骨重擊】"
+            }, 
+            gear: [
+                {name:"1.第一組",items:[["馬夸維爾特","銅斧","碎骨棒"], "圓盾", "皮革戰甲", "松明火炬", "黃鐵礦取火組"]},
+                {name:"2.第二組",items:[["馬卡短劍","黑曜石斧","投槍器 & 投射標槍"], "黑曜石箭袋", "棉甲", "松明火炬", "黃鐵礦取火組"]},
+                {name:"3.第三組",items:["木矛", "皮革戰甲", "木製戰盔", "松明火炬", "黃鐵礦取火組"]}
+            ] 
+        },
+        scholar: { 
+            name: "學者", id: "scholar", attr: "INT", 
+            skills: ["閃避", "察覺", "野獸知識", "求生", "醫療", "語言", "祕聞傳說", "調查"], 
+            heroAbilities: {
+                a:"【直覺思考】", b:"【現場教學】", c:"【經驗分享】",d:"【王權威儀】",e:"【英雄讚歌】",f:"【博學多聞】",
+                g:"【龜縮】", h:"【戰地手術】", i:"【預判警示】",j:"【軍需官】",k:"【氏族羈絆】",l:"【天命宣示】"
+            }, 
+            extraLabel:"術業有專攻", 
+            extraOptions:{celest:{name:"【天律學】",desc:"獲得天律學技能。可觀星改判失敗檢定。",addSkills:["天律學"]}, theo:{name:"【神律學】",desc:"獲得神律學技能。在聖地可重骰大失敗。",addSkills:["神律學"]}, num:{name:"【數律學】",desc:"獲得數律學技能。戰鬥結束可分配先攻。",addSkills:["數律學"]}, vita:{name:"【生知學】",desc:"技能失敗時直接標記成長。",addSkills:[]}}, 
+            gear: [{name:"1.第一組",items:["硬木棒","空白摺本","蘆葦筆 & 胭脂墨","睡袋卷","松明火炬","黃鐵礦取火組"]},{name:"2.第二組",items:["黑曜石小刀","樹皮知識卷 (任一主題)","睡袋卷","陶碗油燈","油脂/樹脂（10劑）","黃鐵礦取火組"]},{name:"3.第三組",items:["投石繩","乾淨棉布（10份）","蘆薈草膏","睡袋卷","鏤空陶燈","油脂/樹脂（10劑）"]}] 
+        },
+        pochteca: { 
+            name: "旅商", id: "pochteca", attr: "CHA", 
+            skills: ["交易","遊說","閃避","騎術","察覺","調查","欺瞞","小刀"], 
+            heroAbilities: {
+                a:"【察言觀色】", b:"【商隊領袖】", c:"【情報掮客】",d:"【博學多聞】",e:"【龜縮】",f:"【散財誘敵】",
+                g:"【尋路者】", h:"【軍需官】", i:"【尋寶獵人】",j:"【金錢賄賂】",k:"【旅商行令】",l:"【易容】"
+            }, 
+            gear: [{name:"1.第一組",items:["黑曜石小刀","野炊工具","額帶背架","松明火炬","黃鐵礦取火組"]},{name:"2.第二組",items:["黑曜石飛刀","鏤空陶燈","油脂/樹脂（10劑）","額帶背架","黃鐵礦取火組"]},{name:"3.第三組",items:["黑曜石小刀","陶碗油燈","油脂/樹脂（10劑）","防水皮帳","黃鐵礦取火組"]}] 
+        },
+        thief: { 
+            name: "盜賊", id: "thief", attr: "AGL", 
+            skills: ["巧手","隱匿","體操","閃避","察覺","調查","欺瞞","小刀"], 
+            heroAbilities: {
+                a:"【背刺】", b:"【刺殺】", c:"【迅捷步法】",d:"【閃電速度】",e:"【蝮蛇瞬咬】",f:"【快速塗毒】",
+                g:"【卑鄙手段】", h:"【妙手空空】", i:"【輕身落地】",j:"【熟悉毒物】",k:"【飛簷走壁】",l:"【易容】"
+            }, 
+            gear: [{name:"1.第一組",items:["黑曜石小刀","投石繩","黑曜石彈丸袋","麻繩（10米）","鹿角鉤爪","松明火炬","黃鐵礦取火組"]},{name:"2.第二組",items:["黑曜石小刀","骨製解繩錐","松明火炬","黃鐵礦取火組"]},{name:"3.第三組",items:["黑曜石飛刀","吹箭筒","吹箭袋","睡袋卷","滑步種子","松明火炬","黃鐵礦取火組"]}] 
+        },
+        farmer: { 
+            name: "農民", id: "farmer", attr: "INT", 
+            skills: ["求生","工藝","漁獵","野獸知識","察覺","游泳","調查","徒手"], 
+            heroAbilities: {
+                a:"【浮田耕藝】", b:"【水獵巧技】", c:"【大廚】",d:"【蜂鳴飛石】",e:"【收割橫掃】",f:"【忍耐之軀】",
+                g:"【下盤穩固】", h:"【採集大師】", i:"【親水泳將】",j:"【氏族羈絆】",k:"【經驗分享】",l:"【快速恢復】"
+            }, 
+            gear: [{name:"1.第一組",items:["挖掘棒","野炊工具","棉織毛毯","松明火炬","黃鐵礦取火組"]},{name:"2.第二組",items:["鹿角尖嘴鋤","睡袋卷","陶碗油燈","油脂/樹脂（10劑）","黃鐵礦取火組"]},{name:"3.第三組",items:["多叉魚矛","睡袋卷","葫蘆瓶","松明火炬","黃鐵礦取火組"]}] 
+        },
+        knight: { 
+            name: "騎士", id: "knight", attr: "STR", 
+            skills: [], // 由騎士團決定
+            heroAbilities: {
+                a:"【守護者】",
+                b:"【舉盾格擋】",
+                c:"【堅強防禦】",
+                d:"【守衛矛陣】",
+                e:"【穿雲長擲】",
+                f:"【血誓】"
+            },
+            gear: [{name:"騎士標準",items:["投槍器", "投射標槍", ["馬夸維爾特","刃棒","銅斧","碎骨棒","木矛"], "圓盾", "木製戰盔", "騎士戰甲(Placeholder)", "松明火炬", "黃鐵礦取火組"]}] 
+        },
+        shaman: { 
+            name: "薩滿", id: "shaman", attr: "WIL", 
+            skills: [], // 由流派決定
+            // 薩滿無英雄能力選單，此處僅為顯示說明
+            heroAbilities: null, 
+            heroDesc: "【魔法】身為薩滿，你創角時不會獲得英雄能力，而是可以施放魔法。你必須選擇一個魔法流派，並受訓該流派的專屬技能。<br>法術選擇：3個戲法 + 3個一階法術 + 1個二階法術。",
+            extraLabel:"魔法流派", 
+            extraOptions:{
+                fang:{name:"毒牙獸術",addSkills:["毒牙獸術","漁獵","隱匿","野獸知識","求生","徒手","小刀","閃避"], forceSkill:"毒牙獸術"}, 
+                pluma:{name:"羽織秘法",addSkills:["羽織秘法","祕聞傳說","語言","巧手","察覺","遊說","表演","棍棒"], forceSkill:"羽織秘法"}, 
+                blood:{name:"心血噬儀",addSkills:["心血噬儀","祕聞傳說","醫療","欺瞞","調查","小刀","徒手","閃避"], forceSkill:"心血噬儀"}, 
+                sun:{name:"天命曜日",addSkills:["天命曜日","語言","祕聞傳說","遊說","察覺","棍棒","劍","閃避"], forceSkill:"天命曜日"}, 
+                med:{name:"滌穢醫道",addSkills:["滌穢醫道","醫療","工藝","求生","語言","遊說","察覺","徒手"], forceSkill:"滌穢醫道"}, 
+                elem:{name:"萬象神息",addSkills:["萬象靈息","求生","體操","閃避","察覺","漁獵","游泳","棍棒"], forceSkill:"萬象靈息"}
+            }, 
+            gear: [
+                {name:"1.正統祭司",items:["黑曜石鏡(法器)", "骨哨", "阿莫斯特利法典(載體)", "祭司棉袍", ["一袋鷹類羽毛", "一袋占卜骨片"], "松木火炬", "黃鐵礦取火組"]},
+                {name:"2.荒野行者",items:["黑曜石飾針(法器)", "硬木棒", "黑曜石鐮刀", "獸骨圖騰(載體)", "獸皮披肩", ["一袋蛇鱗", "寬口陶桶"], "松木火炬", "黃鐵礦取火組"]},
+                {name:"3.血誓醫者",items:["神靈雕像(法器)", "奇普繩結(載體)", "草藥師工具", ["一罐神聖柯巴脂", "葫蘆瓶"], "松木火炬", "黃鐵礦取火組"]}
+            ] 
+        }
+    };
+
+    const COMMON_SKILLS = ["工藝", "巧手", "調查", "徒手", "斧", "棍棒", "劍", "小刀", "弓", "投槍器", "繩索", "吹箭筒", "矛", "體操", "漁獵", "隱匿", "察覺", "求生", "騎術", "游泳", "醫療", "語言", "祕聞傳說", "船藝", "交易", "欺瞞", "表演", "遊說", "野獸知識", "閃避"];
+    const SPECIAL_SKILLS = ["毒牙獸術", "羽織秘法", "心血噬儀", "天命曜日", "滌穢醫道", "萬象靈息", "天律學", "神律學", "數律學", "浮田術", "廚藝"];
+    const ALL_SKILLS = [...COMMON_SKILLS, ...SPECIAL_SKILLS]; 
+
     const SKILL_ATTR_MAP = {
         "工藝": "STR", "巧手": "AGL", "調查": "INT", "徒手": "STR", "斧": "STR", "棍棒": "STR", "劍": "STR", "小刀": "AGL",
-        "弓": "AGL", "投槍器": "STR", "投石繩": "AGL", "吹箭筒": "AGL", "矛": "STR", "體操": "AGL", "狩獵": "AGL", "隱匿": "AGL",
+        "弓": "AGL", "投槍器": "STR", "繩索": "AGL", "吹箭筒": "AGL", "矛": "STR", "體操": "AGL", "漁獵": "AGL", "隱匿": "AGL", "閃避": "AGL",
         "察覺": "INT", "求生": "INT", "騎術": "AGL", "游泳": "AGL", "醫療": "INT", "語言": "INT", "祕聞傳說": "INT", "船藝": "INT",
-        "交易": "CHA", "欺瞞": "CHA", "表演": "CHA", "遊說": "CHA", "野獸知識": "INT", "閃避": "AGL",
-        "靈魂流派": "INT", "獸術流派": "INT", "羽術流派": "INT", "元素流派": "INT", 
-        "天律學": "INT", "神律學": "INT", "數律學": "INT", "廚藝": "INT", "庫拉里": "INT","浮田術": "INT"
+        "交易": "CHA", "欺瞞": "CHA", "表演": "CHA", "遊說": "CHA", "野獸知識": "INT",
+        "毒牙獸術": "INT", "羽織秘法": "INT", "心血噬儀": "INT", "天命曜日": "INT", "滌穢醫道": "INT", "萬象靈息": "INT", 
+        "天律學":"INT", "神律學":"INT", "數律學":"INT", "浮田術":"INT", "廚藝":"INT"
     };
 
     const MEMENTOS = ["一雙舒適耐穿的舊鞋子", "一面樸素的銀製獎章", "一封來自老友或親戚的信", "一本破爛的舊日記本", "一個你家族代代相傳的手鐲", "一尊你童年時獲得的木雕像", "一顆形狀怪異的石頭", "父母送你的一枚紀念銅幣", "一個老舊的錫製酒杯", "作為戰利品的怪物犄角", "幾顆骨製骰子", "繫著一小束頭髮的吊墜盒", "一把華麗的鑰匙", "一張你繼承的手繪地圖", "一只刻有銘文的戒指", "一個骨製哨子", "頂你父母的舊帽子", "格里芬的一根羽毛", "一根雕塑精美的煙斗"];
     const WEAKNESSES = ["輕信：我相信別人告訴我的一切。", "貪婪：我想要更多的財富。", "臉皮薄：我絕不容忍被挑釁。", "莽撞：我總是第一個衝入危險。", "懦弱：我總是待在隊伍的最後面。", "怪物殺手：所有怪物都是邪惡的，必須殺掉。", "憎恨：蝰手獸皆該被剷除。", "懶惰：我一抓到機會就想休息。", "	貪吃：我會把握吃到美食的所有機會。", "虛榮：我會幫助任何稱讚我的人。", "魯莽：我總是不考慮後果地冒險。", "竊盜癖：我看到貴重物品就手癢想偷。", "害怕魔法：魔法是邪惡的力量，不能相信薩滿。", "渴求知識：知識比朋友更重要。", "荒野之子：我從不在室內睡覺。", "吹牛：我總是誇大我的成就。", "暴力：我訴諸暴力來克服每一個障礙。", "霸道：我總是命令別人該怎麼做。", "悲觀：我總是認為事情會往最壞方向發展。", "傲慢：我看不起所有人。"];
     const APPEARANCES = ["臉頰上有一道難看的疤痕", "戴著奇怪的頭飾", "皮膚異常蒼白", "臉上總是掛著微笑", "眼神冰冷且銳利", "肚子有一圈贅肉", "消瘦但精實", "體毛異常地多", "禿頭", "顯眼的紋身", "難聞的體味", "華麗的髮型", "走路一跛一跛", "骯髒沒洗澡", "誠實的藍色眼睛", "一顆銀製假牙", "濃重的香水味", "異色瞳", "聲音沙啞", "飽經風霜的皺紋"];
-    const SPELLS = {
-        gen: ["亮","取","彈","開/關","縫補","感應魔法","上鎖/開鎖","清理","烹飪","理髮","魔法凳","解消術","防護術"],
-        soul: ["感應靈魂","奇術","安定靈魂","放逐術","療傷術","靈魂之楔","靈魂低語","遙視術"],
-        beast: ["伏擊","野獸感官","感應心跳","蛇臂術","噴射銳石","毒刃術","野獸低語","獵者之令","爪刃術","獸甲強化","大步奔行"],
-        pluma: ["花徑","鳥語","感應氣息","羽落","電光一閃","纏繞之根","動物低語","漂浮術","飛羽鏢","綻放術","夸爾特之息"],
-        elem: ["升溫/冷卻","煙團","點燃","火球術","石柱術","碎裂術","強風術","寒霜術"]
+
+/* ================= FVTT ID 對照表 (已更新族裔能力) ================= */
+    const FVTT_ID_MAP = {
+        // --- 族裔 (Race) ---
+        "人類 (馬茲提卡人)": "Compendium.dragonbane-maztica.pack-1.Item.LecAYIaGJq6hx66H",
+        "人類 (庫塔卡人)": "Compendium.dragonbane-maztica.pack-1.Item.o8L8xRStuv84tqLS",
+        "人類 (伊察人)": "Compendium.dragonbane-maztica.pack-1.Item.tU0bMjJGmr8PPu6W",
+        "人類 (帕伊特人)": "Compendium.dragonbane-maztica.pack-1.Item.ym2zCn2fPo7wqKOl",
+        "人類 (狗民)": "Compendium.dragonbane-maztica.pack-1.Item.48QqBOTY0meMbKuS",
+        "人類 (綠民)": "Compendium.dragonbane-maztica.pack-1.Item.QKPRWze40HEob6c6",
+        "半身人": "Compendium.dragonbane-maztica.pack-1.Item.o6bSG1NA8I4OnW5d",
+        "豹人 (狩豹人)": "Compendium.dragonbane-maztica.pack-1.Item.4VgC8pMujw3t7jgz",
+        "豹人 (豹貓人)": "Compendium.dragonbane-maztica.pack-1.Item.33lAoD688WpP5rdq",
+        "蛙人": "Compendium.dragonbane-maztica.pack-1.Item.bMjF9WbuSfsKpzUQ",
+        "矮人": "Compendium.dragonbane-maztica.pack-1.Item.YPzOK6ylo6pnVlO9",
+        "精靈 (土精靈)": "Compendium.dragonbane-maztica.pack-1.Item.uaizl3zjeDkJ7B8K",
+        "精靈 (木精靈)": "Compendium.dragonbane-maztica.pack-1.Item.ZhIX7uC135WkTu8F",
+        "精靈 (金精靈)": "Compendium.dragonbane-maztica.pack-1.Item.kZ2q0duXrtXXmSqp",
+        "蜥蜴人": "Compendium.dragonbane-maztica.pack-1.Item.SJxS4ML2ewWfIQIm",
+        "鷹人": "Compendium.dragonbane-maztica.pack-1.Item.tf0Vcog5sN2jUPyv",
+
+        // --- 族裔能力 (Racial Abilities) [新增部分] ---
+        "通權達變": "Compendium.dragonbane-maztica.pack-5.Item.qDPFnaqIJfGewJ7c",
+        "動如脫兔": "Compendium.dragonbane-maztica.pack-5.Item.kvZjIKg2Ft9tjhDx",
+        "毒藥技術：庫拉里": "Compendium.dragonbane-maztica.pack-5.Item.XAOIz8FqTWzXIPLf",
+        "心如止水": "Compendium.dragonbane-maztica.pack-5.Item.YR4CmUaki8r9aZOz",
+        "泥土皮膚": "Compendium.dragonbane-maztica.pack-5.Item.Kmg2bxz49SReCw4E",
+        "樹質皮膚": "Compendium.dragonbane-maztica.pack-5.Item.8GOddpOexHXzQqzF",
+        "金屬皮膚": "Compendium.dragonbane-maztica.pack-5.Item.cihlSRrQAEk0xZw2",
+        "刻骨銘心": "Compendium.dragonbane-maztica.pack-5.Item.K5mPA7KvhhrFiezN",
+        "沙漠耐性": "Compendium.dragonbane-maztica.pack-5.Item.5zBzCXjlSwggB7Bb",
+        "銳眼": "Compendium.dragonbane-maztica.pack-5.Item.0BhyjdX5EwlDh004",
+        "飛翼": "Compendium.dragonbane-maztica.pack-5.Item.dYk7JH8HJSvDLpKE",
+        "屏氣": "Compendium.dragonbane-maztica.pack-5.Item.xpvjGyuxsV8QJWJP",
+        "肉食者": "Compendium.dragonbane-maztica.pack-5.Item.OJFaqAmcAWhOEwC5",
+        "叢林伏擊": "Compendium.dragonbane-maztica.pack-5.Item.s0agy3rGbvP9aDJA",
+        "狩獵本能": "Compendium.dragonbane-maztica.pack-5.Item.xBSyT13aGF0jZ0gH",
+        "迅捷攀爬": "Compendium.dragonbane-maztica.pack-5.Item.ZpSMgi1OJtBdJmll",
+        "猛力彈跳": "Compendium.dragonbane-maztica.pack-5.Item.I0Tl7ctpc2fmCYCn",
+        "休聲美譽": "Compendium.dragonbane-maztica.pack-5.Item.V4aLWOx9Yd38gg0m",
+
+        // --- 職業 (Profession) ---
+        "工匠": "Compendium.dragonbane-maztica.pack-2.Item.crREYtB55DeQDFTp",
+        "旅商": "Compendium.dragonbane-maztica.pack-2.Item.TRhn0fyWjsRgM7PL",
+        "盜賊": "Compendium.dragonbane-maztica.pack-2.Item.Xzh9LzaGyvkJjf0Q",
+        "詩人": "Compendium.dragonbane-maztica.pack-2.Item.LbzpvhNlHSfUhPNJ",
+        "農民": "Compendium.dragonbane-maztica.pack-2.Item.RdYiEcQMlxfNlLR2",
+        "學者": "Compendium.dragonbane-maztica.pack-2.Item.tbAHeJJlIi5VM32Y",
+        "戰士": "Compendium.dragonbane-maztica.pack-2.Item.lBIWQnOqJUQbScSJ",
+        "獵人": "Compendium.dragonbane-maztica.pack-2.Item.myX5gblUPUvcqZa8",
+        "薩滿": "Compendium.dragonbane-maztica.pack-2.Item.S8tPRw4GTnl6eH88",
+        "騎士": "Compendium.dragonbane-maztica.pack-2.Item.jR0xzyA1CMBGyqas",
+
+        // --- 技能 (Skills - Core) ---
+        "工藝": "Compendium.dragonbane-maztica.pack-6.Item.X9fBXcENGpFmmKz5",
+        "巧手": "Compendium.dragonbane-maztica.pack-6.Item.TswjCPLSlCOLC3Dc",
+        "交易": "Compendium.dragonbane-maztica.pack-6.Item.TL3W3iAYFpQv9pb0",
+        "求生": "Compendium.dragonbane-maztica.pack-6.Item.E64je7mDzygIGV2e",
+        "表演": "Compendium.dragonbane-maztica.pack-6.Item.JZ1q1FbdFaa66N0g",
+        "漁獵": "Compendium.dragonbane-maztica.pack-6.Item.kkceDLLlVgzHQiff",
+        "祕聞傳說": "Compendium.dragonbane-maztica.pack-6.Item.Wq78Gen1tk8gDPYn",
+        "閃避": "Compendium.dragonbane-maztica.pack-6.Item.IaXSR0GOIWgtrRu9",
+        "船藝": "Compendium.dragonbane-maztica.pack-6.Item.ESahOZKFZvqxSqkl",
+        "野獸知識": "Compendium.dragonbane-maztica.pack-6.Item.NtEEGMZeVWZodw9U",
+        "欺瞞": "Compendium.dragonbane-maztica.pack-6.Item.shzqyuGaPTbBU1wG",
+        "游泳": "Compendium.dragonbane-maztica.pack-6.Item.CIV2b6FKkl4hZhQn",
+        "遊說": "Compendium.dragonbane-maztica.pack-6.Item.Mztmc9ih0XYHaOTy",
+        "察覺": "Compendium.dragonbane-maztica.pack-6.Item.g5KiR5Fk9uaOKLAx",
+        "語言": "Compendium.dragonbane-maztica.pack-6.Item.7Qy40YqwUseJK9l8",
+        "調查": "Compendium.dragonbane-maztica.pack-6.Item.jtqAmNjB8y9posMT",
+        "隱匿": "Compendium.dragonbane-maztica.pack-6.Item.BLhHVaXdEKK3vrkX",
+        "醫療": "Compendium.dragonbane-maztica.pack-6.Item.jZZFDgebxqRivuK5",
+        "騎術": "Compendium.dragonbane-maztica.pack-6.Item.zl8Qi2zfaFXiTJ1Y",
+        "體操": "Compendium.dragonbane-maztica.pack-6.Item.wKQ2x5cbxzclaFlJ",
+
+        // --- 技能 (Skills - Weapon) ---
+        "劍": "Compendium.dragonbane-maztica.pack-6.Item.CAMwhmC609axCw1p",
+        "棍棒": "Compendium.dragonbane-maztica.pack-6.Item.zyoubtoutHxJSoXS",
+        "徒手": "Compendium.dragonbane-maztica.pack-6.Item.IbAvD1BGNJfEEMql",
+        "斧": "Compendium.dragonbane-maztica.pack-6.Item.XIIOcs8KfFZTdeH0",
+        "投槍器": "Compendium.dragonbane-maztica.pack-6.Item.Puq2uGrlxgvpmMzB",
+        "繩索": "Compendium.dragonbane-maztica.pack-6.Item.50BUdgfOrvznQdTw",
+        "吹箭筒": "Compendium.dragonbane-maztica.pack-6.Item.pJSVN9TCs6rxRD6t",
+        "矛": "Compendium.dragonbane-maztica.pack-6.Item.imiAtcEDx0iYQ8ZM",
+        "弓": "Compendium.dragonbane-maztica.pack-6.Item.heOiWAzxN7oBIYsK",
+
+       // --- 次要技能 ---
+        "天律學": "Compendium.dragonbane-maztica.pack-6.Item.dK3tccDEmYXEwocu",
+        "神律學": "Compendium.dragonbane-maztica.pack-6.Item.LUOp0MZ2Xql66TUY",
+        "數律學": "Compendium.dragonbane-maztica.pack-6.Item.qBcgRQIQamVVU31d",
+        "庫拉里": "Compendium.dragonbane-maztica.pack-6.Item.7iN7x4T9UxgoGloG",
+        "浮田術": "Compendium.dragonbane-maztica.pack-6.Item.sA1rfLxQO70wR8wX",
+        "廚藝": "Compendium.dragonbane-maztica.pack-6.Item.QXhWtVYdHwmABut3",
+        "天命曜日": "Compendium.dragonbane-maztica.pack-6.Item.xFUDFIQvZXCQDqEc",
+        "心血噬儀": "Compendium.dragonbane-maztica.pack-6.Item.LaJ6PnRiea4sKUBG",
+        "羽織密法": "Compendium.dragonbane-maztica.pack-6.Item.FVFtGuOcylBZUQUk",
+        "毒牙獸術": "Compendium.dragonbane-maztica.pack-6.Item.2QJSrYEPagw0qKG9",
+        "萬象神息": "Compendium.dragonbane-maztica.pack-6.Item.dXpWLGiUNTIAo2CP",
+        "滌穢醫道": "Compendium.dragonbane-maztica.pack-6.Item.8DkjcvY4bDaHZ9Zg",
+
+       // --- 額外特性 ---
+        "羽符編印": "Compendium.dragonbane-maztica.pack-4.Item.UBQbY6awIeB9cmFx",
+        "骨鳴雕刻": "Compendium.dragonbane-maztica.pack-4.Item.k2DLPZVVqljpMUdA",
+        "羽父之祝福": "Compendium.dragonbane-maztica.pack-4.Item.KUr1EfneqaQ0mX66",
+        "噬心者之怒": "Compendium.dragonbane-maztica.pack-4.Item.v7GWnwfRuA9I2Gjm",
+        "術業有專攻（天律學）": "Compendium.dragonbane-maztica.pack-4.Item.HCYDRKDaVYpUw72A",
+        "術業有專攻（生知學）": "Compendium.dragonbane-maztica.pack-4.Item.Tim17TDKnCFOSCTh",
+        "術業有專攻（神律學）": "Compendium.dragonbane-maztica.pack-4.Item.7YRdoADRFPNe1ETV",
+        "術業有專攻（數律學）": "Compendium.dragonbane-maztica.pack-4.Item.RdHJiUUKODAkJkTi",
+        "羽織密法": "Compendium.dragonbane-maztica.pack-6.Item.FVFtGuOcylBZUQUk",
+        "毒牙獸術": "Compendium.dragonbane-maztica.pack-6.Item.2QJSrYEPagw0qKG9",
+        "萬象神息": "Compendium.dragonbane-maztica.pack-6.Item.dXpWLGiUNTIAo2CP",
+        "滌穢醫道": "Compendium.dragonbane-maztica.pack-6.Item.8DkjcvY4bDaHZ9Zg",
+
+       // --- 英雄能力 ---
+        "大廚": "Compendium.dragonbane-maztica.pack-4.Item.pJIBeQTZICWDEok7",
+        "木匠大師": "Compendium.dragonbane-maztica.pack-4.Item.e51xRnnpPkjNnoos",
+        "水獵巧技": "Compendium.dragonbane-maztica.pack-4.Item.rTpcpYMmNolF3qSh",
+        "皮匠大師": "Compendium.dragonbane-maztica.pack-4.Item.GW7Wp0lQQsWghGsb",
+        "直覺思考": "Compendium.dragonbane-maztica.pack-4.Item.4LYwYIwzD8iW97pt",
+        "英雄讚歌": "Compendium.dragonbane-maztica.pack-4.Item.1pgbEnOekm2aaf47",
+        "浮田耕藝": "Compendium.dragonbane-maztica.pack-4.Item.4Ao23OZuES3c678X",
+        "紓壓曲": "Compendium.dragonbane-maztica.pack-4.Item.8kECT1ZfZMa2K8FC",
+        "動物夥伴": "Compendium.dragonbane-maztica.pack-4.Item.pnYWfu3U03tMBRO9",
+        "情報掮客": "Compendium.dragonbane-maztica.pack-4.Item.iftRoHa52AWtcJF0",
+        "現場教學": "Compendium.dragonbane-maztica.pack-4.Item.VcSsnRsPCxoJIrkh",
+        "博學多聞": "Compendium.dragonbane-maztica.pack-4.Item.oP3KiceP6cDh1Pgw",
+        "經驗分享": "Compendium.dragonbane-maztica.pack-4.Item.5v6crPN5MYAwHXB5",
+        "頌神曲": "Compendium.dragonbane-maztica.pack-4.Item.TllevaCfYktWFoHY",
+        "輕身落地": "Compendium.dragonbane-maztica.pack-4.Item.k9NfNfZrP8P9ZIE1",
+        "鍛匠大師": "Compendium.dragonbane-maztica.pack-4.Item.lR7x9Z2gu0xrlYxP",
+        "織匠大師": "Compendium.dragonbane-maztica.pack-4.Item.LYoRymZfaUSMDQjh",
+        "鷹眼": "Compendium.dragonbane-maztica.pack-4.Item.YJUd1oKjJbMQUj3P",
+
+        "下盤穩固": "Compendium.dragonbane-maztica.pack-4.Item.Xaj9BHkVF6OHu14j",
+        "不屈意志": "Compendium.dragonbane-maztica.pack-4.Item.aAPHisjaPlXy2BCG",
+        "石拳重擊": "Compendium.dragonbane-maztica.pack-4.Item.vVYZTD1HJmPRdmuc",
+        "守衛矛陣": "Compendium.dragonbane-maztica.pack-4.Item.vKqlQFe7oEJrqE9I",
+        "守護者": "Compendium.dragonbane-maztica.pack-4.Item.WwcWF9cdhHfSpdwx",
+        "收割橫掃": "Compendium.dragonbane-maztica.pack-4.Item.UgeecMUN5aBNZMMn",
+        "老兵": "Compendium.dragonbane-maztica.pack-4.Item.h8XceaRBxztvQXLU",
+        "妙手空空": "Compendium.dragonbane-maztica.pack-4.Item.eIusnYTgFxSR3ku7",
+        "忍耐之軀": "Compendium.dragonbane-maztica.pack-4.Item.47Nu8umvWgbmMxuW",
+        "快速塗毒": "Compendium.dragonbane-maztica.pack-4.Item.rFKv4BdVnr4GrEq7",
+        "狂暴": "Compendium.dragonbane-maztica.pack-4.Item.KVGYaoMnYEnom3NM",
+        "迅捷步法": "Compendium.dragonbane-maztica.pack-4.Item.kFBPQxQew8ou5mcJ",
+        "刺殺": "Compendium.dragonbane-maztica.pack-4.Item.j1Yq4bGv6uYvn1d6",
+        "卑鄙手段": "Compendium.dragonbane-maztica.pack-4.Item.KyGoJgZ2pbjBAXVu",
+        "穿雲長擲": "Compendium.dragonbane-maztica.pack-4.Item.ew1Zmrvle9wqU8mB",
+        "背刺": "Compendium.dragonbane-maztica.pack-4.Item.uwRXSiQS9dudi7eB",
+        "音樂家": "Compendium.dragonbane-maztica.pack-4.Item.5iXnJ39t8tO0SFWK",
+        "破甲強襲": "Compendium.dragonbane-maztica.pack-4.Item.TmZwy9r1WLcpJCJ9",
+        "閃電速度": "Compendium.dragonbane-maztica.pack-4.Item.xJrRTZWhDnvc6RSn",
+        "堅強防禦": "Compendium.dragonbane-maztica.pack-4.Item.0kYig7nywMM7RoDd",
+        "專注追獵": "Compendium.dragonbane-maztica.pack-4.Item.qzIvrbBrVHokZ5Bk",
+        "強力一擊": "Compendium.dragonbane-maztica.pack-4.Item.8d3SDeGE06ZeOB3q",
+        "強力投擲": "Compendium.dragonbane-maztica.pack-4.Item.JF37h9cfRzpWKhgO",
+        "散財誘敵": "Compendium.dragonbane-maztica.pack-4.Item.lave12GFm3PXUzDC",
+        "碎骨重擊": "Compendium.dragonbane-maztica.pack-4.Item.jGDiJIDROrng4drs",
+        "蜂鳥迴身": "Compendium.dragonbane-maztica.pack-4.Item.uw3cCEt7eWqdk938",
+        "蜂鳴飛石": "Compendium.dragonbane-maztica.pack-4.Item.BshSYbYDvo2mqkuJ",
+        "預判警示": "Compendium.dragonbane-maztica.pack-4.Item.TQ1E5uKKuGKSZDvn",
+        "銅斧鉤殺": "Compendium.dragonbane-maztica.pack-4.Item.sRxSzqgdzCAAoNrt",
+        "蝮蛇瞬咬": "Compendium.dragonbane-maztica.pack-4.Item.L19IBTUqt1gnhj3p",
+        "戰地手術": "Compendium.dragonbane-maztica.pack-4.Item.6X0aw2Ta0P5jNfxB",
+        "戰歌": "Compendium.dragonbane-maztica.pack-4.Item.31B0HPjyS1Ztlin3",
+        "舉盾格擋": "Compendium.dragonbane-maztica.pack-4.Item.ztRGQRyvemgKln5E",
+        "鋸裂處刑": "Compendium.dragonbane-maztica.pack-4.Item.83WukU4YtWhvQadZ",
+        "龜縮": "Compendium.dragonbane-maztica.pack-4.Item.eN8PYDmWdL3gNSKD",
+        "雙重射擊": "Compendium.dragonbane-maztica.pack-4.Item.P9HyxbPLZIPUaU4T",
+        "雙重斬擊": "Compendium.dragonbane-maztica.pack-4.Item.QYZBHiNDvZ7uPiMx",
+
+        "孤狼": "Compendium.dragonbane-maztica.pack-4.Item.IXIqdfWuFO2B3hr9",
+        "怪物獵人": "Compendium.dragonbane-maztica.pack-4.Item.ih2vGXnGYDKeh7HO",
+        "軍需官": "Compendium.dragonbane-maztica.pack-4.Item.OBgy3a8ZjJdtlHlL",
+        "飛簷走壁": "Compendium.dragonbane-maztica.pack-4.Item.VerrjUxqL3rcxelN",
+        "商隊領袖": "Compendium.dragonbane-maztica.pack-4.Item.1fnxmK614pTsGgWa",
+        "採集大師": "Compendium.dragonbane-maztica.pack-4.Item.hdaCd62n34f0ZULO",
+        "陷阱大師": "Compendium.dragonbane-maztica.pack-4.Item.SVgAJs2IFwD9tZKR",
+        "尋路者": "Compendium.dragonbane-maztica.pack-4.Item.8C4kiXr3qtzn59Xk",
+        "尋寶獵人": "Compendium.dragonbane-maztica.pack-4.Item.47INSlyzblioR6Hh",
+        "熟悉毒物": "Compendium.dragonbane-maztica.pack-4.Item.FzQ493Y1CAF5MV7h",
+        "親水泳將": "Compendium.dragonbane-maztica.pack-4.Item.zCT5JtJNYqlPYNek",
+
+        "天命宣示": "Compendium.dragonbane-maztica.pack-4.Item.NJzYDZhBnYUtY355",
+        "氏族羈絆": "Compendium.dragonbane-maztica.pack-4.Item.GuDirREOyCW2WgmB",
+        "王權威儀": "Compendium.dragonbane-maztica.pack-4.Item.zJPsBTVK7cA89iI1",
+        "血誓": "Compendium.dragonbane-maztica.pack-4.Item.r1sxD4kuCPAgeaTP",
+        "易容": "Compendium.dragonbane-maztica.pack-4.Item.onElF4UskKkThJl5",
+        "金錢賄賂": "Compendium.dragonbane-maztica.pack-4.Item.X8IlNl6ZdF7Vpoal",
+        "威嚇": "Compendium.dragonbane-maztica.pack-4.Item.0n5gHri7U8AcYhoX",
+        "旅商行令": "Compendium.dragonbane-maztica.pack-4.Item.Y2qyxuiDqg9EJ2db",
+        "察言觀色": "Compendium.dragonbane-maztica.pack-4.Item.JecJ5fxnf6adVhbw",
+        "操弄人心": "Compendium.dragonbane-maztica.pack-4.Item.tAPrufp3x1cI5d6E",
+
+       // --- 騎士團能力 ---
+        "死亡尖嘯": "Compendium.dragonbane-maztica.pack-4.Item.gAirgzG9JN3WJsbx",
+        "弱點打擊": "Compendium.dragonbane-maztica.pack-4.Item.k32AJYiz3ap94tvd",
+        "密林潛獵": "Compendium.dragonbane-maztica.pack-4.Item.l3edUIr5s1r8EV1Y",
+        "處決準備": "Compendium.dragonbane-maztica.pack-4.Item.z3G8JVaR1pqkvhiH",
+        "鮮血嗅覺": "Compendium.dragonbane-maztica.pack-4.Item.Wl7yYyZXvAwb6Jw4",
+        "獵豹突襲": "Compendium.dragonbane-maztica.pack-4.Item.XYbwPHopBayX6MQF",
+        "生擒者": "Compendium.dragonbane-maztica.pack-4.Item.JMFfHiPZfY4zHojZ",
+        "飛羽偏轉": "Compendium.dragonbane-maztica.pack-4.Item.klwK47ZsBk4R1zYR",
+        "猛禽俯衝": "Compendium.dragonbane-maztica.pack-4.Item.6mqeAL1VOn41ZZ3c",
+        "雷霆釘刺": "Compendium.dragonbane-maztica.pack-4.Item.CrLqmqwYRpXxpoqa",
+        "獵鷹之姿": "Compendium.dragonbane-maztica.pack-4.Item.BTQPup7Di5ilirwq",
+        "耀光戰姿": "Compendium.dragonbane-maztica.pack-4.Item.C9IwFS2msoN1zNjB",
+
+       // --- 裝備 ---
+        "羽織工具": "Compendium.dragonbane-maztica.weapon.Item.a0iliDupmRU5Z8PH",
+        "獸刻工具": "Compendium.dragonbane-maztica.weapon.Item.h2FmHEkUmIHV15Ix",
+        "吹箭針袋": "Compendium.dragonbane-maztica.weapon.Item.fi60BNTiyVBgK8gl",
+        "行軍乾糧": "Compendium.dragonbane-maztica.weapon.Item.C5F5BNOz4PT9IP09",
+        "睡袋卷": "Compendium.dragonbane-maztica.weapon.Item.OXk6SqDkxPpmAkcf",
+        "生火組": "Compendium.dragonbane-maztica.weapon.Item.MJS8i7UU31m84zew",
+        "松明火炬": "Compendium.dragonbane-maztica.weapon.Item.d8Ki44WcNwZFLmIa",
+        "陶碗油燈": "Compendium.dragonbane-maztica.weapon.Item.zSa38cmen5cBluqQ",
+        "樹脂（燃料）": "Compendium.dragonbane-maztica.weapon.Item.wz9rgGFG49BTL2EE",
+        "鏤空陶燈": "Compendium.dragonbane-maztica.weapon.Item.uA8AlNjwPLuDhZkt",
+        "蠟燭": "Compendium.dragonbane-maztica.weapon.Item.NV3dR22d8Sc2ppeO",
+        "麻繩（10 米）": "Compendium.dragonbane-maztica.weapon.Item.ouPr0d3cq5aqF32L",
+        "圈套陷阱": "Compendium.dragonbane-maztica.weapon.Item.hJWicuk4NX4MBem9",
+        "額帶背架": "Compendium.dragonbane-maztica.weapon.Item.uT1t2WWk7DS31Pb9",
+        "黑曜石箭袋": "Compendium.dragonbane-maztica.weapon.Item.oYCRWluK2TIMJ0cM",
+        "骨鏃箭袋": "Compendium.dragonbane-maztica.weapon.Item.xBAC6SpxRBGPjCk1",
+        "蘆葦釣竿": "Compendium.dragonbane-maztica.weapon.Item.AIoaU0qImxlMCokg",
+        "長鼓": "Compendium.dragonbane-maztica.weapon.Item.W7iVnERAgz806vqn",
+        "長笛": "Compendium.dragonbane-maztica.weapon.Item.iHJWKIkeWsUB5l5V",
+        "海貝號角": "Compendium.dragonbane-maztica.weapon.Item.2Mtun9zDcgKcIeIk",
+        "黑曜石鏡": "Compendium.dragonbane-maztica.weapon.Item.bMuNfwt1BCz7Ddvg",
+        "黑曜石飾針": "Compendium.dragonbane-maztica.weapon.Item.AGkLQXrHa7KwlY98",
+        "阿莫斯特利法典": "Compendium.dragonbane-maztica.weapon.Item.hYmfTHI5rApEamAp",
+        "奇普繩結": "Compendium.dragonbane-maztica.weapon.Item.aCqvVJJFZbhOyuvi",
+        "神靈雕像": "Compendium.dragonbane-maztica.weapon.Item.RPYzREHJSxbeiVhV",
+        "獸骨圖騰": "Compendium.dragonbane-maztica.weapon.Item.3VOU5o3FBRixjhfu",
+        "一袋鷹類羽毛": "Compendium.dragonbane-maztica.weapon.Item.41Gqk8u67Utd1gpY",
+        "一袋占卜骨片": "Compendium.dragonbane-maztica.weapon.Item.bKFDESKA1ro9rGer",
+        "黑曜石鐮刀": "Compendium.dragonbane-maztica.weapon.Item.kRHERkuapqEBCE1P",
+        "一袋蛇鱗": "Compendium.dragonbane-maztica.weapon.Item.LWkDRn7iFoseNW9S",
+        "寬口陶桶": "Compendium.dragonbane-maztica.weapon.Item.vEV2QAkPx45wQnlu",
+        "草藥工具": "Compendium.dragonbane-maztica.weapon.Item.q2THV4fnp2nDLLYo",
+        "一罐神聖柯巴脂": "Compendium.dragonbane-maztica.weapon.Item.1mhVJyfDxhukAt33",
+        "葫蘆瓶": "Compendium.dragonbane-maztica.weapon.Item.jZ4dGcms8Pgib46n",
+        "空白摺本": "Compendium.dragonbane-maztica.weapon.Item.LXgOGe4atLqNPmM0",
+        "蘆葦筆 & 胭脂墨": "Compendium.dragonbane-maztica.weapon.Item.9dAFQxljZKThtrHH",
+        "樹皮知識卷": "Compendium.dragonbane-maztica.weapon.Item.uSHeXKO9UE48RBoD",
+        "乾淨棉布": "Compendium.dragonbane-maztica.weapon.Item.toqdVQBESz006nXX",
+        "蘆薈草膏": "Compendium.dragonbane-maztica.weapon.Item.6gvRx1Tml42wTtXH",
+        "防水皮帳": "Compendium.dragonbane-maztica.weapon.Item.mAa5pSGl53N3DP4N",
+        "鹿角鉤爪": "Compendium.dragonbane-maztica.weapon.Item.L2jpRPWCkvfPQ09T",
+        "骨製解繩錐": "Compendium.dragonbane-maztica.weapon.Item.W7iVnERAgz806vqn",
+        "滑步種子": "Compendium.dragonbane-maztica.weapon.Item.WXYPRsWbulVAsbk7",
+        "挖掘棒": "Compendium.dragonbane-maztica.weapon.Item.yXNGuiSy58JtSdTQ",
+        "棉織毛毯": "Compendium.dragonbane-maztica.weapon.Item.qn9F9YTIsLxEJXtv",
+        "鹿角尖嘴鋤": "Compendium.dragonbane-maztica.weapon.Item.fSO9uMwCuEKK6ydk",
+        "多叉魚矛": "Compendium.dragonbane-maztica.weapon.Item.mUUntBzaIQqH9lqi",
+        "螢火蟲籠": "Compendium.dragonbane-maztica.weapon.Item.WJiEydqvdhvTyzRT",
+
+        "吹箭筒": "Compendium.dragonbane-maztica.weapon.Item.LlMmN7lhnEZkSaDf",
+        "黑曜石小刀": "Compendium.dragonbane-maztica.weapon.Item.rvz9aBiFhRiDPUiT",
+        "黑曜石飛刃": "Compendium.dragonbane-maztica.weapon.Item.8gaxlTG3lWTnF9Z6",
+        "棉甲": "Compendium.dragonbane-maztica.weapon.Item.T1RuLZCOzntKYK3W",
+        "馬夸維爾特": "Compendium.dragonbane-maztica.weapon.Item.NeiDGlp5BcH4ABkV",
+        "馬卡短劍": "Compendium.dragonbane-maztica.weapon.Item.Ee8dP8DNAOzU0yL6",
+        "奇馬里圓盾": "Compendium.dragonbane-maztica.weapon.Item.dAvDuurLjwzeFTAr",
+        "獸皮甲": "Compendium.dragonbane-maztica.weapon.Item.HI0hVlvNCSY7h9QA",
+        "投石繩": "Compendium.dragonbane-maztica.weapon.Item.AQ8LplmA4lAkOrUU",
+        "戰弓": "Compendium.dragonbane-maztica.weapon.Item.2fwH3Zzczioktuzd",
+        "短弓": "Compendium.dragonbane-maztica.weapon.Item.wQm5mAfkjswvHIJr",
+        "銅斧": "Compendium.dragonbane-maztica.weapon.Item.dg3sYe4I9CH7SGyH",
+        "碎骨棒": "Compendium.dragonbane-maztica.weapon.Item.gXZL8fTI6iLjzK0K",
+        "皮革戰甲": "Compendium.dragonbane-maztica.weapon.Item.psQIxZcY9ktmYu3K",
+        "黑曜石斧": "Compendium.dragonbane-maztica.weapon.Item.LSWQ5I4QYMWVscmE",
+        "投槍器": "Compendium.dragonbane-maztica.weapon.Item.yIf2O1h7bN4pbr6a",
+        "投射標槍": "Compendium.dragonbane-maztica.weapon.Item.aKJfGwSbMp6rDIwm",
+        "木矛": "Compendium.dragonbane-maztica.weapon.Item.HPQZt19Ukqy8q3ix",
+        "木製戰盔": "Compendium.dragonbane-maztica.weapon.Item.BF6WU4Caaep49sfw",
+        "棘刃棒": "Compendium.dragonbane-maztica.weapon.Item.zsbKXJioWr8RBykC",
+        "鷹騎士戰甲": "Compendium.dragonbane-maztica.weapon.Item.TENabAEnvytIQBzV",
+        "豹騎士戰甲": "Compendium.dragonbane-maztica.weapon.Item.mu9DmrZxsv3VNM4r",
+        "祭司棉袍": "Compendium.dragonbane-maztica.weapon.Item.BSX02rS359HzwIzD",
+        "硬木短杖": "Compendium.dragonbane-maztica.weapon.Item.WhpGMGhNbovMdV5f",
+        "硬木棒": "Compendium.dragonbane-maztica.weapon.Item.63H6fSOr6suWJZjm"
     };
 
-    /* ================= 狀態 ================= */
+/* ================= 狀態 ================= */
     let char = {
         race: 'human', subrace: 'maztican', age: 'adult',
-        prof: 'warrior', heroKey: null, extraKey: null, gearIndex: 0, weaponChoice: null,
+        prof: 'artisan', // 預設改為工匠
+        heroKeys: [], 
+        extraKey: null, gearIndex: 0,
+        artisanPath: 'feather', artisanGlyphs: [], 
+        knightOrder: 'eagle', knightTech: '', knightTechSource: 'order',
+        
+        // ★ 關鍵修復：這裡確保了 recipes 屬性的存在
+        recipes: { r1: [], r2: "" }, 
+        
         attrs: {STR:10, CON:10, AGL:10, INT:10, WIL:10, CHA:10},
         calculatedAttrs: {STR:10, CON:10, AGL:10, INT:10, WIL:10, CHA:10},
-        coreSkills: [], freeSkills: [], bonusSkills: [], // 新增：額外贈送技能
-        spells: { t0:[], t1:[] }
+        coreSkills: [], freeSkills: [],
+        spells: { t0:[], t1:[], t2:[] }
     };
 
-    /* ================= 數學公式 ================= */
+    /* ================= 數學公式與輔助函式 ================= */
     function getSkillBase(attrVal) {
         if(attrVal <= 5) return 3;
         if(attrVal <= 8) return 4;
@@ -692,8 +1231,9 @@
         return "+1D6";
     }
 
-    /* ================= 輪盤邏輯 ================= */
-    let outerAngle = 0; let innerAngle = 0;
+ /* ================= 輪盤邏輯 ================= */
+    let outerAngle = 0; 
+    let innerAngle = 0;
     const raceKeys = Object.keys(RACES);
     const classKeys = Object.keys(PROFESSIONS);
 
@@ -706,13 +1246,8 @@
         createRingItems(classRing, classKeys, PROFESSIONS, 220, 'outer', (index) => {
             rotateToItem('outer', index, classKeys.length);
             char.prof = classKeys[index];
-            // 職業更換時的清理邏輯
-            char.heroKey = null; char.extraKey = null; 
-            char.coreSkills = []; // 清空核心技能
-            char.bonusSkills = []; // 清空贈送技能
             updateClassOptions();
             updateLabelDisplay();
-            updateAvatar(); // 點擊時確保更新立繪
         });
 
         createRingItems(raceRing, raceKeys, RACES, 132, 'inner', (index) => {
@@ -720,9 +1255,9 @@
             char.race = raceKeys[index];
             updateRaceOptions();
             updateLabelDisplay();
-            updateAvatar(); // 點擊時確保更新立繪
         });
 
+        // 預設轉到人類(0)和工匠(0)
         updateActiveItem('class-ring', 0);
         updateActiveItem('race-ring', 0);
         updateLabelDisplay();
@@ -731,16 +1266,20 @@
     function createRingItems(ring, keys, dataObj, radius, type, callback) {
         const step = 360 / keys.length;
         ring.innerHTML = "";
+        
         keys.forEach((key, i) => {
             const itemData = dataObj[key];
             const el = document.createElement('div');
             el.className = 'wheel-item';
             el.innerHTML = `<img src="${getIconPath(key)}" alt="${itemData.name}" onerror="this.style.display='none';this.parentNode.innerText='${itemData.name[0]}'">`;
+            
             const angle = i * step - 90;
             el.style.transform = `rotate(${angle}deg) translate(${radius}px) rotate(${-angle}deg)`;
             el.onclick = () => callback(i);
+            
             el.onmouseenter = () => updateLabelHover(type, itemData.name);
             el.onmouseleave = () => updateLabelDisplay();
+
             ring.appendChild(el);
         });
     }
@@ -779,99 +1318,18 @@
         });
     }
 
-    // --- 淡入淡出與預加載 ---
-    let currentAvatarRequest = 0; 
-
-    function updateAvatar() {
-        const rData = RACES[char.race];
-        const pData = PROFESSIONS[char.prof];
-        const img = document.getElementById('char-img');
-        
-        let targetSrc = `images/${rData.id}_${pData.id}.webp`;
-        if (rData.subraces && char.subrace) {
-            const subId = rData.subraces[char.subrace].id;
-            targetSrc = `images/${rData.id}_${subId}_${pData.id}.webp`;
-        }
-
-        const requestId = ++currentAvatarRequest;
-        img.style.opacity = 0;
-
-        const tryLoad = (src) => {
-            return new Promise((resolve, reject) => {
-                const temp = new Image();
-                temp.onload = () => resolve(src);
-                temp.onerror = () => reject();
-                temp.src = src;
-            });
-        };
-
-        setTimeout(async () => {
-            if (requestId !== currentAvatarRequest) return; 
-
-            try {
-                await tryLoad(targetSrc);
-                if (requestId !== currentAvatarRequest) return;
-                img.src = targetSrc;
-            } catch (e) {
-                try {
-                    const fallbackSrc = `images/${rData.id}_${pData.id}.webp`;
-                    if (targetSrc === fallbackSrc) throw "No fallback"; 
-                    await tryLoad(fallbackSrc);
-                    if (requestId !== currentAvatarRequest) return;
-                    img.src = fallbackSrc;
-                } catch (e2) {
-                    if (requestId !== currentAvatarRequest) return;
-                    img.src = `https://placehold.co/600x600/333/gold?text=${rData.name}`;
-                }
-            }
-            
-            img.style.opacity = 1;
-        }, 300);
-    }
-
     function updateLabelDisplay() {
         const rName = RACES[char.race].name.split(' ')[0];
         const cName = PROFESSIONS[char.prof].name.split(' ')[0];
         document.getElementById('race-label-display').innerText = rName;
         document.getElementById('class-label-display').innerText = cName;
-        // 分離邏輯：這裡不再呼叫 updateAvatar
+        updateAvatar();
     }
 
     function updateLabelHover(type, name) {
         const simpleName = name.split(' ')[0];
         if(type==='inner') document.getElementById('race-label-display').innerText = simpleName;
         else document.getElementById('class-label-display').innerText = simpleName;
-    }
-
-    // --- 隨機功能 ---
-    function randomizeRace() {
-        const idx = Math.floor(Math.random() * raceKeys.length);
-        rotateToItem('inner', idx, raceKeys.length);
-        char.race = raceKeys[idx];
-        updateRaceOptions();
-        updateLabelDisplay();
-        updateAvatar(); // 明確呼叫
-    }
-
-    function randomizeClass() {
-        const idx = Math.floor(Math.random() * classKeys.length);
-        rotateToItem('outer', idx, classKeys.length);
-        char.prof = classKeys[idx];
-        char.bonusSkills = []; // 清理贈送技能
-        updateClassOptions();
-        updateLabelDisplay();
-        updateAvatar(); // 明確呼叫
-    }
-
-    function randomizeTrait(type) {
-        let list = [];
-        if(type==='weakness') list = WEAKNESSES;
-        else if(type==='appearance') list = APPEARANCES;
-        else if(type==='memento') list = MEMENTOS;
-        
-        const val = list[Math.floor(Math.random() * list.length)];
-        document.getElementById(`${type}-select`).value = val;
-        handleCustomInput(type);
     }
 
     /* ================= UI 更新邏輯 ================= */
@@ -894,6 +1352,7 @@
         fillSimpleSelect('appearance-select', APPEARANCES, "隨機 / 自選");
 
         initWheel();
+        // 手動觸發一次初始更新
         updateRaceOptions();
         updateClassOptions();
     }
@@ -925,156 +1384,534 @@
     function updateRaceAbility() {
         char.subrace = document.getElementById('subrace-select').value;
         const rData = RACES[char.race];
+        
         let text = rData.ability;
         if(char.subrace && rData.subraces && rData.subraces[char.subrace]) {
-            text += `<br><br><span class="highlight">亞種特性:</span> ` + rData.subraces[char.subrace].ability;
+            text += `<br>` + rData.subraces[char.subrace].ability;
         }
-        document.getElementById('race-ability-box').innerHTML = text;
         
-        // 觸發全局技能重算
-        updateBonusSkills();
+        const matches = text.match(/【.*?】/g);
+        let displayText = "";
+        if(matches) {
+            displayText = [...new Set(matches)].map(m => `<span class="highlight">${m}</span>`).join('<br>');
+        } else {
+             displayText = text.substring(0, 20) + "...";
+        }
+        
+        document.getElementById('race-ability-box').innerHTML = displayText;
         updateStatsAndSkills();
-        updateAvatar();
     }
 
+/* --- 大廚 UI 更新邏輯 (暴力修復版) --- */
+    function updateChefUI() {
+        const container = document.getElementById('chef-recipe-container');
+        if (!container) return; // 防呆
+
+        // 判斷是否為農民且選取了 'c' (大廚)
+        if (char.prof === 'farmer' && char.heroKeys.includes('c')) {
+            container.style.display = 'block';
+
+            // ★ 強制檢查結構：如果找不到二星的標籤容器，直接重寫整個 HTML
+            const grid2 = document.getElementById('recipe-grid-2');
+            if (!grid2 || grid2.tagName !== 'DIV') {
+                console.log("偵測到食譜介面結構錯誤，正在自動修復...");
+                container.innerHTML = `
+                    <label style="font-size:0.8em; color:var(--gold-orange);">大廚食譜</label>
+                    <div style="font-size:0.8em; color:#888; margin:5px 0;">一星菜餚 (選 2) <span id="cnt-r1" style="color:var(--gold-primary)">0/2</span></div>
+                    <div id="recipe-grid-1" class="tag-container" style="display:flex; flex-wrap:wrap; gap:3px;"></div>
+                    <div style="font-size:0.8em; color:#888; margin:10px 0 5px;">二星菜餚 (選 1)</div>
+                    <div id="recipe-grid-2" class="tag-container" style="display:flex; flex-wrap:wrap; gap:3px;"></div>
+                `;
+            }
+
+            // 結構修復後，執行渲染
+            renderRecipeTags1(); 
+            renderRecipeTags2(); 
+        } else {
+            container.style.display = 'none';
+            // 清空選擇
+            if(char.recipes) {
+                char.recipes.r1 = [];
+                char.recipes.r2 = "";
+            }
+        }
+    }
+
+    function renderRecipeTags() {
+        const div = document.getElementById('recipe-grid-1');
+        div.innerHTML = "";
+        RECIPES.r1.forEach(r => {
+            const btn = document.createElement('div');
+            btn.className = 'tag removable';
+            btn.style.cursor = 'pointer';
+            btn.innerText = r;
+            
+            if (char.recipes.r1.includes(r)) {
+                btn.style.borderColor = 'var(--gold-primary)';
+                btn.style.backgroundColor = 'rgba(212, 175, 55, 0.2)';
+                btn.style.color = '#fff';
+            } else {
+                btn.style.borderColor = '#444';
+            }
+
+            btn.onclick = () => {
+                if (char.recipes.r1.includes(r)) {
+                    char.recipes.r1 = char.recipes.r1.filter(x => x !== r);
+                } else {
+                    if (char.recipes.r1.length >= 2) { alert("一星菜餚最多選擇 2 道！"); return; }
+                    char.recipes.r1.push(r);
+                }
+                renderRecipeTags();
+                document.getElementById('cnt-r1').innerText = `${char.recipes.r1.length}/2`;
+            };
+            div.appendChild(btn);
+        });
+        document.getElementById('cnt-r1').innerText = `${char.recipes.r1.length}/2`;
+    }
+
+ /* --- 職業選項 (已修正：切換職業時自動隱藏法術區塊) --- */
     function updateClassOptions() {
         const pData = PROFESSIONS[char.prof];
         
-        document.getElementById('resource-hint').innerText = `起始資源: ${pData.resource}`;
-
+        // 取得所有 DOM 元素
+        const artisanDiv = document.getElementById('artisan-path-container');
+        const knightDiv = document.getElementById('knight-order-container');
+        const knightTechDiv = document.getElementById('knight-tech-container');
         const heroDiv = document.getElementById('hero-ability-container');
-        const heroSel = document.getElementById('hero-ability-select');
-        heroSel.innerHTML = "";
-        if(pData.heroAbilities) {
-            heroDiv.style.display = 'block';
-            for(let k in pData.heroAbilities) heroSel.add(new Option(pData.heroAbilities[k].split('】')[0]+'】', k));
-        } else { heroDiv.style.display = 'none'; char.heroKey = null; }
-
         const extraDiv = document.getElementById('extra-trait-container');
-        const extraSel = document.getElementById('extra-trait-select');
-        extraSel.innerHTML = "";
-        if(pData.extraOptions) {
+        const limitLabel = document.getElementById('hero-limit-label');
+        const spellSel = document.getElementById('spell-selector'); // 取得法術區塊
+        const chefDiv = document.getElementById('chef-recipe-container');
+
+        // 【修正點】：每次切換職業時，先強制隱藏法術區塊
+        spellSel.style.display = 'none';
+        if(chefDiv) chefDiv.style.display = 'none';
+        char.heroKeys = [];
+        document.getElementById('hero-desc-preview').innerHTML = "請選擇能力...";
+        
+        // 重置所有特殊區塊
+        artisanDiv.style.display = 'none';
+        knightDiv.style.display = 'none';
+        knightTechDiv.style.display = 'none';
+        extraDiv.style.display = 'none';
+        heroDiv.style.display = 'block'; 
+        limitLabel.innerText = "(擇二)";
+        chefDiv.style.display = 'none';
+
+        if (char.prof === 'artisan') {
+            artisanDiv.style.display = 'block';
+            limitLabel.innerText = "(擇一)"; 
+            updateArtisanPath(); 
+
+        } else if (char.prof === 'knight') {
+            knightDiv.style.display = 'block';
+            knightTechDiv.style.display = 'block';
+            limitLabel.innerText = "(擇一)";
+            updateKnightOrder();
+
+        } else if (char.prof === 'shaman') {
+            // 薩滿無選擇英雄能力，顯示固定文字
+            heroDiv.style.display = 'block';
+            limitLabel.innerText = "(固定)";
+            document.getElementById('hero-ability-list').innerHTML = "";
+            document.getElementById('hero-desc-preview').innerHTML = pData.heroDesc;
+            
+            // 顯示流派選擇
+            const extraSel = document.getElementById('extra-trait-select');
+            extraSel.innerHTML = "";
             extraDiv.style.display = 'block';
-            document.getElementById('extra-trait-label').innerText = pData.extraLabel.toUpperCase();
+            document.getElementById('extra-trait-label').innerText = pData.extraLabel;
             for(let k in pData.extraOptions) extraSel.add(new Option(pData.extraOptions[k].name, k));
-        } else { extraDiv.style.display = 'none'; char.extraKey = null; }
+            
+            // 這裡會再次呼叫 updateExtraTrait，若為薩滿，它會把 spellSel 重新打開 (display: block)
+            updateExtraTrait();
+
+        } else {
+            // 其他職業
+            const extraSel = document.getElementById('extra-trait-select');
+            extraSel.innerHTML = "";
+            if(pData.extraOptions) {
+                extraDiv.style.display = 'block';
+                document.getElementById('extra-trait-label').innerText = pData.extraLabel ? pData.extraLabel.toUpperCase() : "額外特性";
+                for(let k in pData.extraOptions) extraSel.add(new Option(pData.extraOptions[k].name, k));
+                updateExtraTrait();
+            } else { 
+                char.extraKey = null; 
+            }
+            renderHeroAbilityChecks(pData);
+        }       
+
+        // 薩滿已在上方處理，此處僅處理非薩滿的英雄能力渲染
+        if(char.prof !== 'shaman') {
+            renderHeroAbilityChecks(pData);
+        }
 
         const eqSel = document.getElementById('equip-select');
         eqSel.innerHTML = "";
         pData.gear.forEach((g,i) => eqSel.add(new Option(g.name, i)));
-
-        updateHeroDesc();
-    }
-
-    function updateHeroDesc() {
-        const pData = PROFESSIONS[char.prof];
-        if (pData.heroAbilities) {
-            char.heroKey = document.getElementById('hero-ability-select').value;
-            document.getElementById('hero-desc').innerHTML = pData.heroAbilities[char.heroKey];
+        
+        // 更新裝備與技能
+        if(char.prof !== 'artisan' && char.prof !== 'knight') {
+             renderCoreSkills();
+             updateInventory();
         }
-        updateExtraTrait();
+    }
+ function renderHeroAbilityChecks(pData) {
+        const div = document.getElementById('hero-ability-list');
+        div.innerHTML = "";
+        if (!pData.heroAbilities) return; 
+        
+        let maxSelection = (char.prof === 'artisan' || char.prof === 'knight') ? 1 : 2;
+
+        for (let key in pData.heroAbilities) {
+            const rawText = pData.heroAbilities[key];
+            const title = rawText.split('】')[0].replace('【','') || key;
+            
+            const btn = document.createElement('div');
+            btn.className = 'skill-check';
+            btn.innerHTML = `<span>${title}</span><span style="font-size:1.2em;">+</span>`;
+            
+            // 保持選取狀態
+            if (char.heroKeys.includes(key)) btn.classList.add('active');
+
+            btn.onclick = () => {
+                const idx = char.heroKeys.indexOf(key);
+                if (idx > -1) {
+                    // 取消選取
+                    char.heroKeys.splice(idx, 1);
+                    btn.classList.remove('active');
+                } else {
+                    // 加入選取
+                    if (char.heroKeys.length >= maxSelection) {
+                        alert(`此職業最多選擇 ${maxSelection} 項英雄能力！`);
+                        return;
+                    }
+                    char.heroKeys.push(key);
+                    btn.classList.add('active');
+                }
+                updateHeroDescPreview(pData);
+                
+// ★ 農民連動
+                if (char.prof === 'farmer') {
+                    renderBonusSkills();
+                    updateChefUI(); 
+                }
+};
+            div.appendChild(btn);
+        }
+        // 初始化檢查
+        if (char.prof === 'farmer') updateChefUI();
     }
 
+    function updateHeroDescPreview(pData) {
+        const descBox = document.getElementById('hero-desc-preview');
+        if (char.heroKeys.length === 0) {
+            descBox.innerHTML = "請選擇能力...";
+            return;
+        }
+        descBox.innerHTML = char.heroKeys.map(k => {
+             const raw = pData.heroAbilities[k];
+             const titlePart = raw.split('】')[0] + '】'; 
+             return `<span class="highlight">${titlePart}</span>`;
+        }).join('<br>');
+    }
+
+/* --- 大廚 UI 更新邏輯 (暴力修復版) --- */
+    function updateChefUI() {
+        const container = document.getElementById('chef-recipe-container');
+        if (!container) return; // 防呆
+
+        // 判斷是否為農民且選取了 'c' (大廚)
+        if (char.prof === 'farmer' && char.heroKeys.includes('c')) {
+            container.style.display = 'block';
+
+            // ★ 強制檢查結構：如果找不到二星的標籤容器，直接重寫整個 HTML
+            const grid2 = document.getElementById('recipe-grid-2');
+            if (!grid2 || grid2.tagName !== 'DIV') {
+                console.log("偵測到食譜介面結構錯誤，正在自動修復...");
+                container.innerHTML = `
+                    <label style="font-size:0.8em; color:var(--gold-orange);">大廚食譜</label>
+                    <div style="font-size:0.8em; color:#888; margin:5px 0;">一星菜餚 (選 2) <span id="cnt-r1" style="color:var(--gold-primary)">0/2</span></div>
+                    <div id="recipe-grid-1" class="tag-container" style="display:flex; flex-wrap:wrap; gap:3px;"></div>
+                    <div style="font-size:0.8em; color:#888; margin:10px 0 5px;">二星菜餚 (選 1)</div>
+                    <div id="recipe-grid-2" class="tag-container" style="display:flex; flex-wrap:wrap; gap:3px;"></div>
+                `;
+            }
+
+            // 結構修復後，執行渲染
+            renderRecipeTags1(); 
+            renderRecipeTags2(); 
+        } else {
+            container.style.display = 'none';
+            // 清空選擇
+            if(char.recipes) {
+                char.recipes.r1 = [];
+                char.recipes.r2 = "";
+            }
+        }
+    }
+
+    function renderRecipeTags1() {
+        const div = document.getElementById('recipe-grid-1');
+        div.innerHTML = "";
+        RECIPES.r1.forEach(r => {
+            const btn = document.createElement('div');
+            btn.className = 'tag removable';
+            btn.style.cursor = 'pointer';
+            btn.innerText = r;
+            
+            if (char.recipes.r1.includes(r)) {
+                btn.style.borderColor = 'var(--gold-primary)';
+                btn.style.backgroundColor = 'rgba(212, 175, 55, 0.2)';
+                btn.style.color = '#fff';
+            } else {
+                btn.style.borderColor = '#444';
+            }
+
+            btn.onclick = () => {
+                if (char.recipes.r1.includes(r)) {
+                    char.recipes.r1 = char.recipes.r1.filter(x => x !== r);
+                } else {
+                    if (char.recipes.r1.length >= 2) { alert("一星菜餚最多選擇 2 道！"); return; }
+                    char.recipes.r1.push(r);
+                }
+                renderRecipeTags1();
+                document.getElementById('cnt-r1').innerText = `${char.recipes.r1.length}/2`;
+            };
+            div.appendChild(btn);
+        });
+        document.getElementById('cnt-r1').innerText = `${char.recipes.r1.length}/2`;
+    }
+
+    // 渲染二星菜餚 (單選)
+    function renderRecipeTags2() {
+        const div = document.getElementById('recipe-grid-2');
+        if (!div) return; // 如果還是抓不到，就放棄避免報錯
+
+        div.innerHTML = "";
+        
+        // 確保 RECIPES.r2 存在
+        if (!RECIPES || !RECIPES.r2) {
+            div.innerHTML = "<div style='color:red;'>錯誤：找不到二星食譜資料</div>";
+            return;
+        }
+
+        RECIPES.r2.forEach(r => {
+            const btn = document.createElement('div');
+            btn.className = 'tag removable';
+            btn.style.cursor = 'pointer';
+            btn.innerText = r;
+            
+            // 檢查是否被選中 (單選比對字串)
+            if (char.recipes.r2 === r) {
+                btn.style.borderColor = 'var(--gold-orange)'; // 二星用橘金色區分
+                btn.style.backgroundColor = 'rgba(255, 234, 128, 0.2)';
+                btn.style.color = '#fff';
+                btn.style.fontWeight = 'bold';
+            } else {
+                btn.style.borderColor = '#444';
+                btn.style.color = '#888';
+            }
+
+            btn.onclick = () => {
+                // 如果點擊已選中的，則取消選擇；否則切換為新選擇
+                if (char.recipes.r2 === r) {
+                    char.recipes.r2 = "";
+                } else {
+                    char.recipes.r2 = r;
+                }
+                renderRecipeTags2(); // 重繪更新樣式
+            };
+            div.appendChild(btn);
+        });
+    }
+
+    /* --- 工匠邏輯 --- */
+    function updateArtisanPath() {
+        char.artisanPath = document.getElementById('artisan-path-select').value;
+        const data = ARTISAN_DATA[char.artisanPath];
+        document.getElementById('artisan-path-desc').innerHTML = `<span class="highlight">${data.trait}</span>`;
+        
+        const glyphDiv = document.getElementById('glyph-selection-container');
+        glyphDiv.innerHTML = "";
+        char.artisanGlyphs = []; 
+        document.getElementById('glyph-count').innerText = "0";
+
+        data.glyphs.forEach(g => {
+            const btn = document.createElement('div');
+            btn.className = 'tag removable'; 
+            btn.style.cursor = 'pointer';
+            btn.style.borderColor = '#444';
+            btn.innerText = g;
+            
+            btn.onclick = () => {
+                if (char.artisanGlyphs.includes(g)) {
+                    char.artisanGlyphs = char.artisanGlyphs.filter(x => x!==g);
+                    btn.style.borderColor = '#444';
+                    btn.style.background = '';
+                    btn.style.color = '#bbb';
+                } else {
+                    if (char.artisanGlyphs.length >= 3) return; 
+                    char.artisanGlyphs.push(g);
+                    btn.style.borderColor = 'var(--gold-primary)';
+                    btn.style.backgroundColor = 'rgba(212, 175, 55, 0.2)';
+                    btn.style.color = '#fff';
+                }
+                document.getElementById('glyph-count').innerText = char.artisanGlyphs.length;
+                updateEnhancementDropdowns();
+            };
+            glyphDiv.appendChild(btn);
+        });
+
+        updateEnhancementDropdowns();
+        renderCoreSkills(); 
+        updateInventory(); 
+    }
+
+    function updateEnhancementDropdowns() {
+        const glyphSel = document.getElementById('enhance-glyph-select');
+        glyphSel.innerHTML = "<option>選擇字符...</option>";
+        char.artisanGlyphs.forEach(g => glyphSel.add(new Option(g, g)));
+        const itemSel = document.getElementById('enhance-item-select');
+        itemSel.innerHTML = "<option>選擇物品...</option>";
+        
+        const gearSet = PROFESSIONS.artisan.gear[char.gearIndex].items;
+        const bonusGear = ARTISAN_DATA[char.artisanPath].bonusGear;
+        let flatGear = [];
+        gearSet.forEach(item => {
+            if(!Array.isArray(item)) flatGear.push(item);
+        });
+        
+        [...flatGear, ...bonusGear].forEach(item => {
+            if (!item.includes("工具") && !item.includes("袋") && !item.includes("火炬")) {
+                 itemSel.add(new Option(item, item));
+            }
+        });
+    }
+
+    /* --- 騎士邏輯 --- */
+    function updateKnightOrder() {
+        char.knightOrder = document.getElementById('knight-order-select').value;
+        const data = KNIGHT_DATA[char.knightOrder];
+        document.getElementById('knight-order-desc').innerHTML = `<span class="highlight">${data.trait}</span>`;
+        
+        renderKnightTechniques();
+        renderCoreSkills();
+        updateInventory();
+    }
+
+    function renderKnightTechniques() {
+        const sourceInputs = document.getElementsByName('tech-source');
+        char.knightTechSource = sourceInputs[0].checked ? 'order' : 'warrior';
+        
+        const sel = document.getElementById('knight-tech-select');
+        sel.innerHTML = "";
+        
+        if (char.knightTechSource === 'order') {
+            const techs = KNIGHT_DATA[char.knightOrder].techniques;
+            for (let k in techs) {
+                const name = techs[k].split('】')[0].replace('【','') || k;
+                sel.add(new Option(name, k));
+            }
+        } else {
+            const abils = PROFESSIONS.warrior.heroAbilities;
+            for (let k in abils) {
+                const name = abils[k].split('】')[0].replace('【','') || k;
+                sel.add(new Option(name, k));
+            }
+        }
+        updateKnightTechPreview();
+    }
+
+    function updateKnightTechPreview() {
+        char.knightTech = document.getElementById('knight-tech-select').value;
+        let desc = "";
+        if (char.knightTechSource === 'order') {
+            desc = KNIGHT_DATA[char.knightOrder].techniques[char.knightTech];
+        } else {
+            desc = PROFESSIONS.warrior.heroAbilities[char.knightTech];
+        }
+        const namePart = desc.split('】')[0] + '】';
+        document.getElementById('knight-tech-desc').innerHTML = `<span class="highlight">${namePart}</span>`;
+    }
+
+    /* --- 額外特性與薩滿 --- */
     function updateExtraTrait() {
         const pData = PROFESSIONS[char.prof];
         if (pData.extraOptions) {
             char.extraKey = document.getElementById('extra-trait-select').value;
-            const opt = pData.extraOptions[char.extraKey];
-            document.getElementById('extra-desc').innerHTML = opt.desc;
+            document.getElementById('extra-desc').innerHTML = `<span class="highlight">${pData.extraOptions[char.extraKey].name}</span>`;
         }
-        
         const spellSel = document.getElementById('spell-selector');
         if (char.prof === 'shaman') {
             spellSel.style.display = 'block';
-            char.spells = {t0:[], t1:[]};
+            char.spells = {t0:[], t1:[], t2:[]};
             renderSpellButtons();
         } else { spellSel.style.display = 'none'; }
-        
-        // 觸發全局技能重算
-        updateBonusSkills();
         renderCoreSkills();
         updateInventory(); 
     }
 
-    // --- 新增：全局贈送技能重算函式 ---
-    function updateBonusSkills() {
-        char.bonusSkills = [];
-        const rData = RACES[char.race];
-        const pData = PROFESSIONS[char.prof];
-
-        // 1. 族裔贈送
-        if(char.race === 'halfling') {
-            char.bonusSkills.push(rData.extraSkill);
-        }
-
-        // 2. 職業/能力贈送
-if(char.prof === 'farmer' && char.heroKey) {
-    const abilityText = pData.heroAbilities[char.heroKey];
-    if(abilityText.includes("大廚")) char.bonusSkills.push("廚藝");
-    if(abilityText.includes("浮田耕藝")) char.bonusSkills.push("浮田術"); // <--- 新增這一行
-}
-        if(char.prof === 'scholar' && char.extraKey && pData.extraOptions[char.extraKey].extraSkill) {
-            char.bonusSkills.push(pData.extraOptions[char.extraKey].extraSkill);
-        }
-
-        renderFreeSkills(); // 更新UI
-    }
-
+    /* --- 核心技能渲染 --- */
     function renderCoreSkills() {
-        const pData = PROFESSIONS[char.prof];
-        let pool = [...pData.skills];
-        let mandatorySkill = null; 
-
-        // 薩滿強制技能邏輯
-        if(char.prof === 'shaman' && char.extraKey) {
-            const exOpt = pData.extraOptions[char.extraKey];
-            // [關鍵修正] 強制將主技能加入清單
-            pool = [exOpt.mainSkill, ...exOpt.addSkills]; 
-            // 去除重複
-            pool = [...new Set(pool)];
-            mandatorySkill = exOpt.mainSkill;
-            
-            // 確保強制技能在核心技能中
-            if(!char.coreSkills.includes(mandatorySkill)) {
-                // 如果已經滿6個，嘗試移除一個非強制的
-                if(char.coreSkills.length >= 6) {
-                     char.coreSkills.pop();
+        let pool = [];
+        let forceSkill = null; 
+        
+        if (char.prof === 'artisan') {
+            pool = [...ARTISAN_DATA[char.artisanPath].skills];
+        } else if (char.prof === 'knight') {
+            pool = [...KNIGHT_DATA[char.knightOrder].skills];
+        } else {
+            const pData = PROFESSIONS[char.prof];
+            pool = [...pData.skills];
+            // 修正：只有薩滿 (或其他依賴extra決定技能的職業) 才將 addSkills 混入核心池
+            // 學者這類「額外贈送技能」的職業，不要混入
+            if (pData.extraOptions && char.extraKey) {
+                const opt = pData.extraOptions[char.extraKey];
+                // 只有薩滿需要將流派技能混入核心池供選擇 (雖然是必選)
+                if(char.prof === 'shaman' && opt.addSkills) {
+                    pool = [...new Set([...pool, ...opt.addSkills])];
                 }
-                char.coreSkills.push(mandatorySkill);
+                if(opt.forceSkill) forceSkill = opt.forceSkill; 
             }
         }
-        else if((char.prof==='knight'||char.prof==='scholar'||char.prof==='farmer') && char.extraKey && pData.extraOptions[char.extraKey].addSkills) {
-             pool = [...new Set([...pool, ...pData.extraOptions[char.extraKey].addSkills])];
-        }
         
-        // 清理無效的核心技能 (切換職業或薩滿流派時)
-        char.coreSkills = char.coreSkills.filter(s => pool.includes(s));
-
         const div = document.getElementById('core-skill-list');
         div.innerHTML = "";
         
+        if(forceSkill && !char.coreSkills.includes(forceSkill)) {
+            char.coreSkills.push(forceSkill);
+        }
+        
+        // 過濾非法技能
+        char.coreSkills = char.coreSkills.filter(s => pool.includes(s));
+
         pool.forEach(s => {
             const btn = document.createElement('div');
             btn.className = 'skill-check';
-            const attrKey = SKILL_ATTR_MAP[s] || "STR";
+            
+            let attrKey = SKILL_ATTR_MAP[s] || "STR";
+            if (char.prof === 'artisan' && ARTISAN_DATA[char.artisanPath].attrMap[s]) {
+                attrKey = ARTISAN_DATA[char.artisanPath].attrMap[s];
+            }
+
             const attrVal = char.calculatedAttrs[attrKey] || 10;
             const baseVal = getSkillBase(attrVal);
+            const isForced = (s === forceSkill);
             
             let currentVal = baseVal;
-            let isLocked = (s === mandatorySkill); // 判斷是否為強制鎖定
-
             if (char.coreSkills.includes(s)) {
                 btn.classList.add('active');
                 currentVal = baseVal * 2;
             }
-            if (isLocked) {
-                btn.classList.add('locked');
-            }
             
-            btn.innerHTML = `<span>${s}</span><span class="skill-val" id="skill-val-${s}">${currentVal}</span>`;
+            let html = `<span>${s}</span>`;
+            if(isForced) html = `<span style="color:var(--gold-primary)">${s} (必選)</span>`;
+            
+            btn.innerHTML = `${html}<span class="skill-val">${currentVal}</span>`;
             
             btn.onclick = () => {
-                if(isLocked) return; // 鎖定不可取消
+                if(isForced) return; 
 
                 const valSpan = btn.querySelector('.skill-val');
                 const isTrained = btn.classList.contains('active');
@@ -1094,13 +1931,15 @@ if(char.prof === 'farmer' && char.heroKey) {
             div.appendChild(btn);
         });
         updateFreeSkillOptions();
+        renderBonusSkills();
     }
 
     function updateFreeSkillOptions() {
         const sel = document.getElementById('free-skill-select');
         sel.innerHTML = "";
-        const allTrainedSkills = [...char.coreSkills, ...char.freeSkills, ...char.bonusSkills];
-        const availableSkills = ALL_SKILLS.filter(s => !allTrainedSkills.includes(s));
+        const allTrainedSkills = [...char.coreSkills, ...char.freeSkills];
+        // 修正：只顯示通用技能，避免自選特殊技能
+        const availableSkills = COMMON_SKILLS.filter(s => !allTrainedSkills.includes(s));
         availableSkills.forEach(s => {
             sel.add(new Option(s, s));
         });
@@ -1108,9 +1947,9 @@ if(char.prof === 'farmer' && char.heroKey) {
 
     function addFreeSkill() {
         let max = char.age==='young'?2:(char.age==='old'?6:4);
-        if(char.freeSkills.length>=max) { alert(`你最多只能額外選擇 ${max} 個受訓技能！`); return; }
+        if(char.freeSkills.length>=max) { alert(`你最多只能選擇 ${max} 個自由受訓技能！`); return; }
         const s = document.getElementById('free-skill-select').value;
-        if(!s) return;
+        if(char.coreSkills.includes(s) || char.freeSkills.includes(s)) { alert("該技能已被選為核心或自由受訓技能！"); return; }
         
         char.freeSkills.push(s);
         renderFreeSkills();
@@ -1119,71 +1958,126 @@ if(char.prof === 'farmer' && char.heroKey) {
     
     function renderFreeSkills() {
         const div = document.getElementById('free-skill-list');
-        // 渲染自由技能
-        let html = char.freeSkills.map((s,i) => {
+        div.innerHTML = char.freeSkills.map((s,i) => {
             const attrKey = SKILL_ATTR_MAP[s] || "STR";
             const attrVal = char.calculatedAttrs[attrKey] || 10;
             const baseVal = getSkillBase(attrVal);
             return `<span class="tag removable" onclick="char.freeSkills.splice(${i},1);renderFreeSkills();updateFreeSkillOptions()">${s} (${baseVal*2}) ×</span>`;
         }).join('');
-
-        // 渲染額外技能 (Bonus)
-        char.bonusSkills.forEach(s => {
-            const attrKey = SKILL_ATTR_MAP[s] || "STR";
-            const attrVal = char.calculatedAttrs[attrKey] || 10;
-            const baseVal = getSkillBase(attrVal);
-            html += `<span class="tag bonus">${s} (${baseVal*2}) [額外習得]</span>`;
-        });
-
-        div.innerHTML = html;
         let max = char.age==='young'?2:(char.age==='old'?6:4);
-        document.getElementById('skill-pts').innerText = `自選數量: ${max - char.freeSkills.length}/${max}`;
+        document.getElementById('skill-pts').innerText = `自由點數: ${max - char.freeSkills.length}/${max}`;
     }
 
+    // 額外技能渲染 (農民/學者)
+    function renderBonusSkills() {
+        const div = document.getElementById('bonus-skill-list');
+        div.innerHTML = "";
+        
+        let bonuses = [];
+        
+        // 農民
+        if (char.prof === 'farmer') {
+            if (char.heroKeys.includes('a')) bonuses.push('浮田術');
+            if (char.heroKeys.includes('c')) bonuses.push('廚藝');
+        }
+        
+        // 學者 (修正：額外技能顯示於此)
+        if (char.prof === 'scholar' && char.extraKey) {
+            const extra = PROFESSIONS.scholar.extraOptions[char.extraKey];
+            if (extra && extra.addSkills) {
+                bonuses.push(...extra.addSkills);
+            }
+        }
+
+        bonuses.forEach(s => {
+            const attrKey = SKILL_ATTR_MAP[s] || "INT";
+            const attrVal = char.calculatedAttrs[attrKey] || 10;
+            const baseVal = getSkillBase(attrVal);
+            // 修正：受訓值為 baseVal * 2
+            div.innerHTML += `<div class="tag bonus">★ ${s} (${baseVal*2})</div>`;
+        });
+    }
+
+    /* --- 裝備渲染 (支援下拉) --- */
     function updateInventory() {
         char.gearIndex = document.getElementById('equip-select').value;
         const pData = PROFESSIONS[char.prof];
+        let items = [...pData.gear[char.gearIndex].items];
         
-        // 處理裝備選擇
-        const gearSet = pData.gear[char.gearIndex];
-        const weaponSelectDiv = document.getElementById('weapon-choice-container');
-        const weaponSelect = document.getElementById('weapon-select');
-        
-        if(gearSet.choices) {
-            weaponSelectDiv.style.display = 'block';
-            if(char.weaponChoice === null || !gearSet.choices.includes(char.weaponChoice)) {
-                weaponSelect.innerHTML = "";
-                gearSet.choices.forEach(c => weaponSelect.add(new Option(c, c)));
-                char.weaponChoice = weaponSelect.value;
-            } else {
-                const current = weaponSelect.value;
-                weaponSelect.innerHTML = "";
-                gearSet.choices.forEach(c => weaponSelect.add(new Option(c, c)));
-                weaponSelect.value = current;
-                char.weaponChoice = current;
-            }
-            weaponSelect.onchange = () => { char.weaponChoice = weaponSelect.value; updateInventory(); };
-        } else {
-            weaponSelectDiv.style.display = 'none';
-            char.weaponChoice = null;
+        if(char.prof === 'knight') {
+            const orderName = KNIGHT_DATA[char.knightOrder].name.replace('騎士','');
+            items = items.map(i => {
+                if(typeof i === 'string' && i.includes("騎士戰甲")) return orderName+"戰甲";
+                return i;
+            });
         }
-
-        let items = [...gearSet.items];
-        if(char.weaponChoice) items.unshift(char.weaponChoice); 
-
-        if(char.prof === 'knight' && char.extraKey) {
-            const orderName = PROFESSIONS.knight.extraOptions[char.extraKey].name.replace('團','');
-            items = items.map(i => i.replace("騎士戰甲", orderName+"戰甲"));
+        
+        if(char.prof === 'artisan') {
+            items = [...items, ...ARTISAN_DATA[char.artisanPath].bonusGear];
+            updateEnhancementDropdowns(); 
         }
 
         const memInput = document.getElementById('memento-custom');
         const memVal = memInput.style.display==='none' ? document.getElementById('memento-select').value : memInput.value;
         if(memVal && memVal!=='random' && memVal!=='custom') items.push("★ "+memVal);
 
-        document.getElementById('inventory-list').innerHTML = items.map(i=>`<div class="tag item">${i}</div>`).join('');
+        const listDiv = document.getElementById('inventory-list');
+        listDiv.innerHTML = "";
+        
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = "tag item";
+            
+            if (Array.isArray(item)) {
+                const select = document.createElement('select');
+                select.className = "gear-select";
+                item.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.text = opt;
+                    select.appendChild(option);
+                });
+                div.appendChild(select);
+            } else {
+                div.innerText = item;
+            }
+            listDiv.appendChild(div);
+        });
+
+        updateAvatar();
     }
 
-    // --- [核心] 屬性計算與連動 ---
+    function updateAvatar() {
+        const rData = RACES[char.race];
+        const pData = PROFESSIONS[char.prof];
+        const img = document.getElementById('char-img');
+        
+        let imgName = "";
+        if (rData.subraces && char.subrace) {
+            const subId = rData.subraces[char.subrace].id;
+            imgName = `${rData.id}_${subId}_${pData.id}.webp`;
+        } else {
+            imgName = `${rData.id}_${pData.id}.webp`;
+        }
+        const imgSrc = `images/${imgName}`;
+        
+        img.onerror = () => { 
+            if (imgName.split('_').length > 2) {
+                const fallbackName = `${rData.id}_${pData.id}.webp`;
+                img.src = `images/${fallbackName}`;
+                img.onerror = () => {
+                    img.src = `https://placehold.co/600x600/333/gold?text=${rData.name}`;
+                    img.onerror = null;
+                }
+            } else {
+                img.src = `https://placehold.co/600x600/333/gold?text=${rData.name}`;
+                img.style.opacity = 1;
+            }
+        };
+        img.onload = () => { img.style.opacity = 1; };
+        img.src = imgSrc;
+    }
+
     function updateStatsAndSkills() {
         char.age = document.getElementById('age-select').value;
         let final = {};
@@ -1222,9 +2116,8 @@ if(char.prof === 'farmer' && char.heroKey) {
         if(final.AGL <= 6) move -= 4; else if(final.AGL <= 9) move -= 2; else if(final.AGL >= 16) move += 4; else if(final.AGL >= 13) move += 2;
         document.getElementById('val-move').innerText = move;
         
-        // 重新渲染所有技能數值
         renderCoreSkills(); 
-        updateBonusSkills(); // 重算贈送技能
+        renderFreeSkills();
     }
 
     function updateAgeLogic() {
@@ -1245,13 +2138,19 @@ if(char.prof === 'farmer' && char.heroKey) {
 
     function renderSpellButtons() {
         const flow = char.extraKey; if(!flow) return;
-        const poolT0 = [...SPELLS.gen.slice(0,11), ...(SPELLS[flow] ? SPELLS[flow].slice(0, 3) : [])]; 
-        const poolT1 = [...SPELLS.gen.slice(11), ...(SPELLS[flow] ? SPELLS[flow].slice(3) : [])];
-        renderGrid('grid-t0', poolT0, 't0');
-        renderGrid('grid-t1', poolT1, 't1');
+        const gen = SPELLS.gen;
+        const trad = SPELLS[flow];
+        
+        const poolT0 = [...gen.t0, ...trad.t0];
+        const poolT1 = [...gen.t1, ...trad.t1];
+        const poolT2 = [...gen.t2, ...trad.t2];
+
+        renderGrid('grid-t0', poolT0, 't0', 3);
+        renderGrid('grid-t1', poolT1, 't1', 3);
+        renderGrid('grid-t2', poolT2, 't2', 1);
     }
 
-    function renderGrid(id, list, tier) {
+    function renderGrid(id, list, tier, limit) {
         const div = document.getElementById(id);
         div.innerHTML = "";
         list.forEach(s => {
@@ -1269,7 +2168,7 @@ if(char.prof === 'farmer' && char.heroKey) {
             btn.onclick = () => {
                 if(char.spells[tier].includes(s)) char.spells[tier] = char.spells[tier].filter(x=>x!==s);
                 else {
-                    if(char.spells[tier].length >= 3) { alert("該階法術已滿 3 個！"); return; }
+                    if(char.spells[tier].length >= limit) { alert(`該階法術已滿 ${limit} 個！`); return; }
                     char.spells[tier].push(s);
                 }
                 renderSpellButtons();
@@ -1277,13 +2176,13 @@ if(char.prof === 'farmer' && char.heroKey) {
             };
             div.appendChild(btn);
         });
-        document.getElementById('cnt-'+tier).innerText = `${char.spells[tier].length}/3`;
+        document.getElementById('cnt-'+tier).innerText = `${char.spells[tier].length}/${limit}`;
     }
 
     function updateSpellDisplay() {
         const div = document.getElementById('spell-summary');
         const tags = document.getElementById('spell-tags');
-        const all = [...char.spells.t0, ...char.spells.t1];
+        const all = [...char.spells.t0, ...char.spells.t1, ...char.spells.t2];
         if(all.length > 0) {
             div.style.display = 'block';
             tags.innerHTML = all.map(s => `<span class="tag spell">${s}</span>`).join('');
@@ -1292,174 +2191,308 @@ if(char.prof === 'farmer' && char.heroKey) {
         }
     }
 
-    /* ================= FVTT JSON 生成器 ================= */
+    /* ================= FVTT JSON 生成器 (支援 Mapping 與 Bonus Skills) ================= */
     function downloadFVTTJson() {
-        if(char.coreSkills.length !== 6) { alert("請選擇 6 個核心技能！"); return; }
-        
-        const name = document.getElementById('char-name').value || "未命名英雄";
-        const finalAttrs = {};
-        for(let k in char.calculatedAttrs) finalAttrs[k.toLowerCase()] = char.calculatedAttrs[k];
-        
-        const hp = parseInt(document.getElementById('val-hp').innerText);
-        const wp = parseInt(document.getElementById('val-wp').innerText);
-        const move = parseInt(document.getElementById('val-move').innerText);
-        const enc = parseInt(document.getElementById('val-enc').innerText);
-
-        const actor = {
-            "name": name,
-            "type": "character",
-            "img": "icons/svg/mystery-man.svg",
-            "system": {
-                "attributes": {
-                    "str": { "value": finalAttrs.str, "base": finalAttrs.str },
-                    "con": { "value": finalAttrs.con, "base": finalAttrs.con },
-                    "agl": { "value": finalAttrs.agl, "base": finalAttrs.agl },
-                    "int": { "value": finalAttrs.int, "base": finalAttrs.int },
-                    "wil": { "value": finalAttrs.wil, "base": finalAttrs.wil },
-                    "cha": { "value": finalAttrs.cha, "base": finalAttrs.cha }
-                },
-                "hitPoints": { "value": hp, "max": hp, "base": hp },
-                "willPoints": { "value": wp, "max": wp, "base": wp },
-                "movement": { "value": move, "base": move },
-                "encumbrance": { "value": 0, "max": enc },
-                "bio": { "description": `<p>種族: ${RACES[char.race].name.split(' ')[0]} / 職業: ${PROFESSIONS[char.prof].name.split(' ')[0]}</p>` }
-            },
-            "items": []
-        };
-
-        const rData = RACES[char.race];
-        let raceName = rData.name.split(' ')[0];
-        let raceDesc = rData.ability;
-        if(char.subrace && rData.subraces && rData.subraces[char.subrace]) {
-            raceName += ` (${rData.subraces[char.subrace].name.split(' ')[0]})`;
-            raceDesc += `<hr><strong>亞種特性:</strong> ${rData.subraces[char.subrace].ability}`;
-        }
-        actor.items.push(createItem("kin", raceName, raceDesc));
-
-        const pData = PROFESSIONS[char.prof];
-        actor.items.push(createItem("profession", pData.name.split(' ')[0], `<p>核心屬性: ${pData.attr}</p>`));
-
-        const allTrainedSkills = [...char.coreSkills, ...char.freeSkills, ...char.bonusSkills];
-        allTrainedSkills.forEach(s => {
-            const attrVal = finalAttrs[SKILL_ATTR_MAP[s].toLowerCase()] || 10;
-            const base = getSkillBase(attrVal);
-            actor.items.push(createSkillItem(s, SKILL_ATTR_MAP[s], base * 2));
-        });
-
-        if(char.heroKey && pData.heroAbilities) {
-            const hNameFull = pData.heroAbilities[char.heroKey].split('】');
-            const hName = hNameFull[0].replace('【','');
-            const hDesc = hNameFull[1];
-            actor.items.push(createAbilityItem(hName, hDesc, "heroic"));
-        }
-        if(char.extraKey && pData.extraOptions) {
-            const exInfo = pData.extraOptions[char.extraKey];
-            actor.items.push(createAbilityItem(exInfo.name, exInfo.desc, "kin"));
-        }
-
-        if(char.prof === 'shaman') {
-            [...char.spells.t0, ...char.spells.t1].forEach(s => {
-                actor.items.push(createSpellItem(s));
-            });
-        }
-
-        const gearList = [];
-        document.querySelectorAll('#inventory-list .tag.item').forEach(el => {
-            let txt = el.innerText;
-            if(!txt.includes("1D")) gearList.push(txt);
-        });
-        
-        gearList.forEach(itemName => {
-            let type = "item";
-            if(itemName.includes("甲") || itemName.includes("衣") || itemName.includes("戰甲")) type = "armor";
-            else if(itemName.includes("盔") || itemName.includes("帽") || itemName.includes("戰盔")) type = "helmet";
-            else if(["劍", "斧", "弓", "矛", "棍", "刀", "槍", "彈", "箭", "吹箭", "箭袋", "投石繩", "馬夸"].some(k => itemName.includes(k))) type = "weapon";
+        try {
+            if(char.coreSkills.length !== 6) { alert("請選擇 6 個核心技能！"); return; }
             
-            actor.items.push(createGearItem(itemName, type));
-        });
+            const name = document.getElementById('char-name').value || "未命名英雄";
+            const finalAttrs = {};
+            for(let k in char.calculatedAttrs) finalAttrs[k.toLowerCase()] = char.calculatedAttrs[k];
+            
+            const hp = parseInt(document.getElementById('val-hp').innerText);
+            const wp = parseInt(document.getElementById('val-wp').innerText);
+            const move = parseInt(document.getElementById('val-move').innerText);
+            const enc = parseInt(document.getElementById('val-enc').innerText);
 
-        const money = document.getElementById('money-input').value;
-        if(money > 0) actor.items.push(createGearItem("銀幣", "item", money));
-        const food = document.getElementById('food-input').value;
-        if(food > 0) actor.items.push(createGearItem("口糧", "item", food));
+            const actor = {
+                "name": name,
+                "type": "character",
+                "img": "icons/svg/mystery-man.svg",
+                "system": {
+                    "attributes": {
+                        "str": { "value": finalAttrs.str, "base": finalAttrs.str },
+                        "con": { "value": finalAttrs.con, "base": finalAttrs.con },
+                        "agl": { "value": finalAttrs.agl, "base": finalAttrs.agl },
+                        "int": { "value": finalAttrs.int, "base": finalAttrs.int },
+                        "wil": { "value": finalAttrs.wil, "base": finalAttrs.wil },
+                        "cha": { "value": finalAttrs.cha, "base": finalAttrs.cha }
+                    },
+                    "hitPoints": { "value": hp, "max": hp, "base": hp },
+                    "willPoints": { "value": wp, "max": wp, "base": wp },
+                    "movement": { "value": move, "base": move },
+                    "encumbrance": { "value": 0, "max": enc },
+                    "bio": { "description": `<p>種族: ${RACES[char.race].name.split(' ')[0]} / 職業: ${PROFESSIONS[char.prof].name.split(' ')[0]}</p>` }
+                },
+                "items": []
+            };
 
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(actor, null, 2));
-        const downloadAnchorNode = document.createElement('a');
-        downloadAnchorNode.setAttribute("href", dataStr);
-        downloadAnchorNode.setAttribute("download", `${name}_fvtt.json`);
-        document.body.appendChild(downloadAnchorNode);
-        downloadAnchorNode.click();
-        downloadAnchorNode.remove();
+            const rData = RACES[char.race];
+            let raceName = rData.name.split(' ')[0];
+            let raceDesc = rData.ability;
+            if(char.subrace && rData.subraces && rData.subraces[char.subrace]) {
+                raceName += ` (${rData.subraces[char.subrace].name.split(' ')[0]})`;
+                raceDesc += `<hr><strong>亞種特性:</strong> ${rData.subraces[char.subrace].ability}`;
+            }
+            actor.items.push(createItem("kin", raceName, raceDesc));
+
+            const pData = PROFESSIONS[char.prof];
+            actor.items.push(createItem("profession", pData.name.split(' ')[0], `<p>核心屬性: ${pData.attr}</p>`));
+
+            // 合併所有技能 (包含核心、自由、與額外獎勵)
+            const allTrainedSkills = [...char.coreSkills, ...char.freeSkills];
+            
+            // 加入農民的額外技能
+            if(char.prof === 'farmer') {
+                if(char.heroKeys.includes('a')) allTrainedSkills.push('浮田術');
+                if(char.heroKeys.includes('c')) allTrainedSkills.push('廚藝');
+            }
+            // 加入學者的額外技能
+            if(char.prof === 'scholar' && char.extraKey) {
+                const extra = PROFESSIONS.scholar.extraOptions[char.extraKey];
+                if(extra && extra.addSkills) allTrainedSkills.push(...extra.addSkills);
+            }
+
+            allTrainedSkills.forEach(s => {
+                const attrKey = SKILL_ATTR_MAP[s] || "INT";
+                const attrVal = finalAttrs[attrKey.toLowerCase()] || 10;
+                const base = getSkillBase(attrVal);
+                // 修正：FVTT 匯出時，所有技能的數值都乘 2 (視為受訓)
+                actor.items.push(createSkillItem(s, attrKey, base * 2));
+            });
+
+            if(char.heroKeys && char.heroKeys.length > 0 && pData.heroAbilities) {
+                char.heroKeys.forEach(k => {
+                    const hNameFull = pData.heroAbilities[k].split('】');
+                    const hName = hNameFull[0].replace('【','');
+                    const hDesc = hNameFull[1];
+                    actor.items.push(createAbilityItem(hName, hDesc, "heroic"));
+                });
+            }
+            
+            if(char.prof === 'shaman') {
+                 actor.items.push(createAbilityItem("魔法", pData.heroDesc, "heroic"));
+            }
+
+            if(char.extraKey && pData.extraOptions) {
+                const exInfo = pData.extraOptions[char.extraKey];
+                actor.items.push(createAbilityItem(exInfo.name, exInfo.desc, "kin"));
+            }
+            
+            if(char.prof === 'artisan') {
+                const aData = ARTISAN_DATA[char.artisanPath];
+                actor.items.push(createAbilityItem(aData.name, aData.trait + " " + aData.desc, "ability"));
+                char.artisanGlyphs.forEach(g => {
+                     actor.items.push(createAbilityItem("字符: "+g, "工匠已知字符", "ability"));
+                });
+            }
+            
+            if(char.prof === 'knight') {
+                const kData = KNIGHT_DATA[char.knightOrder];
+                actor.items.push(createAbilityItem(kData.name, kData.trait + " " + kData.desc, "kin"));
+                
+                let techDesc = "";
+                let techName = "";
+                if(char.knightTechSource === 'order') {
+                    if(char.knightTech && kData.techniques[char.knightTech]) {
+                        techDesc = kData.techniques[char.knightTech];
+                        techName = techDesc.split('】')[0].replace('【','');
+                    }
+                } else {
+                    if(char.knightTech && PROFESSIONS.warrior.heroAbilities[char.knightTech]) {
+                        techDesc = PROFESSIONS.warrior.heroAbilities[char.knightTech];
+                        techName = techDesc.split('】')[0].replace('【','');
+                    }
+                }
+                if(techName) actor.items.push(createAbilityItem(techName, techDesc, "ability"));
+            }
+
+            if(char.prof === 'shaman') {
+                [...char.spells.t0, ...char.spells.t1, ...char.spells.t2].forEach(s => {
+                    actor.items.push(createSpellItem(s));
+                });
+            }
+
+// ★★★ 農民食譜修正：現在會正確加入 FVTT 清單 ★★★
+            if (char.prof === 'farmer' && char.recipes) {
+                char.recipes.r1.forEach(r => {
+                    actor.items.push(createGearItem("食譜：" + r, "item")); 
+                });
+                if (char.recipes.r2) {
+                    actor.items.push(createGearItem("食譜：" + char.recipes.r2, "item"));
+                }
+            }
+
+            // 裝備讀取 (安全版)
+            const gearList = [];
+            document.querySelectorAll('#inventory-list .tag.item').forEach(el => {
+                const select = el.querySelector('select');
+                if (select) {
+                    gearList.push(select.value);
+                } else {
+                    let txt = el.innerText;
+                    if(!txt.includes("1D")) gearList.push(txt);
+                }
+            });
+            
+            gearList.forEach(itemName => {
+                let type = "item";
+                if(itemName.includes("甲") || itemName.includes("衣") || itemName.includes("戰甲") || itemName.includes("披肩") || itemName.includes("袍")) type = "armor";
+                else if(itemName.includes("盔") || itemName.includes("帽") || itemName.includes("戰盔")) type = "helmet";
+                else if(["劍", "斧", "弓", "矛", "棍", "刀", "槍", "彈", "箭", "吹箭", "鐮刀"].some(k => itemName.includes(k))) type = "weapon";
+                
+                actor.items.push(createGearItem(itemName, type));
+            });
+
+            const money = document.getElementById('money-input').value;
+            if(money > 0) actor.items.push(createGearItem("銀幣", "item", money));
+            const food = document.getElementById('food-input').value;
+            if(food > 0) actor.items.push(createGearItem("口糧", "item", food));
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(actor, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `${name}_fvtt.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        } catch (e) {
+            alert("匯出發生錯誤: " + e.message);
+            console.error(e);
+        }
     }
 
     /* --- PDF 功能函式 --- */
     function openPDFPreview() {
         const name = document.getElementById('char-name').value || "未命名英雄";
         
-        // 1. 填入數據到預覽視窗
         document.getElementById('pdf-char-name').innerText = name;
         const rName = RACES[char.race].name.split(' ')[0];
         const cName = PROFESSIONS[char.prof].name.split(' ')[0];
         document.getElementById('pdf-char-desc').innerText = `${rName} ${cName} (${document.getElementById('age-select').options[document.getElementById('age-select').selectedIndex].text})`;
 
-        // 屬性
         let attrsHtml = "";
         for(let k in char.calculatedAttrs) {
             attrsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">${k}</span><span class="pdf-attr-val">${char.calculatedAttrs[k]}</span></div>`;
         }
         document.getElementById('pdf-attrs').innerHTML = attrsHtml;
 
-        // 狀態
         document.getElementById('pdf-hp').innerText = document.getElementById('val-hp').innerText;
         document.getElementById('pdf-wp').innerText = document.getElementById('val-wp').innerText;
         document.getElementById('pdf-mov').innerText = document.getElementById('val-move').innerText;
         document.getElementById('pdf-enc').innerText = document.getElementById('val-enc').innerText;
         document.getElementById('pdf-dmg').innerText = document.getElementById('val-dmg').innerText;
 
-        // 技能
         let skillsHtml = "";
-        const allSkills = [...ALL_SKILLS];
-        allSkills.forEach(s => {
-            const attrKey = SKILL_ATTR_MAP[s] || "STR";
+        const allTrained = [...char.coreSkills, ...char.freeSkills];
+        if(char.prof === 'farmer') {
+            if(char.heroKeys.includes('a')) allTrained.push('浮田術');
+            if(char.heroKeys.includes('c')) allTrained.push('廚藝');
+        }
+        if(char.prof === 'scholar' && char.extraKey) {
+            const extra = PROFESSIONS.scholar.extraOptions[char.extraKey];
+            if(extra && extra.addSkills) allTrained.push(...extra.addSkills);
+        }
+
+        ALL_SKILLS.forEach(s => {
+            let attrKey = SKILL_ATTR_MAP[s] || "STR";
+            if (char.prof === 'artisan' && ARTISAN_DATA[char.artisanPath].attrMap[s]) {
+                attrKey = ARTISAN_DATA[char.artisanPath].attrMap[s];
+            }
+            const isTrained = allTrained.includes(s);
             const attrVal = char.calculatedAttrs[attrKey] || 10;
             const baseVal = getSkillBase(attrVal);
-            let val = baseVal;
-            let isTrained = false;
-            
-            if (char.coreSkills.includes(s) || char.freeSkills.includes(s) || char.bonusSkills.includes(s)) {
-                val = baseVal * 2;
-                isTrained = true;
-            }
-            
+            const val = isTrained ? baseVal * 2 : baseVal;
+
             skillsHtml += `<div class="pdf-skill-item ${isTrained ? 'trained' : ''}"><span>${s} <small style="color:#666">(${attrKey})</small></span><span>${val}</span></div>`;
         });
         document.getElementById('pdf-skills').innerHTML = skillsHtml;
 
-        // 能力
         let abilitiesHtml = "";
         const rData = RACES[char.race];
         abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${rData.name} 特性</div><div class="pdf-ability-desc">${rData.ability}</div></div>`;
         if(char.subrace && rData.subraces[char.subrace]) {
              abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">亞種: ${rData.subraces[char.subrace].name}</div><div class="pdf-ability-desc">${rData.subraces[char.subrace].ability}</div></div>`;
         }
-        const pData = PROFESSIONS[char.prof];
-        if(char.heroKey && pData.heroAbilities) {
-             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">英雄能力</div><div class="pdf-ability-desc">${pData.heroAbilities[char.heroKey]}</div></div>`;
-        }
-        if(char.extraKey && pData.extraOptions) {
-             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${pData.extraLabel}</div><div class="pdf-ability-desc">${pData.extraOptions[char.extraKey].desc}</div></div>`;
-        }
         
-        // 法術
-        if (char.prof === 'shaman') {
-             const allSpells = [...char.spells.t0, ...char.spells.t1];
+        if (char.prof === 'artisan') {
+             const aData = ARTISAN_DATA[char.artisanPath];
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${aData.name}</div><div class="pdf-ability-desc">${aData.trait} - ${aData.desc}</div></div>`;
+             
+             if (char.heroKeys.length > 0) {
+                 const pData = PROFESSIONS[char.prof];
+                 char.heroKeys.forEach(k => {
+                     abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">英雄能力</div><div class="pdf-ability-desc">${pData.heroAbilities[k]}</div></div>`;
+                 });
+             }
+
+             if(char.artisanGlyphs.length > 0) {
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">已知字符</div><div class="pdf-inventory">${char.artisanGlyphs.map(g=>`<div class="pdf-item">${g}</div>`).join('')}</div></div>`;
+             }
+             const eGlyph = document.getElementById('enhance-glyph-select').value;
+             const eItem = document.getElementById('enhance-item-select').value;
+             if (eGlyph && eItem && !eGlyph.includes("選擇") && !eItem.includes("選擇")) {
+                  abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">裝備強化</div><div class="pdf-ability-desc">將 [${eGlyph}] 刻印於 [${eItem}] 之上。</div></div>`;
+             }
+        } else if (char.prof === 'knight') {
+             const kData = KNIGHT_DATA[char.knightOrder];
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${kData.name}</div><div class="pdf-ability-desc">${kData.trait} - ${kData.desc}</div></div>`;
+             
+             if (char.heroKeys.length > 0) {
+                 const pData = PROFESSIONS[char.prof];
+                 char.heroKeys.forEach(k => {
+                     abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">英雄能力</div><div class="pdf-ability-desc">${pData.heroAbilities[k]}</div></div>`;
+                 });
+             }
+
+             let techDesc = "";
+             if(char.knightTechSource === 'order') {
+                 if(char.knightTech) techDesc = kData.techniques[char.knightTech];
+             } else {
+                 if(char.knightTech) techDesc = PROFESSIONS.warrior.heroAbilities[char.knightTech];
+             }
+             if(techDesc) {
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">專屬戰技</div><div class="pdf-ability-desc">${techDesc}</div></div>`;
+             }
+
+        } else if (char.prof === 'shaman') {
+             const pData = PROFESSIONS[char.prof];
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">職業特性</div><div class="pdf-ability-desc">${pData.heroDesc}</div></div>`;
+             
+             if(char.extraKey && pData.extraOptions) {
+                 const pData = PROFESSIONS[char.prof];
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${pData.extraLabel}</div><div class="pdf-ability-desc">${pData.extraOptions[char.extraKey].desc}</div></div>`;
+            }
+
+             const allSpells = [...char.spells.t0, ...char.spells.t1, ...char.spells.t2];
              if (allSpells.length > 0) {
                  abilitiesHtml += `<div class="pdf-ability-box" style="margin-top:10px; border-top:1px solid #444; padding-top:5px;"><div class="pdf-ability-name">法術</div><div class="pdf-inventory">${allSpells.map(s=>`<div class="pdf-item">${s}</div>`).join('')}</div></div>`;
+             }
+
+        } else {
+            if (char.heroKeys.length > 0) {
+                 const pData = PROFESSIONS[char.prof];
+                 char.heroKeys.forEach(k => {
+                     abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">英雄能力</div><div class="pdf-ability-desc">${pData.heroAbilities[k]}</div></div>`;
+                 });
+            }
+            if(char.extraKey && PROFESSIONS[char.prof].extraOptions) {
+                 const pData = PROFESSIONS[char.prof];
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${pData.extraLabel}</div><div class="pdf-ability-desc">${pData.extraOptions[char.extraKey].desc}</div></div>`;
+            }
+        }
+// 農民食譜 (PDF)
+        if (char.prof === 'farmer' && char.heroKeys.includes('c')) {
+             let recipeText = "";
+             if (char.recipes.r1.length > 0) recipeText += `[一星] ${char.recipes.r1.join('、')} `;
+             if (char.recipes.r2) recipeText += `[二星] ${char.recipes.r2}`;
+             
+             if (recipeText) {
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">已知食譜</div><div class="pdf-ability-desc">${recipeText}</div></div>`;
              }
         }
         document.getElementById('pdf-abilities').innerHTML = abilitiesHtml;
 
-        // 特徵
         let traitsHtml = "";
         const weak = document.getElementById('weakness-select').value;
         if(weak && weak!=='random') traitsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">弱點</span><span>${weak}</span></div>`;
@@ -1470,49 +2503,112 @@ if(char.prof === 'farmer' && char.heroKey) {
         if(memVal && memVal!=='random' && memVal!=='custom') traitsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">紀念物</span><span>${memVal}</span></div>`;
         document.getElementById('pdf-traits').innerHTML = traitsHtml;
 
-        // 裝備
         let gearHtml = "";
         document.querySelectorAll('#inventory-list .tag.item').forEach(el => {
-            gearHtml += `<div class="pdf-item">${el.innerText}</div>`;
+            const select = el.querySelector('select');
+            let itemText = "";
+            if (select) {
+                itemText = select.value;
+            } else {
+                itemText = el.innerText;
+            }
+            gearHtml += `<div class="pdf-item">${itemText}</div>`;
         });
         document.getElementById('pdf-gear').innerHTML = gearHtml;
         document.getElementById('pdf-money').innerText = document.getElementById('money-input').value;
         document.getElementById('pdf-food').innerText = document.getElementById('food-input').value;
 
-        // 顯示 Modal
         document.getElementById('pdf-preview-modal').classList.add('show');
     }
 
-    function closePreview() {
-        document.getElementById('pdf-preview-modal').classList.remove('show');
+    // FVTT Helper Functions
+    // 為了自動對應 FVTT，我們需要產生標準的 Item 物件
+    // 如果您有 Compendium UUID 對照表，可以在這裡加入 lookup 邏輯
+    function findCompendiumId(name, type) {
+        // 1. 嘗試完全匹配名稱
+        if (FVTT_ID_MAP[name]) return FVTT_ID_MAP[name];
+        
+        // 2. 嘗試部分匹配 (例如網頁是 "人類 (伊察人)"，但對照表只有 "人類")
+        // 這部分視需求開啟，目前建議精準匹配比較安全
+        
+        return null; // 找不到則回傳 null，FVTT 會改用我們生成的純文字資料
     }
 
-    function confirmDownloadPDF() {
-        const element = document.getElementById('pdf-content');
-        const name = document.getElementById('char-name').value || "未命名英雄";
-        
-        const opt = {
-          margin:       0,
-          filename:     `${name}_character_sheet.pdf`,
-          image:        { type: 'jpeg', quality: 0.98 },
-          html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#111' },
-          jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // 隱藏 toolbar 避免被截圖到
-        document.querySelector('.pdf-toolbar').style.display = 'none';
-        
-        html2pdf().set(opt).from(element).save().then(() => {
-            document.querySelector('.pdf-toolbar').style.display = 'flex';
-            closePreview();
-        });
+    function createItem(type, name, desc) { 
+        const uuid = findCompendiumId(name, type);
+        return { 
+            "name": name, 
+            "type": type, 
+            "img": `icons/svg/${type === 'kin' ? 'mystery-man' : 'book'}.svg`, 
+            "system": { "description": desc },
+            "flags": { "core": { "sourceId": uuid } }
+        }; 
     }
+    
+    function createSkillItem(name, attr, val) { 
+        // 技能比較特殊，通常是系統內建，但如果有自訂技能物品也可對應
+        const uuid = findCompendiumId(name, "skill");
+        const isWeapon = ["斧","棍棒","劍","小刀","弓","投槍器","繩索","吹箭筒","矛"].includes(name); 
+        return { 
+            "name": name, 
+            "type": "skill", 
+            "img": "icons/svg/sword.svg", 
+            "system": { 
+                "description": "", 
+                "attribute": attr.toLowerCase(), 
+                "skillType": isWeapon ? "weapon" : "core", 
+                "value": val 
+            },
+            "flags": { "core": { "sourceId": uuid } }
+        }; 
+    }
+    
+    function createAbilityItem(name, desc, type) { 
+        const uuid = findCompendiumId(name, "ability");
+        return { 
+            "name": name, 
+            "type": "ability", 
+            "img": "icons/svg/aura.svg", 
+            "system": { "description": desc, "abilityType": type },
+            "flags": { "core": { "sourceId": uuid } }
+        }; 
+    }
+    
+    function createSpellItem(name) { 
+        const uuid = findCompendiumId(name, "spell");
+        return { 
+            "name": name, 
+            "type": "spell", 
+            "img": "icons/svg/daze.svg", 
+            "system": { "school": "general", "rank": 0 },
+            "flags": { "core": { "sourceId": uuid } }
+        }; 
+    }
+    
+// 農民食譜 (FVTT)
+            if (char.prof === 'farmer' && char.heroKeys.includes('c')) {
+                char.recipes.r1.forEach(r => {
+                    actor.items.push(createGearItem("食譜：" + r, "item")); // 或使用 createItem 自訂類型
+                });
+                if (char.recipes.r2) {
+                    actor.items.push(createGearItem("食譜：" + char.recipes.r2, "item"));
+                }
+            }
 
-    function createItem(type, name, desc) { return { "name": name, "type": type, "img": `icons/svg/${type === 'kin' ? 'mystery-man' : 'book'}.svg`, "system": { "description": desc } }; }
-    function createSkillItem(name, attr, val) { const isWeapon = ["斧","棍棒","劍","小刀","弓","投槍器","投石繩","吹箭筒","矛"].includes(name); return { "name": name, "type": "skill", "img": "icons/svg/sword.svg", "system": { "description": "", "attribute": attr.toLowerCase(), "skillType": isWeapon ? "weapon" : "core", "value": val } }; }
-    function createAbilityItem(name, desc, type) { return { "name": name, "type": "ability", "img": "icons/svg/aura.svg", "system": { "description": desc, "abilityType": type } }; }
-    function createSpellItem(name) { return { "name": name, "type": "spell", "img": "icons/svg/daze.svg", "system": { "school": "general", "rank": 0 } }; }
-    function createGearItem(name, type, qty=1) { let icon = "item-bag"; if(type === 'weapon') icon = "sword"; if(type === 'armor') icon = "chest"; if(type === 'helmet') icon = "helmet"; return { "name": name, "type": type, "img": `icons/svg/${icon}.svg`, "system": { "quantity": parseInt(qty) } }; }
+    function createGearItem(name, type, qty=1) { 
+        const uuid = findCompendiumId(name, type);
+        let icon = "item-bag"; 
+        if(type === 'weapon') icon = "sword"; 
+        if(type === 'armor') icon = "chest"; 
+        if(type === 'helmet') icon = "helmet"; 
+        return { 
+            "name": name, 
+            "type": type, 
+            "img": `icons/svg/${icon}.svg`, 
+            "system": { "quantity": parseInt(qty) },
+            "flags": { "core": { "sourceId": uuid } }
+        }; 
+    }
 
     init();
 </script>
