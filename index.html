@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>馬茲提卡：創角網站</title>
+    <title>馬茲提卡：傳奇起源</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;500;700&family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
@@ -1470,8 +1470,14 @@
     }
 
  /* --- 職業選項 (已修正：切換職業時自動隱藏法術區塊) --- */
-    function updateClassOptions() {
+ function updateClassOptions() {
         const pData = PROFESSIONS[char.prof];
+        
+        // ★ 修正 1：將裝備選單的重置移到最前方，避免切換職業時讀取到舊的超出範圍的選項而當機！
+        const eqSel = document.getElementById('equip-select');
+        eqSel.innerHTML = "";
+        pData.gear.forEach((g,i) => eqSel.add(new Option(g.name, i)));
+        char.gearIndex = 0; 
         
         // 取得所有 DOM 元素
         const artisanDiv = document.getElementById('artisan-path-container');
@@ -1480,12 +1486,13 @@
         const heroDiv = document.getElementById('hero-ability-container');
         const extraDiv = document.getElementById('extra-trait-container');
         const limitLabel = document.getElementById('hero-limit-label');
-        const spellSel = document.getElementById('spell-selector'); // 取得法術區塊
+        const spellSel = document.getElementById('spell-selector');
         const chefDiv = document.getElementById('chef-recipe-container');
 
-        // 【修正點】：每次切換職業時，先強制隱藏法術區塊
+        // 每次切換職業時，先強制隱藏特殊區塊
         spellSel.style.display = 'none';
         if(chefDiv) chefDiv.style.display = 'none';
+        
         char.heroKeys = [];
         document.getElementById('hero-desc-preview').innerHTML = "請選擇能力...";
         
@@ -1496,7 +1503,6 @@
         extraDiv.style.display = 'none';
         heroDiv.style.display = 'block'; 
         limitLabel.innerText = "(擇二)";
-        chefDiv.style.display = 'none';
 
         if (char.prof === 'artisan') {
             artisanDiv.style.display = 'block';
@@ -1510,24 +1516,20 @@
             updateKnightOrder();
 
         } else if (char.prof === 'shaman') {
-            // 薩滿無選擇英雄能力，顯示固定文字
             heroDiv.style.display = 'block';
             limitLabel.innerText = "(固定)";
             document.getElementById('hero-ability-list').innerHTML = "";
             document.getElementById('hero-desc-preview').innerHTML = pData.heroDesc;
             
-            // 顯示流派選擇
             const extraSel = document.getElementById('extra-trait-select');
             extraSel.innerHTML = "";
             extraDiv.style.display = 'block';
             document.getElementById('extra-trait-label').innerText = pData.extraLabel;
             for(let k in pData.extraOptions) extraSel.add(new Option(pData.extraOptions[k].name, k));
             
-            // 這裡會再次呼叫 updateExtraTrait，若為薩滿，它會把 spellSel 重新打開 (display: block)
             updateExtraTrait();
 
         } else {
-            // 其他職業
             const extraSel = document.getElementById('extra-trait-select');
             extraSel.innerHTML = "";
             if(pData.extraOptions) {
@@ -1539,18 +1541,12 @@
                 char.extraKey = null; 
             }
             renderHeroAbilityChecks(pData);
-        }       
-
-        // 薩滿已在上方處理，此處僅處理非薩滿的英雄能力渲染
+        }
+        
         if(char.prof !== 'shaman') {
             renderHeroAbilityChecks(pData);
         }
 
-        const eqSel = document.getElementById('equip-select');
-        eqSel.innerHTML = "";
-        pData.gear.forEach((g,i) => eqSel.add(new Option(g.name, i)));
-        
-        // 更新裝備與技能
         if(char.prof !== 'artisan' && char.prof !== 'knight') {
              renderCoreSkills();
              updateInventory();
@@ -1999,9 +1995,15 @@
     }
 
     /* --- 裝備渲染 (支援下拉) --- */
-    function updateInventory() {
-        char.gearIndex = document.getElementById('equip-select').value;
+function updateInventory() {
+        char.gearIndex = document.getElementById('equip-select').value || 0;
         const pData = PROFESSIONS[char.prof];
+        
+        // ★ 修正 2：安全防呆機制，如果找不到對應的裝備選項，強制回歸第 1 組
+        if (!pData.gear[char.gearIndex]) {
+            char.gearIndex = 0;
+        }
+        
         let items = [...pData.gear[char.gearIndex].items];
         
         if(char.prof === 'knight') {
@@ -2046,7 +2048,6 @@
 
         updateAvatar();
     }
-
     function updateAvatar() {
         const rData = RACES[char.race];
         const pData = PROFESSIONS[char.prof];
@@ -2585,15 +2586,415 @@
         }; 
     }
     
-// 農民食譜 (FVTT)
-            if (char.prof === 'farmer' && char.heroKeys.includes('c')) {
+/* --- 裝備渲染 (支援下拉) --- */
+    function updateInventory() {
+        char.gearIndex = document.getElementById('equip-select').value || 0;
+        const pData = PROFESSIONS[char.prof];
+        
+        if (!pData.gear[char.gearIndex]) {
+            char.gearIndex = 0;
+        }
+        
+        let items = [...pData.gear[char.gearIndex].items];
+        
+        if(char.prof === 'knight') {
+            const orderName = KNIGHT_DATA[char.knightOrder].name.replace('騎士','');
+            items = items.map(i => {
+                if(typeof i === 'string' && i.includes("騎士戰甲")) return orderName+"戰甲";
+                return i;
+            });
+        }
+        
+        if(char.prof === 'artisan') {
+            items = [...items, ...ARTISAN_DATA[char.artisanPath].bonusGear];
+            updateEnhancementDropdowns(); 
+        }
+
+        const memInput = document.getElementById('memento-custom');
+        const memVal = memInput.style.display==='none' ? document.getElementById('memento-select').value : memInput.value;
+        if(memVal && memVal!=='random' && memVal!=='custom') items.push("★ "+memVal);
+
+        const listDiv = document.getElementById('inventory-list');
+        listDiv.innerHTML = "";
+        
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = "tag item";
+            
+            if (Array.isArray(item)) {
+                const select = document.createElement('select');
+                select.className = "gear-select";
+                item.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt;
+                    option.text = opt;
+                    select.appendChild(option);
+                });
+                div.appendChild(select);
+            } else {
+                div.innerText = item;
+            }
+            listDiv.appendChild(div);
+        });
+
+        updateAvatar();
+    }
+
+    /* ================= FVTT JSON 生成器 ================= */
+    function downloadFVTTJson() {
+        try {
+            if(char.coreSkills.length !== 6) { alert("請選擇 6 個核心技能！"); return; }
+            
+            const name = document.getElementById('char-name').value || "未命名英雄";
+            const finalAttrs = {};
+            for(let k in char.calculatedAttrs) finalAttrs[k.toLowerCase()] = char.calculatedAttrs[k];
+            
+            const hp = parseInt(document.getElementById('val-hp').innerText);
+            const wp = parseInt(document.getElementById('val-wp').innerText);
+            const move = parseInt(document.getElementById('val-move').innerText);
+            const enc = parseInt(document.getElementById('val-enc').innerText);
+
+            const actor = {
+                "name": name,
+                "type": "character",
+                "img": "icons/svg/mystery-man.svg",
+                "system": {
+                    "attributes": {
+                        "str": { "value": finalAttrs.str, "base": finalAttrs.str },
+                        "con": { "value": finalAttrs.con, "base": finalAttrs.con },
+                        "agl": { "value": finalAttrs.agl, "base": finalAttrs.agl },
+                        "int": { "value": finalAttrs.int, "base": finalAttrs.int },
+                        "wil": { "value": finalAttrs.wil, "base": finalAttrs.wil },
+                        "cha": { "value": finalAttrs.cha, "base": finalAttrs.cha }
+                    },
+                    "hitPoints": { "value": hp, "max": hp, "base": hp },
+                    "willPoints": { "value": wp, "max": wp, "base": wp },
+                    "movement": { "value": move, "base": move },
+                    "encumbrance": { "value": 0, "max": enc },
+                    "bio": { "description": `<p>種族: ${RACES[char.race].name.split(' ')[0]} / 職業: ${PROFESSIONS[char.prof].name.split(' ')[0]}</p>` }
+                },
+                "items": []
+            };
+
+            const rData = RACES[char.race];
+            let raceName = rData.name.split(' ')[0];
+            let raceDesc = rData.ability;
+            if(char.subrace && rData.subraces && rData.subraces[char.subrace]) {
+                raceName += ` (${rData.subraces[char.subrace].name.split(' ')[0]})`;
+                raceDesc += `<hr><strong>亞種特性:</strong> ${rData.subraces[char.subrace].ability}`;
+            }
+            actor.items.push(createItem("kin", raceName, raceDesc));
+
+            const pData = PROFESSIONS[char.prof];
+            actor.items.push(createItem("profession", pData.name.split(' ')[0], `<p>核心屬性: ${pData.attr}</p>`));
+
+            const allTrainedSkills = [...char.coreSkills, ...char.freeSkills];
+            if(char.prof === 'farmer') {
+                if(char.heroKeys.includes('a')) allTrainedSkills.push('浮田術');
+                if(char.heroKeys.includes('c')) allTrainedSkills.push('廚藝');
+            }
+            if(char.prof === 'scholar' && char.extraKey) {
+                const extra = PROFESSIONS.scholar.extraOptions[char.extraKey];
+                if(extra && extra.addSkills) allTrainedSkills.push(...extra.addSkills);
+            }
+
+            allTrainedSkills.forEach(s => {
+                const attrKey = SKILL_ATTR_MAP[s] || "INT";
+                const attrVal = finalAttrs[attrKey.toLowerCase()] || 10;
+                const base = getSkillBase(attrVal);
+                actor.items.push(createSkillItem(s, attrKey, base * 2));
+            });
+
+            if(char.heroKeys && char.heroKeys.length > 0 && pData.heroAbilities) {
+                char.heroKeys.forEach(k => {
+                    const hNameFull = pData.heroAbilities[k].split('】');
+                    const hName = hNameFull[0].replace('【','');
+                    const hDesc = hNameFull[1];
+                    actor.items.push(createAbilityItem(hName, hDesc, "heroic"));
+                });
+            }
+            
+            if(char.prof === 'shaman') {
+                 actor.items.push(createAbilityItem("魔法", pData.heroDesc, "heroic"));
+            }
+
+            if(char.extraKey && pData.extraOptions) {
+                const exInfo = pData.extraOptions[char.extraKey];
+                actor.items.push(createAbilityItem(exInfo.name, exInfo.desc, "kin"));
+            }
+            
+            if(char.prof === 'artisan') {
+                const aData = ARTISAN_DATA[char.artisanPath];
+                actor.items.push(createAbilityItem(aData.name, aData.trait + " " + aData.desc, "ability"));
+                char.artisanGlyphs.forEach(g => {
+                     actor.items.push(createAbilityItem("字符: "+g, "工匠已知字符", "ability"));
+                });
+            }
+            
+            if(char.prof === 'knight') {
+                const kData = KNIGHT_DATA[char.knightOrder];
+                actor.items.push(createAbilityItem(kData.name, kData.trait + " " + kData.desc, "kin"));
+                
+                let techDesc = "";
+                let techName = "";
+                if(char.knightTechSource === 'order') {
+                    if(char.knightTech && kData.techniques[char.knightTech]) {
+                        techDesc = kData.techniques[char.knightTech];
+                        techName = techDesc.split('】')[0].replace('【','');
+                    }
+                } else {
+                    if(char.knightTech && PROFESSIONS.warrior.heroAbilities[char.knightTech]) {
+                        techDesc = PROFESSIONS.warrior.heroAbilities[char.knightTech];
+                        techName = techDesc.split('】')[0].replace('【','');
+                    }
+                }
+                if(techName) actor.items.push(createAbilityItem(techName, techDesc, "ability"));
+            }
+
+            if(char.prof === 'shaman') {
+                [...char.spells.t0, ...char.spells.t1, ...char.spells.t2].forEach(s => {
+                    actor.items.push(createSpellItem(s));
+                });
+            }
+
+            if (char.prof === 'farmer' && char.recipes) {
                 char.recipes.r1.forEach(r => {
-                    actor.items.push(createGearItem("食譜：" + r, "item")); // 或使用 createItem 自訂類型
+                    actor.items.push(createGearItem("食譜：" + r, "item")); 
                 });
                 if (char.recipes.r2) {
                     actor.items.push(createGearItem("食譜：" + char.recipes.r2, "item"));
                 }
             }
+
+            const gearList = [];
+            document.querySelectorAll('#inventory-list .tag.item').forEach(el => {
+                const select = el.querySelector('select');
+                if (select) {
+                    gearList.push(select.value);
+                } else {
+                    let txt = el.innerText;
+                    if(!txt.includes("1D")) gearList.push(txt);
+                }
+            });
+            
+            gearList.forEach(itemName => {
+                let type = "item";
+                if(itemName.includes("甲") || itemName.includes("衣") || itemName.includes("戰甲") || itemName.includes("披肩") || itemName.includes("袍")) type = "armor";
+                else if(itemName.includes("盔") || itemName.includes("帽") || itemName.includes("戰盔")) type = "helmet";
+                else if(["劍", "斧", "弓", "矛", "棍", "刀", "槍", "彈", "箭", "吹箭", "鐮刀"].some(k => itemName.includes(k))) type = "weapon";
+                
+                actor.items.push(createGearItem(itemName, type));
+            });
+
+            const money = document.getElementById('money-input').value;
+            if(money > 0) actor.items.push(createGearItem("月幣", "item", money));
+            const food = document.getElementById('food-input').value;
+            if(food > 0) actor.items.push(createGearItem("口糧", "item", food));
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(actor, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `${name}_fvtt.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        } catch (e) {
+            alert("匯出發生錯誤: " + e.message);
+            console.error(e);
+        }
+    }
+
+    /* --- PDF 功能函式 --- */
+    function openPDFPreview() {
+        const name = document.getElementById('char-name').value || "未命名英雄";
+        
+        document.getElementById('pdf-char-name').innerText = name;
+        const rName = RACES[char.race].name.split(' ')[0];
+        const cName = PROFESSIONS[char.prof].name.split(' ')[0];
+        document.getElementById('pdf-char-desc').innerText = `${rName} ${cName} (${document.getElementById('age-select').options[document.getElementById('age-select').selectedIndex].text})`;
+
+        let attrsHtml = "";
+        for(let k in char.calculatedAttrs) {
+            attrsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">${k}</span><span class="pdf-attr-val">${char.calculatedAttrs[k]}</span></div>`;
+        }
+        document.getElementById('pdf-attrs').innerHTML = attrsHtml;
+
+        document.getElementById('pdf-hp').innerText = document.getElementById('val-hp').innerText;
+        document.getElementById('pdf-wp').innerText = document.getElementById('val-wp').innerText;
+        document.getElementById('pdf-mov').innerText = document.getElementById('val-move').innerText;
+        document.getElementById('pdf-enc').innerText = document.getElementById('val-enc').innerText;
+        document.getElementById('pdf-dmg').innerText = document.getElementById('val-dmg').innerText;
+
+        let skillsHtml = "";
+        const allTrained = [...char.coreSkills, ...char.freeSkills];
+        if(char.prof === 'farmer') {
+            if(char.heroKeys.includes('a')) allTrained.push('浮田術');
+            if(char.heroKeys.includes('c')) allTrained.push('廚藝');
+        }
+        if(char.prof === 'scholar' && char.extraKey) {
+            const extra = PROFESSIONS.scholar.extraOptions[char.extraKey];
+            if(extra && extra.addSkills) allTrained.push(...extra.addSkills);
+        }
+
+        ALL_SKILLS.forEach(s => {
+            let attrKey = SKILL_ATTR_MAP[s] || "STR";
+            if (char.prof === 'artisan' && ARTISAN_DATA[char.artisanPath].attrMap[s]) {
+                attrKey = ARTISAN_DATA[char.artisanPath].attrMap[s];
+            }
+            const isTrained = allTrained.includes(s);
+            const attrVal = char.calculatedAttrs[attrKey] || 10;
+            const baseVal = getSkillBase(attrVal);
+            const val = isTrained ? baseVal * 2 : baseVal;
+
+            skillsHtml += `<div class="pdf-skill-item ${isTrained ? 'trained' : ''}"><span>${s} <small style="color:#666">(${attrKey})</small></span><span>${val}</span></div>`;
+        });
+        document.getElementById('pdf-skills').innerHTML = skillsHtml;
+
+        let abilitiesHtml = "";
+        const rData = RACES[char.race];
+        abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${rData.name} 特性</div><div class="pdf-ability-desc">${rData.ability}</div></div>`;
+        if(char.subrace && rData.subraces[char.subrace]) {
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">亞種: ${rData.subraces[char.subrace].name}</div><div class="pdf-ability-desc">${rData.subraces[char.subrace].ability}</div></div>`;
+        }
+        
+        if (char.prof === 'artisan') {
+             const aData = ARTISAN_DATA[char.artisanPath];
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${aData.name}</div><div class="pdf-ability-desc">${aData.trait} - ${aData.desc}</div></div>`;
+             
+             if (char.heroKeys.length > 0) {
+                 const pData = PROFESSIONS[char.prof];
+                 char.heroKeys.forEach(k => {
+                     abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">英雄能力</div><div class="pdf-ability-desc">${pData.heroAbilities[k]}</div></div>`;
+                 });
+             }
+
+             if(char.artisanGlyphs.length > 0) {
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">已知字符</div><div class="pdf-inventory">${char.artisanGlyphs.map(g=>`<div class="pdf-item">${g}</div>`).join('')}</div></div>`;
+             }
+             const eGlyph = document.getElementById('enhance-glyph-select').value;
+             const eItem = document.getElementById('enhance-item-select').value;
+             if (eGlyph && eItem && !eGlyph.includes("選擇") && !eItem.includes("選擇")) {
+                  abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">裝備強化</div><div class="pdf-ability-desc">將 [${eGlyph}] 刻印於 [${eItem}] 之上。</div></div>`;
+             }
+        } else if (char.prof === 'knight') {
+             const kData = KNIGHT_DATA[char.knightOrder];
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${kData.name}</div><div class="pdf-ability-desc">${kData.trait} - ${kData.desc}</div></div>`;
+             
+             if (char.heroKeys.length > 0) {
+                 const pData = PROFESSIONS[char.prof];
+                 char.heroKeys.forEach(k => {
+                     abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">英雄能力</div><div class="pdf-ability-desc">${pData.heroAbilities[k]}</div></div>`;
+                 });
+             }
+
+             let techDesc = "";
+             if(char.knightTechSource === 'order') {
+                 if(char.knightTech) techDesc = kData.techniques[char.knightTech];
+             } else {
+                 if(char.knightTech) techDesc = PROFESSIONS.warrior.heroAbilities[char.knightTech];
+             }
+             if(techDesc) {
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">專屬戰技</div><div class="pdf-ability-desc">${techDesc}</div></div>`;
+             }
+
+        } else if (char.prof === 'shaman') {
+             const pData = PROFESSIONS[char.prof];
+             abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">職業特性</div><div class="pdf-ability-desc">${pData.heroDesc}</div></div>`;
+             
+             if(char.extraKey && pData.extraOptions) {
+                 const pData = PROFESSIONS[char.prof];
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${pData.extraLabel}</div><div class="pdf-ability-desc">${pData.extraOptions[char.extraKey].desc}</div></div>`;
+            }
+
+             const allSpells = [...char.spells.t0, ...char.spells.t1, ...char.spells.t2];
+             if (allSpells.length > 0) {
+                 abilitiesHtml += `<div class="pdf-ability-box" style="margin-top:10px; border-top:1px solid #444; padding-top:5px;"><div class="pdf-ability-name">法術</div><div class="pdf-inventory">${allSpells.map(s=>`<div class="pdf-item">${s}</div>`).join('')}</div></div>`;
+             }
+
+        } else {
+            if (char.heroKeys.length > 0) {
+                 const pData = PROFESSIONS[char.prof];
+                 char.heroKeys.forEach(k => {
+                     abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">英雄能力</div><div class="pdf-ability-desc">${pData.heroAbilities[k]}</div></div>`;
+                 });
+            }
+            if(char.extraKey && PROFESSIONS[char.prof].extraOptions) {
+                 const pData = PROFESSIONS[char.prof];
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">${pData.extraLabel}</div><div class="pdf-ability-desc">${pData.extraOptions[char.extraKey].desc}</div></div>`;
+            }
+        }
+        
+        if (char.prof === 'farmer' && char.heroKeys.includes('c')) {
+             let recipeText = "";
+             if (char.recipes.r1.length > 0) recipeText += `[一星] ${char.recipes.r1.join('、')} `;
+             if (char.recipes.r2) recipeText += `[二星] ${char.recipes.r2}`;
+             
+             if (recipeText) {
+                 abilitiesHtml += `<div class="pdf-ability-box"><div class="pdf-ability-name">已知食譜</div><div class="pdf-ability-desc">${recipeText}</div></div>`;
+             }
+        }
+
+        document.getElementById('pdf-abilities').innerHTML = abilitiesHtml;
+
+        let traitsHtml = "";
+        const weak = document.getElementById('weakness-select').value;
+        if(weak && weak!=='random') traitsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">弱點</span><span>${weak}</span></div>`;
+        const app = document.getElementById('appearance-select').value;
+        if(app && app!=='random') traitsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">外觀</span><span>${app}</span></div>`;
+        const memInput = document.getElementById('memento-custom');
+        const memVal = memInput.style.display==='none' ? document.getElementById('memento-select').value : memInput.value;
+        if(memVal && memVal!=='random' && memVal!=='custom') traitsHtml += `<div class="pdf-attr-row"><span class="pdf-attr-name">紀念物</span><span>${memVal}</span></div>`;
+        document.getElementById('pdf-traits').innerHTML = traitsHtml;
+
+        let gearHtml = "";
+        document.querySelectorAll('#inventory-list .tag.item').forEach(el => {
+            const select = el.querySelector('select');
+            let itemText = "";
+            if (select) {
+                itemText = select.value;
+            } else {
+                itemText = el.innerText;
+            }
+            gearHtml += `<div class="pdf-item">${itemText}</div>`;
+        });
+        document.getElementById('pdf-gear').innerHTML = gearHtml;
+        document.getElementById('pdf-money').innerText = document.getElementById('money-input').value;
+        document.getElementById('pdf-food').innerText = document.getElementById('food-input').value;
+
+        document.getElementById('pdf-preview-modal').classList.add('show');
+    }
+
+    function closePreview() {
+        document.getElementById('pdf-preview-modal').classList.remove('show');
+    }
+
+    function confirmDownloadPDF() {
+        try {
+            const element = document.getElementById('pdf-content');
+            const name = document.getElementById('char-name').value || "未命名英雄";
+            
+            const opt = {
+              margin:       0,
+              filename:     `${name}_character_sheet.pdf`,
+              image:        { type: 'jpeg', quality: 0.98 },
+              html2canvas:  { scale: 2, useCORS: true, backgroundColor: '#111' },
+              jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            document.querySelector('.pdf-toolbar').style.display = 'none';
+            
+            html2pdf().set(opt).from(element).save().then(() => {
+                document.querySelector('.pdf-toolbar').style.display = 'flex';
+                closePreview();
+            }).catch(err => {
+                alert("PDF 產出時發生錯誤：" + err.message);
+                document.querySelector('.pdf-toolbar').style.display = 'flex';
+            });
+        } catch (e) {
+            alert("PDF 模組未載入或發生異常：" + e.message);
+            document.querySelector('.pdf-toolbar').style.display = 'flex';
+        }
+    }
 
     function createGearItem(name, type, qty=1) { 
         const uuid = findCompendiumId(name, type);
